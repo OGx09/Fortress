@@ -11,5 +11,5 @@ interface FortressRepository {
 
     suspend fun removePassword(passwordEntity: PasswordEntity)
 
-    suspend fun savePassord(passwordEntity: PasswordEntity)
+    suspend fun savePassword(passwordEntity: PasswordEntity)
 }

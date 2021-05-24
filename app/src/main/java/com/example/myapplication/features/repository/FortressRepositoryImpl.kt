@@ -13,7 +13,6 @@ class FortressRepositoryImpl(private val dao: FortressDao) : FortressRepository{
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) = dao.delete(passwordEntity = passwordEntity)
 
-    override suspend fun savePassord(passwordEntity: PasswordEntity) = dao.insert(passwordEntity = passwordEntity)
-
+    override suspend fun savePassword(passwordEntity: PasswordEntity) = dao.insert(passwordEntity = passwordEntity)
 
 }
