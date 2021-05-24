@@ -5,6 +5,7 @@ object Versions {
     val kotlin_stdlib = "1.4.32"
     val compose ="1.0.0-beta07"
     val room_version = "2.3.0"
+    val hilt_version = "2.35"
 
 }
 
@@ -21,7 +22,8 @@ object Libs{
         "androidx.compose.compiler:compiler:${Versions.compose}",
         "androidx.compose.material:material:${Versions.compose}",
         "androidx.lifecycle:lifecycle-runtime:${Versions.lifecycle}",
-        "androidx.room:room-ktx:${Versions.room_version}"
+        "androidx.room:room-ktx:${Versions.room_version}",
+        "com.google.dagger:hilt-android:${Versions.hilt_version}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 
@@ -30,6 +32,7 @@ object Libs{
     val androidTestDeps = arrayOf("androidx.test.espresso:espresso-core:3.3.0",
         "androidx.test.ext:junit:1.1.2")
 
-    val kaptDeps = arrayOf("androidx.room:room-compiler:${Versions.room_version}")
+    val kaptDeps = arrayOf("androidx.room:room-compiler:${Versions.room_version}",
+        "com.google.dagger:hilt-android-compiler:${Versions.hilt_version}")
 
 }

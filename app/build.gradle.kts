@@ -3,7 +3,10 @@ plugins {
     id ("com.android.application")
     id ("kotlin-android")
     id("kotlin-kapt")
-   // kotlin("jvm") version "1.5.0"
+    kotlin("kapt")
+    id("dagger.hilt.android.plugin")
+
+    // kotlin("jvm") version "1.5.0"
 }
 
 android {
