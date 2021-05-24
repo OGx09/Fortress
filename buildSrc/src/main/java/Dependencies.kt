@@ -1,11 +1,11 @@
 
 object Versions {
-    val lifecycle = "2.3.1"
-    val junit ="4.13.2"
-    val kotlin_stdlib = "1.4.32"
-    val compose ="1.0.0-beta07"
-    val room_version = "2.3.0"
-    val hilt_version = "2.35"
+    const val lifecycle = "2.3.1"
+    const val junit ="4.13.2"
+    const val kotlin_stdlib = "1.4.32"
+    const val compose ="1.0.0-beta07"
+    const val room_version = "2.3.0"
+    const val hilt_version = "2.35"
 
 }
 
