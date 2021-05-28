@@ -11,7 +11,7 @@ object Versions {
 
 object Libs{
     val deps = arrayOf(
-        "org.jetbrains.kotlin:kotlin-stdlib:1.4.32",
+        "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin_stdlib}",
         "androidx.core:core-ktx:1.3.2",
         "androidx.appcompat:appcompat:1.2.0",
         "com.google.android.material:material:1.3.0",
@@ -23,7 +23,8 @@ object Libs{
         "androidx.compose.material:material:${Versions.compose}",
         "androidx.lifecycle:lifecycle-runtime:${Versions.lifecycle}",
         "androidx.room:room-ktx:${Versions.room_version}",
-        "com.google.dagger:hilt-android:${Versions.hilt_version}"
+        "com.google.dagger:hilt-android:${Versions.hilt_version}",
+        "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin_stdlib}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 

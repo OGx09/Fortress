@@ -4,7 +4,6 @@ buildscript {
     ext.hilt_version = '2.35'
     repositories {
         google()
-        jcenter()
         mavenCentral()
         mavenLocal()
     }
@@ -21,7 +20,6 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         mavenLocal()
     }
