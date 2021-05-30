@@ -10,14 +10,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".features.main.MainActivity">
+        <activity
+            android:windowSoftInputMode="adjustPan"
+            android:name=".features.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".features.managepassword.AddPasswordActivity" />
+        <activity
+            android:windowSoftInputMode="adjustPan"
+            android:name=".features.managepassword.AddPasswordActivity" />
     </application>
 
 </manifest>
