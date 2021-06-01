@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -75,29 +76,32 @@ class AddPasswordActivity : ThemeBaseActivity(){
 
 
             val webTextState = remember { mutableStateOf(TextFieldValue()) }
+
+            val webNameTextState = remember { mutableStateOf(TextFieldValue()) }
+
+            val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
+
+            val buttonState = mutableStateOf(true)
+
             TextField(
                 value = webTextState.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
-                onValueChange = { webTextState.value =it },
+                onValueChange = { webTextState.value =it
+                    buttonState.value = isValid(webNameTextState, buzzTextState, webTextState) },
                 label = {Text("Website")},
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Uri),
                 leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_website)),
                     contentDescription =null )},
             )
 
-            val webNameTextState = remember { mutableStateOf(TextFieldValue()) }
-
-            val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
-
             TextField(value = webNameTextState.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
                 onValueChange = { webNameTextState.value =it
-                    Log.d("HelloWorld03",  "__ ${check(buzzTextState,
-                    webNameTextState, webTextState)}") },
+                    buttonState.value = isValid(webNameTextState, buzzTextState, webTextState) },
                 label = {Text("Website Name")},
                 leadingIcon = { Icon(painter =
                 painterResource(id = (R.drawable.ic_website)),
@@ -112,22 +116,19 @@ class AddPasswordActivity : ThemeBaseActivity(){
                     .padding(10.dp),
                 onValueChange = {
                     buzzTextState.value =it
-                    Log.d("HelloWorld03",  "__ ${check(buzzTextState,
-                        webNameTextState, webTextState)}") },
+                    buttonState.value = isValid(webNameTextState, buzzTextState, webTextState) },
                 label = {Text("Buzz Word")},
                 leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
                     contentDescription =null )}
             )
 
-            Log.d("HelloWorld03",  "__ ${check(buzzTextState,
-                webNameTextState, webTextState)}")
-
-            Button(onClick = { enable = true }, modifier =
+            Button(onClick = {
+                             Toast.makeText(this@AddPasswordActivity, "Toas", Toast.LENGTH_LONG).show()
+            }, enabled = buttonState.value, modifier =
             Modifier
                 .padding(15.dp)
                 .requiredHeight(50.dp)
                 .fillMaxWidth()
-                .clickable (onClick = {}, enabled = true )
             ) {
                 Text("Save Password", fontSize = 18.sp)
             }
@@ -135,7 +136,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
     }
 
 
-    private fun check(vararg states: MutableState<TextFieldValue>): Boolean{
+    private fun isValid(vararg states: MutableState<TextFieldValue>): Boolean{
         states.forEach {
             if(TextUtils.isEmpty(it.value.text)){
                 return false
