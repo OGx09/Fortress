@@ -2,8 +2,11 @@ package com.example.myapplication.features.managepassword
 
 import android.content.Context
 import android.content.Intent
+import android.text.TextUtils
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,10 +18,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -88,11 +88,16 @@ class AddPasswordActivity : ThemeBaseActivity(){
             )
 
             val webNameTextState = remember { mutableStateOf(TextFieldValue()) }
+
+            val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
+
             TextField(value = webNameTextState.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
-                onValueChange = { webNameTextState.value =it },
+                onValueChange = { webNameTextState.value =it
+                    Log.d("HelloWorld03",  "__ ${check(buzzTextState,
+                    webNameTextState, webTextState)}") },
                 label = {Text("Website Name")},
                 leadingIcon = { Icon(painter =
                 painterResource(id = (R.drawable.ic_website)),
@@ -101,27 +106,42 @@ class AddPasswordActivity : ThemeBaseActivity(){
 
             Password()
 
-            val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
             TextField(value = buzzTextState.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
-                onValueChange = { buzzTextState.value =it },
+                onValueChange = {
+                    buzzTextState.value =it
+                    Log.d("HelloWorld03",  "__ ${check(buzzTextState,
+                        webNameTextState, webTextState)}") },
                 label = {Text("Buzz Word")},
                 leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
                     contentDescription =null )}
             )
 
+            Log.d("HelloWorld03",  "__ ${check(buzzTextState,
+                webNameTextState, webTextState)}")
 
-
-            Button(onClick = { /*TODO*/ }, modifier =
-                Modifier
-                .padding(15.dp).requiredHeight(50.dp)
-                    .fillMaxWidth()
+            Button(onClick = { enable = true }, modifier =
+            Modifier
+                .padding(15.dp)
+                .requiredHeight(50.dp)
+                .fillMaxWidth()
+                .clickable (onClick = {}, enabled = true )
             ) {
                 Text("Save Password", fontSize = 18.sp)
             }
         }
+    }
+
+
+    private fun check(vararg states: MutableState<TextFieldValue>): Boolean{
+        states.forEach {
+            if(TextUtils.isEmpty(it.value.text)){
+                return false
+            }
+        }
+        return true;
     }
 
     @Composable
