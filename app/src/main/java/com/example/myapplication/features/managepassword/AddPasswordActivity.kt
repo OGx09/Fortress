@@ -81,7 +81,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
 
             val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
 
-            val buttonState = mutableStateOf(true)
+            val buttonState = remember{mutableStateOf(true)}
 
             TextField(
                 value = webTextState.value,
@@ -122,8 +122,11 @@ class AddPasswordActivity : ThemeBaseActivity(){
                     contentDescription =null )}
             )
 
+
             Button(onClick = {
-                             Toast.makeText(this@AddPasswordActivity, "Toas", Toast.LENGTH_LONG).show()
+                             Toast.makeText(this@AddPasswordActivity,
+                                 "Toast",
+                                 Toast.LENGTH_LONG).show()
             }, enabled = buttonState.value, modifier =
             Modifier
                 .padding(15.dp)
