@@ -24,7 +24,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFortressDb(@ApplicationContext context: Context): FortressDatabase{
-        return Room.databaseBuilder(context, FortressDatabase::class.java, "fortress-db").build()
+        return Room
+            .databaseBuilder(context, FortressDatabase::class.java, "fortress-db")
+            .fallbackToDestructiveMigration() // Change to migration later
+            .build()
     }
 
 

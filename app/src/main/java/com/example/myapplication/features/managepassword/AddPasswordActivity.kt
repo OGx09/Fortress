@@ -5,6 +5,7 @@ import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,9 +39,12 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.features.ui.ThemeBaseActivity
 import com.example.myapplication.features.ui.white100
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddPasswordActivity : ThemeBaseActivity(){
 
+    private val viewModel : AddPaswordActivityViewModel by viewModels()
 
     companion object{
         fun start(context: Context){
@@ -48,6 +52,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
             context.startActivity(starter)
         }
     }
+
 
     @ExperimentalComposeApi
     @Composable
@@ -81,7 +86,8 @@ class AddPasswordActivity : ThemeBaseActivity(){
 
             val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
 
-            val buttonState = remember{mutableStateOf(true)}
+            val buttonState = remember{mutableStateOf(false)}
+            val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
 
             TextField(
                 value = webTextState.value,
@@ -108,7 +114,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
                     contentDescription =null )}
             )
 
-            Password()
+            Password(passwordTextState)
 
             TextField(value = buzzTextState.value,
                 modifier = Modifier
@@ -124,9 +130,11 @@ class AddPasswordActivity : ThemeBaseActivity(){
 
 
             Button(onClick = {
-                             Toast.makeText(this@AddPasswordActivity,
-                                 "Toast",
-                                 Toast.LENGTH_LONG).show()
+                viewModel.savePassword(webTextState.value.text,
+                    webNameTextState.value.text,
+                    passwordTextState.value.text,
+                    buzzWord = buzzTextState.value.text)
+
             }, enabled = buttonState.value, modifier =
             Modifier
                 .padding(15.dp)
@@ -149,8 +157,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
     }
 
     @Composable
-    fun Password(){
-        val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
+    fun Password(passwordTextState: MutableState<TextFieldValue>){
         TextField(value = passwordTextState.value,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier

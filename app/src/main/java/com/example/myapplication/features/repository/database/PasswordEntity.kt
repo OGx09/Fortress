@@ -12,8 +12,10 @@ import androidx.room.PrimaryKey
  */
 
 @Entity
-data class PasswordEntity(@PrimaryKey val id: Int,
+data class PasswordEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
                           @ColumnInfo(name = "platform_website") val platformWebsite: String?,
                           @ColumnInfo(name = "platform_logo") val platformLogo: String?,
                           @ColumnInfo(name = "platform_password") val platformPassword: String?,
-                          @ColumnInfo(name = "platform_name") val platformName: String?)
+                          @ColumnInfo(name = "platform_name") val platformName: String?,
+                          @ColumnInfo(name = "buzz_word") val buzzWord: String?
+)

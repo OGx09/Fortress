@@ -6,6 +6,7 @@ object Versions {
     const val compose ="1.0.0-beta07"
     const val room_version = "2.3.0"
     const val hilt_version = "2.35"
+    const val biometric = "1.1.0"
 
 }
 
@@ -23,6 +24,7 @@ object Libs{
         "androidx.compose.material:material:${Versions.compose}",
         "androidx.lifecycle:lifecycle-runtime:${Versions.lifecycle}",
         "androidx.room:room-ktx:${Versions.room_version}",
+        "androidx.biometric:biometric:${Versions.biometric}",
         "com.google.dagger:hilt-android:${Versions.hilt_version}",
         "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin_stdlib}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
