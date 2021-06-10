@@ -30,6 +30,8 @@ class EncryptionUtils {
     }
 
     private fun getCipher(): Cipher {
+        var y=0
+
         return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
                 + KeyProperties.BLOCK_MODE_CBC + "/"
                 + KeyProperties.ENCRYPTION_PADDING_PKCS7)
@@ -39,3 +41,8 @@ class EncryptionUtils {
 
 
 }
+
+ class Emptyj:
+         fun d(){
+
+         }

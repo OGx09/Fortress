@@ -1,24 +1,30 @@
 package com.example.myapplication.features.utils
 
+import android.widget.Toast
 import androidx.biometric.BiometricPrompt
+import androidx.fragment.app.FragmentActivity
 import java.util.concurrent.Executor
 
 
 
 
-class FingerprintUtils(encryptionUtils: EncryptionUtils){
+class FingerprintUtils(encryptionUtils: EncryptionUtils, private val activity: FragmentActivity){
 
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    fun ind(){
-        biometricPrompt = BiometricPrompt(this, executor,
+    init{
+        init()
+    }
+
+    fun init(){
+        biometricPrompt = BiometricPrompt(context, executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int,
                                                    errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext,
+                    Toast.makeText(context,
                         "Authentication error: $errString", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -26,14 +32,14 @@ class FingerprintUtils(encryptionUtils: EncryptionUtils){
                 override fun onAuthenticationSucceeded(
                     result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    Toast.makeText(applicationContext,
+                    Toast.makeText(context,
                         "Authentication succeeded!", Toast.LENGTH_SHORT)
                         .show()
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Authentication failed",
+                    Toast.makeText(context, "Authentication failed",
                         Toast.LENGTH_SHORT)
                         .show()
                 }
