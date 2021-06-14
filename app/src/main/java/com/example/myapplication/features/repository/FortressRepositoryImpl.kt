@@ -15,7 +15,7 @@ class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : For
     override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao.delete(passwordEntity = passwordEntity)
 
     override suspend fun savePassword(passwordEntity: PasswordEntity){
-
+        encryptionUtils.encryptSecretInformation(passwordEntity = passwordEntity)
     }
 
 }
