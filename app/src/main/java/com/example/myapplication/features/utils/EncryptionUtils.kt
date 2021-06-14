@@ -64,7 +64,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
             .build()
     }
 
-   suspend fun encryptSecretInformation( passwordEntity: PasswordEntity?) {
+   suspend fun encryptSecretInformation( passwordEntity: FortressModel?) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
         val cipher = getCipher()
         val secretKey = getSecretKey()
@@ -73,7 +73,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
             val encryptedInfo: ByteArray = cipher.doFinal(
                 passwordEntity.toString().toByteArray(Charset.defaultCharset())
             )
-            dao.insertEncryptedEntity(Arrays.toString(encryptedInfo))
+            dao.insertEncryptedEntity(PasswordEntity(null, Arrays.toString(encryptedInfo)))
 
             Log.d(
                 "MY_APP_TAG", "Encrypted information: " +

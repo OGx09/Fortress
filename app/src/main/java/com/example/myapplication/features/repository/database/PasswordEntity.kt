@@ -13,7 +13,7 @@ import com.google.gson.Gson
  */
 
 @Entity
-data class PasswordEntity(@ColumnInfo(name ="encryptedData") val encryptedData: String?){
+data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?, @ColumnInfo(name ="encryptedData") val encryptedData: String?){
     override fun toString(): String {
         return Gson().toJson(this)
     }

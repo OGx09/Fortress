@@ -22,7 +22,7 @@ interface FortressDao {
     suspend fun insert(passwordEntity: PasswordEntity)
 
     @Insert
-    suspend fun insertEncryptedEntity(encryptedArray: String)
+    suspend fun insertEncryptedEntity(passwordEntity: PasswordEntity)
 
     @Delete
     suspend fun delete(passwordEntity: PasswordEntity)

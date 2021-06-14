@@ -28,16 +28,15 @@ object AppModule {
             .build()
     }
 
+    @Provides
+    @Singleton
+    fun provideEncryptionUtils(db: FortressDatabase) = EncryptionUtils(db.passwordDao())
 
     @Provides
     @Singleton
-    fun provideFortressRepository(db: FortressDatabase): FortressRepository{
-        return FortressRepositoryImpl(db.passwordDao())
+    fun provideFortressRepository(encryptionUtils: EncryptionUtils): FortressRepository{
+        return FortressRepositoryImpl(encryptionUtils)
     }
-
-
-    @Provides
-    fun provideEncryptionUtils(db: FortressDatabase) = EncryptionUtils(db.passwordDao())
 
 
 }
