@@ -22,23 +22,19 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
     private var isEncrypt : Boolean = false
     private var passwordEntity: PasswordEntity? =null
 
-    private val deferred = CompletableDeferred<Boolean>()
+    private val deferred = CompletableDeferred<BiometricPrompt.AuthenticationResult>()
 
     init{
-
+        init()
     }
 
-    fun doEncrypt(isEncrypt: Boolean, passwordEntity: PasswordEntity){
-        this.isEncrypt = isEncrypt
-        this.passwordEntity = passwordEntity
-    }
-
-    private suspend fun init(plainPassword: String){
+    private fun init(){
         biometricPrompt = BiometricPrompt(activity, Executors.newSingleThreadExecutor(),
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int,
                                                    errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
+                    deferred.completeExceptionally(Exception("$errString"))
                     Toast.makeText(activity,
                         "Authentication error: $errString", Toast.LENGTH_SHORT)
                         .show()
@@ -48,23 +44,7 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
                     result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     encryptionUtils.generateSecretKey()
-
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        if (isEncrypt){
-//                            passwordEntity?.apply { passwordEntity
-//                                this.platformPassword?.apply {
-////                                    encryptionUtils
-////                                        .encryptSecretInformation(this,
-////                                            passwordEntity)
-//                                }
-//                            }
-//                        }else{
-//                            do
-//                           // encryptionUtils.decryptSecretInformation()
-//                        }
-//                    }
-
-
+                    deferred.complete(result)
                     Handler(Looper.getMainLooper()).post {
                         Toast.makeText(activity,
                             "Authentication succeeded!", Toast.LENGTH_SHORT)
@@ -74,6 +54,7 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
+                    deferred.completeExceptionally(Exception("Fingerprint authentication has failed!"))
                     Toast.makeText(activity, "AuonAuthenticationSucceededthentication failed",
                         Toast.LENGTH_SHORT)
                         .show()
@@ -88,8 +69,10 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
     }
 
 
-    fun show(){
-        biometricPrompt.authenticate(promptInfo)
+    fun show(): CompletableDeferred<BiometricPrompt.AuthenticationResult>{
+        biometricPrompt.authenticate(promptInfo,
+            BiometricPrompt.CryptoObject(encryptionUtils.getCipher()))
+        return deferred
     }
 
 }

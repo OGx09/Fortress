@@ -43,6 +43,8 @@ import com.example.myapplication.features.ui.ThemeBaseActivity
 import com.example.myapplication.features.ui.white100
 import com.example.myapplication.features.utils.FingerprintUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CompletionHandler
+import kotlinx.coroutines.DisposableHandle
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -142,7 +144,9 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
                     webNameTextState.value.text,
                     passwordTextState.value.text,
                     buzzWord = buzzTextState.value.text)
-                fingerPrintUtils.show()
+                fingerPrintUtils.show().invokeOnCompletion(handler = CompletionHandler(){
+
+                })
             }, enabled = buttonState.value, modifier =
             Modifier
                 .padding(15.dp)
@@ -154,6 +158,13 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
         }
     }
 
+
+    val disposable = object : DisposableHandle {
+        override fun dispose() {
+            TODO("Not yet implemented")
+        }
+
+    }
 
     private fun isValid(vararg states: MutableState<TextFieldValue>): Boolean{
         states.forEach {

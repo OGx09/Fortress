@@ -44,7 +44,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         return keyStore.getKey(KEY_NAME, null) as SecretKey
     }
 
-    private fun getCipher(): Cipher {
+    fun getCipher(): Cipher {
         return Cipher.getInstance(
             KeyProperties.KEY_ALGORITHM_AES + "/"
                     + KeyProperties.BLOCK_MODE_CBC + "/"
