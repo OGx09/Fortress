@@ -2,6 +2,8 @@ package com.example.myapplication.features.managepassword
 
 import android.content.Context
 import android.content.Intent
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
@@ -39,12 +41,16 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.features.ui.ThemeBaseActivity
 import com.example.myapplication.features.ui.white100
+import com.example.myapplication.features.utils.FingerprintUtils
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddPasswordActivity : ThemeBaseActivity(){
+class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
 
     private val viewModel : AddPaswordActivityViewModel by viewModels()
+
+    @Inject lateinit var fingerPrintUtils : FingerprintUtils
 
     companion object{
         fun start(context: Context){
@@ -79,7 +85,6 @@ class AddPasswordActivity : ThemeBaseActivity(){
                 color = white100, style = TextStyle(fontWeight = FontWeight.Bold)
             )
 
-
             val webTextState = remember { mutableStateOf(TextFieldValue()) }
 
             val webNameTextState = remember { mutableStateOf(TextFieldValue()) }
@@ -90,6 +95,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
             val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
 
             TextField(
+                singleLine= true,
                 value = webTextState.value,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,6 +109,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
             )
 
             TextField(value = webNameTextState.value,
+                singleLine= true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
@@ -117,6 +124,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
             Password(passwordTextState)
 
             TextField(value = buzzTextState.value,
+                singleLine= true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
@@ -134,7 +142,7 @@ class AddPasswordActivity : ThemeBaseActivity(){
                     webNameTextState.value.text,
                     passwordTextState.value.text,
                     buzzWord = buzzTextState.value.text)
-
+                fingerPrintUtils.show()
             }, enabled = buttonState.value, modifier =
             Modifier
                 .padding(15.dp)
@@ -169,4 +177,6 @@ class AddPasswordActivity : ThemeBaseActivity(){
                 contentDescription =null )}
         )
     }
+
+
 }

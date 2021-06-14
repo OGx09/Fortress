@@ -6,7 +6,7 @@ import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.repository.FortressRepository
 import java.lang.IllegalArgumentException
 
-class MainActivityViewModelFactory(private val repository: FortressRepository): ViewModelProvider.Factory {
+class ActivityViewModelFactory(private val repository: FortressRepository): ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)){

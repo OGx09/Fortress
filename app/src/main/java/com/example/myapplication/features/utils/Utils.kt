@@ -1,27 +1,29 @@
 package com.example.myapplication.features.utils
 
+import android.os.Handler
+import android.os.Looper
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import javax.inject.Inject
 
 
+class FingerprintUtils @Inject constructor(private val encryptionUtils: EncryptionUtils, private val activity: FragmentActivity){
 
-
-class FingerprintUtils(private val encryptionUtils: EncryptionUtils, private val activity: FragmentActivity){
-
-    private lateinit var executor: Executor
-    private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    lateinit var executor: Executor
+    lateinit var biometricPrompt: BiometricPrompt
+    lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     init{
         init()
     }
 
-    fun init(){
-        biometricPrompt = BiometricPrompt(activity, executor,
+    private fun init(){
+        biometricPrompt = BiometricPrompt(activity, Executors.newSingleThreadExecutor(),
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int,
                                                    errString: CharSequence) {
@@ -36,9 +38,11 @@ class FingerprintUtils(private val encryptionUtils: EncryptionUtils, private val
                     super.onAuthenticationSucceeded(result)
                     encryptionUtils.generateSecretKey()
 
-                    Toast.makeText(activity,
-                        "Authentication succeeded!", Toast.LENGTH_SHORT)
-                        .show()
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(activity,
+                            "Authentication succeeded!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
 
                 override fun onAuthenticationFailed() {

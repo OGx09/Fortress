@@ -16,9 +16,10 @@ import androidx.compose.ui.unit.Dp
 import com.example.myapplication.features.managepassword.AddPasswordActivity
 import com.example.myapplication.features.ui.StateCodelabTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity @Inject constructor() : AppCompatActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
 

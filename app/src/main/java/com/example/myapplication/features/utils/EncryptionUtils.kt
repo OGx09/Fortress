@@ -13,8 +13,9 @@ import java.util.concurrent.Executor
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.inject.Inject
 
-class EncryptionUtils {
+class EncryptionUtils @Inject constructor() {
 
     companion object {
         const val KEY_NAME: String = "androiddebugkey"
@@ -78,6 +79,28 @@ class EncryptionUtils {
         }
     }
 
+
+
+
+    private fun decryptSecretInformation(plainTextPassword: String) {
+        // Exceptions are unhandled for getCipher() and getSecretKey().
+        val cipher = getCipher()
+        val secretKey = getSecretKey()
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+            val encryptedInfo: ByteArray = cipher.doFinal(
+                plainTextPassword.toByteArray(Charset.defaultCharset())
+            )
+            Log.d(
+                "MY_APP_TAG", "Encrypted information: " +
+                        Arrays.toString(encryptedInfo)
+            )
+        } catch (e: InvalidKeyException) {
+            Log.e("MY_APP_TAG", "Key is invalid.")
+        } catch (e: UserNotAuthenticatedException) {
+            Log.d("MY_APP_TAG", "The key's validity timed out.")
+        }
+    }
 
 }
 

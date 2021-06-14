@@ -6,29 +6,26 @@ import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.repository.FortressRepository
 import com.example.myapplication.features.utils.EncryptionUtils
 import com.example.myapplication.features.utils.FingerprintUtils
-import com.example.myapplication.features.utils.MainActivityViewModelFactory
-import dagger.Binds
+import com.example.myapplication.features.utils.ActivityViewModelFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ActivityContext
-import javax.inject.Singleton
 
 @Module
 @InstallIn(ActivityComponent::class)
 object MainActivityModule {
 
+
     @Provides
     fun bindMainActivityViewModel(@ActivityContext activity: MainActivity,
                                   repository: FortressRepository): MainActivityViewModel{
-        return ViewModelProvider(activity, MainActivityViewModelFactory(repository = repository))
+        return ViewModelProvider(activity, ActivityViewModelFactory(repository = repository))
             .get(MainActivityViewModel::class.java)
     }
 
-    @Provides
-    fun provideEncryptionUtils() = EncryptionUtils()
-
-    @Provides
-    fun provideFingerprintUtils(encryptionUtils: EncryptionUtils, activity: MainActivity) = FingerprintUtils(encryptionUtils, activity)
+//    @Provides
+//    fun provideFingerprintUtils(encryptionUtils: EncryptionUtils, activity: MainActivity)
+//    = FingerprintUtils(encryptionUtils, activity)
 }
