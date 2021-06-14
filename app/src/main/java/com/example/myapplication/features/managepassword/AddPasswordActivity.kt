@@ -45,6 +45,7 @@ import com.example.myapplication.features.utils.FingerprintUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.DisposableHandle
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,6 +70,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
     }
 
 
+    @ExperimentalCoroutinesApi
     @ExperimentalComposeApi
     @Preview
     @Composable
@@ -140,13 +142,17 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
 
 
             Button(onClick = {
-                viewModel.savePassword(webTextState.value.text,
-                    webNameTextState.value.text,
-                    passwordTextState.value.text,
-                    buzzWord = buzzTextState.value.text)
-                fingerPrintUtils.show().invokeOnCompletion(handler = CompletionHandler(){
-
-                })
+                suspend {
+                    val fingerprintUtils = fingerPrintUtils.show()
+                    if (!fingerprintUtils.isCancelled) {
+                        viewModel.savePassword(
+                            webTextState.value.text,
+                            webNameTextState.value.text,
+                            passwordTextState.value.text,
+                            buzzWord = buzzTextState.value.text
+                        )
+                    }
+                }
             }, enabled = buttonState.value, modifier =
             Modifier
                 .padding(15.dp)
