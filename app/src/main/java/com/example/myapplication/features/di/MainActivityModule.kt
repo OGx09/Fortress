@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.repository.FortressRepository
+import com.example.myapplication.features.utils.EncryptionUtils
+import com.example.myapplication.features.utils.FingerprintUtils
 import com.example.myapplication.features.utils.MainActivityViewModelFactory
 import dagger.Binds
 import dagger.Module
@@ -23,4 +25,10 @@ object MainActivityModule {
         return ViewModelProvider(activity, MainActivityViewModelFactory(repository = repository))
             .get(MainActivityViewModel::class.java)
     }
+
+    @Provides
+    fun provideEncryptionUtils() = EncryptionUtils()
+
+    @Provides
+    fun provideFingerprintUtils(encryptionUtils: EncryptionUtils, activity: MainActivity) = FingerprintUtils(encryptionUtils, activity)
 }
