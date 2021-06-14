@@ -5,6 +5,11 @@ import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import androidx.biometric.BiometricPrompt
+import com.example.myapplication.features.repository.database.FortressDao
+import com.example.myapplication.features.repository.database.FortressDatabase
+import com.example.myapplication.features.repository.database.PasswordEntity
+import com.example.myapplication.features.repository.models.FortressModel
+import com.google.gson.Gson
 import java.nio.charset.Charset
 import java.security.InvalidKeyException
 import java.security.KeyStore
@@ -15,7 +20,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.inject.Inject
 
-class EncryptionUtils @Inject constructor() {
+class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
 
     companion object {
         const val KEY_NAME: String = "androiddebugkey"
@@ -59,15 +64,17 @@ class EncryptionUtils @Inject constructor() {
             .build()
     }
 
-    private fun encryptSecretInformation(plainTextPassword: String) {
+   suspend fun encryptSecretInformation( passwordEntity: PasswordEntity?) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
         val cipher = getCipher()
         val secretKey = getSecretKey()
         try {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey)
             val encryptedInfo: ByteArray = cipher.doFinal(
-                plainTextPassword.toByteArray(Charset.defaultCharset())
+                passwordEntity.toString().toByteArray(Charset.defaultCharset())
             )
+            dao.insertEncryptedEntity(Arrays.toString(encryptedInfo))
+
             Log.d(
                 "MY_APP_TAG", "Encrypted information: " +
                         Arrays.toString(encryptedInfo)
@@ -82,25 +89,33 @@ class EncryptionUtils @Inject constructor() {
 
 
 
-    private fun decryptSecretInformation(plainTextPassword: String) {
+    suspend fun decryptSecretInformation(id: Int) :FortressModel?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
         val cipher = getCipher()
         val secretKey = getSecretKey()
+        var fortressModel: FortressModel? =null
         try {
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
-            val encryptedInfo: ByteArray = cipher.doFinal(
-                plainTextPassword.toByteArray(Charset.defaultCharset())
-            )
+            val encryptedStrinng = dao.getEncryptedEntity(id)
+            val decryptedString: ByteArray = cipher.doFinal(encryptedStrinng.toByteArray())
+            val serializeString = Gson().toJson(decryptedString)
+            fortressModel = Gson().fromJson(serializeString, FortressModel::class.java)
             Log.d(
                 "MY_APP_TAG", "Encrypted information: " +
-                        Arrays.toString(encryptedInfo)
+                        decryptedString
             )
         } catch (e: InvalidKeyException) {
+            fortressModel = null
             Log.e("MY_APP_TAG", "Key is invalid.")
         } catch (e: UserNotAuthenticatedException) {
+            fortressModel = null
             Log.d("MY_APP_TAG", "The key's validity timed out.")
+        } finally {
+            return fortressModel
         }
     }
+
+    val  getDao : FortressDao = dao
 
 }
 

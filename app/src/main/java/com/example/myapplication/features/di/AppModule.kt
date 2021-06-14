@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.myapplication.features.repository.FortressRepository
 import com.example.myapplication.features.repository.FortressRepositoryImpl
 import com.example.myapplication.features.repository.database.FortressDatabase
+import com.example.myapplication.features.utils.EncryptionUtils
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -35,8 +36,8 @@ object AppModule {
     }
 
 
-    //@Provides
-    //fun provideEncryptionUtils() = EncryptionUtils()
+    @Provides
+    fun provideEncryptionUtils(db: FortressDatabase) = EncryptionUtils(db.passwordDao())
 
 
 }

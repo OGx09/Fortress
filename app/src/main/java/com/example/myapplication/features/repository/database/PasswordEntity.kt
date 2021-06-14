@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.Gson
 
 
 /**
@@ -12,10 +13,8 @@ import androidx.room.PrimaryKey
  */
 
 @Entity
-data class PasswordEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
-                          @ColumnInfo(name = "platform_website") val platformWebsite: String?,
-                          @ColumnInfo(name = "platform_logo") val platformLogo: String?,
-                          @ColumnInfo(name = "platform_password") val platformPassword: String?,
-                          @ColumnInfo(name = "platform_name") val platformName: String?,
-                          @ColumnInfo(name = "buzz_word") val buzzWord: String?
-)
+data class PasswordEntity(@ColumnInfo(name ="encryptedData") val encryptedData: String?){
+    override fun toString(): String {
+        return Gson().toJson(this)
+    }
+}
