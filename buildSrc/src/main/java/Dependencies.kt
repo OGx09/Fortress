@@ -8,11 +8,13 @@ object Versions {
     const val hilt_version = "2.35"
     const val biometric = "1.1.0"
     const val gson ="2.8.7"
-
+    const val composable ="1.0.0-beta08"
 }
 
 object Libs{
     val deps = arrayOf(
+        "androidx.compose.ui:ui-test-junit4:${Versions.compose}",
+        "androidx.compose.ui:ui-test-manifest:${Versions.compose}",
         "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin_stdlib}",
         "androidx.core:core-ktx:1.3.2",
         "androidx.appcompat:appcompat:1.2.0",

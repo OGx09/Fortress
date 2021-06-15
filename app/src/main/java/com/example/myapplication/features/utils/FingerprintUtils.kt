@@ -70,7 +70,8 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
 
 
     fun show(): CompletableDeferred<BiometricPrompt.AuthenticationResult>{
-        biometricPrompt.authenticate(promptInfo)
+        biometricPrompt.authenticate(promptInfo,
+            BiometricPrompt.CryptoObject(encryptionUtils.getCipher()))
         return deferred
     }
 
