@@ -1,5 +1,8 @@
 package com.example.myapplication
 
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.myapplication.features.main.MainActivity
@@ -18,13 +21,18 @@ import org.junit.Rule
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
-    //@get:Rule
-    //val composeTestRule = createAndroidRule<MainActivity>()
+    @get:Rule
+    val composableRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.myapplication", appContext.packageName)
+    fun check_AddPassword() {
+        composableRule.onNodeWithText("+").assertExists()
+        composableRule.onNodeWithText("+").performClick()
+    }
+
+
+    @Test
+    fun fillout_form(){
+
     }
 }
