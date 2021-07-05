@@ -34,10 +34,9 @@ object Libs{
 
     val testDeps = arrayOf( "junit:junit:${Versions.junit}", "androidx.room:room-testing:${Versions.room_version}")
 
-    val androidTestDeps = arrayOf("androidx.test.easpresso:espresso-core:3.3.0",
-        "androidx.test.ext:junit:1.1.2",
-        "androidx.compose.ui:ui-test-junit4:${Versions.compose}",
-        "androidx.compose.ui:ui-test-manifest:${Versions.compose}")
+    val androidTestDeps = arrayOf("androidx.test.ext:junit:1.1.2",
+        "androidx.compose.ui:ui-test-junit4:${Versions.composable}",
+        "androidx.compose.ui:ui-test-manifest:${Versions.composable}")
 
     val kaptDeps = arrayOf("androidx.room:room-compiler:${Versions.room_version}",
         "com.google.dagger:hilt-android-compiler:${Versions.hilt_version}")
