@@ -90,7 +90,8 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             Text("Add New Password!",
                 modifier = Modifier.padding(20.dp),
                 fontSize = TextUnit(18F, TextUnitType.Sp),
-                color = white100, style = TextStyle(fontWeight = FontWeight.Bold)
+                color = MaterialTheme.colors.primary,
+                style = TextStyle(fontWeight = FontWeight.Bold)
             )
 
             Spacer(modifier = Modifier.size(30.dp))

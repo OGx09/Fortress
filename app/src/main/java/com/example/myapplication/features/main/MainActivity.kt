@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.myapplication.features.managepassword.AddPasswordActivity
@@ -34,34 +35,14 @@ class MainActivity @Inject constructor() : ThemeBaseActivity() {
     @ExperimentalComposeApi
     @Composable
     override fun MainContent() {
-        Content()
+        ContentBody()
     }
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        Log.d("DATATATTA", "${this::viewModel.isLateinit}")
-//        setContent {
-//        }
-//    }
 
-    @Preview
-    @Composable
-    fun Content() {
-        StateCodelabTheme {
-            Scaffold(
-                modifier = Modifier.background(Color.Transparent),
-                floatingActionButtonPosition = FabPosition.End,
-                floatingActionButton = {
-                    FloatingActionButton(onClick = { AddPasswordActivity.start(this) }) {
-                        Text("+")
-                    }
-                },
-                content = {
-                    ContentBody()
-                }
-            )
-        }
+    override fun fabResId(): Int{
+        return android.R.drawable.ic_input_add
     }
+
 
     @Preview
     @Composable
