@@ -1,10 +1,10 @@
-package com.example.myapplication.features.di
+package com.example.myapplication.di
 
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.features.managepassword.AddPasswordActivity
 import com.example.myapplication.features.managepassword.AddPaswordActivityViewModel
-import com.example.myapplication.features.repository.FortressRepository
-import com.example.myapplication.features.utils.ActivityViewModelFactory
+import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.utils.ActivityViewModelFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

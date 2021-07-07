@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 @Composable
 fun StateCodelabTheme(
         darkTheme: Boolean = isSystemInDarkTheme(),
-        content: @Composable() () -> Unit
+        content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
         DarkColorPalette
@@ -20,18 +20,19 @@ fun StateCodelabTheme(
     }
 
     MaterialTheme(
-            colors = colors,
-            typography = typography,
-            shapes = shapes,
-            content = content
+    colors = colors,
+    typography = typography,
+    shapes = shapes,
+    content = content,
     )
 }
 
 
 private val DarkColorPalette = darkColors(
-        primary = purple200,
-        primaryVariant = purple700,
-        secondary = teal200
+    primary = white100,
+    primaryVariant = grey800,
+    secondary = teal200,
+    background = grey800,
 )
 
 private val LightColorPalette = lightColors(

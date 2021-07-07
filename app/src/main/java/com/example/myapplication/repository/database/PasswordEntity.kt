@@ -1,7 +1,5 @@
-package com.example.myapplication.features.repository.database
+package com.example.myapplication.repository.database
 
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey

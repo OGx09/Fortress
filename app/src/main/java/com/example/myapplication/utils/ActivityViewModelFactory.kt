@@ -1,9 +1,9 @@
-package com.example.myapplication.features.utils
+package com.example.myapplication.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.features.main.MainActivityViewModel
-import com.example.myapplication.features.repository.FortressRepository
+import com.example.myapplication.repository.FortressRepository
 import java.lang.IllegalArgumentException
 
 class ActivityViewModelFactory(private val repository: FortressRepository): ViewModelProvider.Factory {

@@ -1,12 +1,11 @@
-package com.example.myapplication.features.di
+package com.example.myapplication.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.myapplication.features.repository.FortressRepository
-import com.example.myapplication.features.repository.FortressRepositoryImpl
-import com.example.myapplication.features.repository.database.FortressDatabase
-import com.example.myapplication.features.utils.EncryptionUtils
-import dagger.Binds
+import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.repository.FortressRepositoryImpl
+import com.example.myapplication.repository.database.FortressDatabase
+import com.example.myapplication.utils.EncryptionUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,20 +1,17 @@
-package com.example.myapplication.features.utils
+package com.example.myapplication.utils
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
-import androidx.biometric.BiometricPrompt
-import com.example.myapplication.features.repository.database.FortressDao
-import com.example.myapplication.features.repository.database.FortressDatabase
-import com.example.myapplication.features.repository.database.PasswordEntity
-import com.example.myapplication.features.repository.models.FortressModel
+import com.example.myapplication.repository.database.FortressDao
+import com.example.myapplication.repository.database.PasswordEntity
+import com.example.myapplication.repository.models.FortressModel
 import com.google.gson.Gson
 import java.nio.charset.Charset
 import java.security.InvalidKeyException
 import java.security.KeyStore
 import java.util.*
-import java.util.concurrent.Executor
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey

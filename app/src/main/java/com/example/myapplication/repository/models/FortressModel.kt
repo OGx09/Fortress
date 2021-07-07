@@ -1,8 +1,5 @@
-package com.example.myapplication.features.repository.models
+package com.example.myapplication.repository.models
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.Gson
 
 data class FortressModel(val platformWebsite: String?, val platformLogo: String?,

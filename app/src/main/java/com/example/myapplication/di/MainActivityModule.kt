@@ -1,12 +1,10 @@
-package com.example.myapplication.features.di
+package com.example.myapplication.di
 
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
-import com.example.myapplication.features.repository.FortressRepository
-import com.example.myapplication.features.utils.EncryptionUtils
-import com.example.myapplication.features.utils.FingerprintUtils
-import com.example.myapplication.features.utils.ActivityViewModelFactory
+import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.utils.ActivityViewModelFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

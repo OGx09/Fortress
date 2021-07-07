@@ -1,8 +1,8 @@
-package com.example.myapplication.features.repository
+package com.example.myapplication.repository
 
-import com.example.myapplication.features.repository.database.PasswordEntity
-import com.example.myapplication.features.repository.models.FortressModel
-import com.example.myapplication.features.utils.EncryptionUtils
+import com.example.myapplication.repository.database.PasswordEntity
+import com.example.myapplication.repository.models.FortressModel
+import com.example.myapplication.utils.EncryptionUtils
 
 class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : FortressRepository{
 

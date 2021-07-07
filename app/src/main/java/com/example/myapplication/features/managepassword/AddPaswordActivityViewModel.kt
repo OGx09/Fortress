@@ -2,9 +2,8 @@ package com.example.myapplication.features.managepassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.features.repository.FortressRepository
-import com.example.myapplication.features.repository.database.PasswordEntity
-import com.example.myapplication.features.repository.models.FortressModel
+import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.repository.models.FortressModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

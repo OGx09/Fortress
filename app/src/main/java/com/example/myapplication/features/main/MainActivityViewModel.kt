@@ -1,7 +1,7 @@
 package com.example.myapplication.features.main
 
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.features.repository.FortressRepository
+import com.example.myapplication.repository.FortressRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

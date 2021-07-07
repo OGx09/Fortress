@@ -1,13 +1,11 @@
-package com.example.myapplication.features.utils
+package com.example.myapplication.utils
 
 import android.os.Handler
 import android.os.Looper
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
-import com.example.myapplication.features.repository.database.PasswordEntity
+import com.example.myapplication.repository.database.PasswordEntity
 import kotlinx.coroutines.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
