@@ -42,8 +42,8 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
                     result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     encryptionUtils.generateSecretKey()
-                    deferred.complete(result)
                     Handler(Looper.getMainLooper()).post {
+                        deferred.complete(result)
                         Toast.makeText(activity,
                             "Authentication succeeded!", Toast.LENGTH_SHORT)
                             .show()
@@ -53,9 +53,11 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
                     deferred.completeExceptionally(Exception("Fingerprint authentication has failed!"))
-                    Toast.makeText(activity, "AuonAuthenticationSucceededthentication failed",
-                        Toast.LENGTH_SHORT)
-                        .show()
+                    Handler(Looper.getMainLooper()).run {
+                        Toast.makeText(activity, "AuonAuthenticationSucceededthentication failed",
+                            Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             })
 
@@ -68,9 +70,18 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
 
 
     fun show(): CompletableDeferred<BiometricPrompt.AuthenticationResult>{
-        biometricPrompt.authenticate(promptInfo,
-            BiometricPrompt.CryptoObject(encryptionUtils.getCipher()))
+        biometricPrompt.authenticate(promptInfo)
         return deferred
+    }
+
+    val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
+        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+            Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
+        }
+
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            super.onAuthenticationSucceeded(result)
+        }
     }
 
 }
