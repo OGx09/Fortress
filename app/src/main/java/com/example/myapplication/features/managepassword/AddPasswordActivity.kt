@@ -132,7 +132,24 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             )
             Spacer(modifier = Modifier.size(30.dp))
             Button(onClick = {
-                val fingerprintUtils = fingerPrintUtils.show()
+                val fingerprintUtils = fingerPrintUtils.show{fingerprintResult ->
+                    fingerprintResult.run {
+                        errorString?.apply {
+                            // Show error message
+                        }
+
+                        result?.apply {
+                            //Successful authentication
+                            viewModel.savePassword(
+                            webTextState.value.text,
+                            webNameTextState.value.text,
+                            passwordTextState.value.text,
+                            buzzWord = buzzTextState.value.text
+                        )
+                        }
+                    }
+
+                }
 //                    if (!fingerprintUtils.isCancelled) {
 //                        viewModel.savePassword(
 //                            webTextState.value.text,
