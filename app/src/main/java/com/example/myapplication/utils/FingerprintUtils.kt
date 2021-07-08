@@ -2,11 +2,18 @@ package com.example.myapplication.utils
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import com.example.myapplication.repository.database.PasswordEntity
 import kotlinx.coroutines.*
+import java.security.KeyPair
+import java.security.KeyStore
+import java.security.PrivateKey
+import java.security.Signature
+import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -19,6 +26,9 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
     lateinit var promptInfo: BiometricPrompt.PromptInfo
     private var isEncrypt : Boolean = false
     private var passwordEntity: PasswordEntity? =null
+    private val TAG = "FingerprintUtils"
+    val KEY_NAME = UUID.randomUUID().toString()
+    private var mToBeSignedMessage: String? = null
 
     private val deferred = CompletableDeferred<BiometricPrompt.AuthenticationResult>()
 
@@ -70,17 +80,61 @@ class FingerprintUtils @Inject constructor(private val encryptionUtils: Encrypti
 
 
     fun show(): CompletableDeferred<BiometricPrompt.AuthenticationResult>{
+        var signature: Signature? = null
+
+        try {
+            mToBeSignedMessage = "$KEY_NAME:1234567"
+            signature = initSignature()
+        }catch (e: java.lang.Exception){
+            e.printStackTrace()
+        }
         biometricPrompt.authenticate(promptInfo)
         return deferred
+    }
+
+
+    @Throws(Exception::class)
+    private fun initSignature(keyame: String): Signature?{
+        val keyPair =getKeyPair(keyame)
+        if (keyPair != null){
+            val signature = Signature.getInstance("SHA256withECDSA")
+            signature.initSign(keyPair.private)
+            return signature
+        }
+        return null
+    }
+
+    val mainThreadLooper = MainThread
+
+    @Throws(Exception::class)
+    private fun getKeyPair(keyName: String): KeyPair?{
+        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+        if(keyStore.containsAlias(keyName)){
+            //Get Public Key
+            val publicKey = keyStore.getCertificate(keyName).publicKey
+            //Get private key
+            val privateKey = keyStore.getKey(keyName, null) as PrivateKey
+            return KeyPair(publicKey, privateKey)
+        }
+        return null
     }
 
     val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
+            super.onAuthenticationError(errorCode, errString)
         }
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
+            if (result.cryptoObject != null && result.cryptoObject?.signature != null){
+                result.cryptoObject?.signature != null
+                try{
+                    val signature = result.cryptoObject?.signature
+                    signature.update()
+                }
+            }
         }
     }
 
