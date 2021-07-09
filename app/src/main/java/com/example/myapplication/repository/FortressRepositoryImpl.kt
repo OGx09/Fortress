@@ -3,6 +3,7 @@ package com.example.myapplication.repository
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
 import com.example.myapplication.utils.EncryptionUtils
+import javax.crypto.Cipher
 
 class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : FortressRepository{
 
@@ -16,8 +17,8 @@ class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : For
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao.delete(passwordEntity = passwordEntity)
 
-    override suspend fun savePassword(passwordEntity: FortressModel){
-        encryptionUtils.encryptSecretInformation(passwordEntity = passwordEntity)
+    override suspend fun savePassword(cipher: Cipher, passwordEntity: FortressModel){
+        encryptionUtils.encryptSecretInformation(cipher = cipher, passwordEntity = passwordEntity)
     }
 
 }

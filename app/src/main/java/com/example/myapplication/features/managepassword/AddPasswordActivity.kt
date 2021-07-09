@@ -3,6 +3,7 @@ package com.example.myapplication.features.managepassword
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
+import android.util.Log
 import android.widget.ScrollView
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
@@ -42,7 +43,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
 
     private val viewModel : AddPaswordActivityViewModel by viewModels()
 
-    @Inject lateinit var fingerPrintUtils : FingerprintUtils
+   // @Inject lateinit var fingerPrintUtils : FingerprintUtils
 
     companion object{
         fun start(context: Context){
@@ -132,33 +133,12 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             )
             Spacer(modifier = Modifier.size(30.dp))
             Button(onClick = {
-                val fingerprintUtils = fingerPrintUtils.show{fingerprintResult ->
-                    fingerprintResult.run {
-                        errorString?.apply {
-                            // Show error message
-                        }
-
-                        result?.apply {
-                            //Successful authentication
-                            viewModel.savePassword(
+                viewModel.savePassword(
                             webTextState.value.text,
                             webNameTextState.value.text,
                             passwordTextState.value.text,
-                            buzzWord = buzzTextState.value.text
-                        )
-                        }
-                    }
-
-                }
-//                    if (!fingerprintUtils.isCancelled) {
-//                        viewModel.savePassword(
-//                            webTextState.value.text,
-//                            webNameTextState.value.text,
-//                            passwordTextState.value.text,
-//                            buzzWord = buzzTextState.value.text
-//                        )
-//                    }
-            }, enabled = buttonState.value,
+                            buzzWord = buzzTextState.value.text)
+                }, enabled = buttonState.value,
                 modifier = Modifier
                     .padding(12.dp)
                     .requiredHeight(50.dp)
@@ -169,6 +149,13 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
         }
     }
 
+//                    if (!fingerprintUtils.isCancelled) {
+//                        viewModel.savePassword(
+//                            webTextState.value.text,
+//                            webNameTextState.value.text,
+//                            passwordTextState.value.text,
+//                            buzzWord = buzzTextState.value.text
+//                        )
 
     val disposable = object : DisposableHandle {
         override fun dispose() {

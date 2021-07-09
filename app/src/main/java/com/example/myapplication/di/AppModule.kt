@@ -2,6 +2,7 @@ package com.example.myapplication.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.myapplication.features.managepassword.AddPasswordActivity
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.FortressRepositoryImpl
 import com.example.myapplication.repository.database.FortressDatabase
@@ -36,6 +37,4 @@ object AppModule {
     fun provideFortressRepository(encryptionUtils: EncryptionUtils): FortressRepository{
         return FortressRepositoryImpl(encryptionUtils)
     }
-
-
 }

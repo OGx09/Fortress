@@ -33,7 +33,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         keyGenerator.generateKey()
     }
 
-    private fun getSecretKey(): SecretKey {
+    fun getSecretKey(): SecretKey {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
 
         // Before the keystore can be accessed, it must be loaded.
@@ -61,12 +61,9 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
             .build()
     }
 
-   suspend fun encryptSecretInformation( passwordEntity: FortressModel?) {
+   suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: FortressModel?) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
-        val cipher = getCipher()
-        val secretKey = getSecretKey()
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
             val encryptedInfo: ByteArray = cipher.doFinal(
                 passwordEntity.toString().toByteArray(Charset.defaultCharset())
             )

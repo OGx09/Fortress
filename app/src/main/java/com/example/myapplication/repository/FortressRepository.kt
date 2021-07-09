@@ -2,6 +2,7 @@ package com.example.myapplication.repository
 
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
+import javax.crypto.Cipher
 
 interface FortressRepository {
 
@@ -11,5 +12,5 @@ interface FortressRepository {
 
     suspend fun removePassword(passwordEntity: PasswordEntity)
 
-    suspend fun savePassword(passwordEntity: FortressModel)
+    suspend fun savePassword(cipher: Cipher, passwordEntity: FortressModel)
 }

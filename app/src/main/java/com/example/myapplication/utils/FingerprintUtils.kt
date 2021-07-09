@@ -1,7 +1,9 @@
 package com.example.myapplication.utils
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64.encodeToString
 import android.util.Log
@@ -20,6 +22,11 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import android.util.Base64
 import androidx.biometric.BiometricManager
+import com.example.myapplication.features.managepassword.AddPasswordActivity
+import dagger.hilt.android.qualifiers.ActivityContext
+import java.security.spec.ECGenParameterSpec
+import javax.crypto.Cipher
+import kotlin.coroutines.CoroutineContext
 
 
 class MainThreadExecutor: Executor {
@@ -31,9 +38,8 @@ class MainThreadExecutor: Executor {
 
 }
 
-
-
-class FingerprintUtils @Inject constructor(private val activity: FragmentActivity){
+class FingerprintUtils @Inject constructor(private val encrptedUtils: EncryptionUtils,
+                                               private val activity: AddPasswordActivity){
 
     lateinit var executor: Executor
     lateinit var biometricPrompt: BiometricPrompt
@@ -46,45 +52,59 @@ class FingerprintUtils @Inject constructor(private val activity: FragmentActivit
 
     fun authenticate(result: (FingerprintResult) -> Unit){
         this.result = result
+        Log.d("fingerprintUtils", "___> ${canUseBiometric(activity)}")
         if (canUseBiometric(activity)){
             var signature: Signature? = null
 
             try {
                 mToBeSignedMessage = "$KEY_NAME:1234567"
                 signature = initSignature(KEY_NAME)
+                Log.d("fingerprintUtils", "___> $signature}")
             }catch (e: java.lang.Exception){
                 throw RuntimeException()
             }
-            showBiometricPrompt(signature = signature)
+           // showBiometricPrompt(signature = signature)
         }else{
             result.invoke(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
     }
 
     @Throws(Exception::class)
-    private fun generateKeyPair(keyName: String, invalidateBiometricEnrollment: Boolean){
+    private fun generateKeyPair(keyName: String, invalidateBiometricEnrollment: Boolean): KeyPair{
         val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
+        val keyBuilder = KeyGenParameterSpec.Builder(keyName, KeyProperties.PURPOSE_SIGN)
+            .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
+            .setDigests(KeyProperties.DIGEST_SHA256,
+                KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA512)
+            .setUserAuthenticationRequired(true)
 
+        if(Build.VERSION.SDK_INT >= 24){
+            keyBuilder.setInvalidatedByBiometricEnrollment(invalidateBiometricEnrollment)
+        }
+        keyPairGenerator.initialize(keyBuilder.build())
+
+        return keyPairGenerator.generateKeyPair()
     }
 
     fun register(registerFingerResult: (FingerprintResult) -> Unit){
         this.result = registerFingerResult
         if (canUseBiometric(activity)){
-            var signature: Signature? = null
-
+            var cipher: Cipher? = null
             try {
-                mToBeSignedMessage = "$KEY_NAME:1234567"
-                signature = initSignature(KEY_NAME)
+                cipher = encrptedUtils.getCipher()
+                val secretKey = encrptedUtils.getSecretKey()
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+
             }catch (e: java.lang.Exception){
                 throw RuntimeException()
             }
-            showBiometricPrompt(signature = signature)
+            showBiometricPrompt(cipher = cipher)
         }else{
             result.invoke(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
     }
 
-    private fun showBiometricPrompt(signature: Signature?){
+    private fun showBiometricPrompt(cipher: Cipher?){
 
         val biometricPrompt = BiometricPrompt(activity, getMainThreadExecutor, authenticationCallback)
 
@@ -95,15 +115,15 @@ class FingerprintUtils @Inject constructor(private val activity: FragmentActivit
             .build()
 
             //Show biometric prompt
-        if (signature != null){
+        if (cipher != null){
             Log.i(TAG, "Show biometric prompt");
-            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(signature))
+            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
     }
 
     @Throws(Exception::class)
     private fun initSignature(keyame: String): Signature?{
-        val keyPair =getKeyPair(keyame)
+        val keyPair = getKeyPair(keyame)
         if (keyPair != null){
             val signature = Signature.getInstance("SHA256withECDSA")
             signature.initSign(keyPair.private)
@@ -138,16 +158,10 @@ class FingerprintUtils @Inject constructor(private val activity: FragmentActivit
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
-            if (result.cryptoObject != null && result.cryptoObject?.signature != null){
-                result.cryptoObject?.signature != null
+            if (result.cryptoObject != null){
                 try{
-                    val signature = result.cryptoObject?.signature
-                    signature?.update(mToBeSignedMessage?.toByteArray())
-                    val signatureString = encodeToString(signature?.sign(), Base64.URL_SAFE)
-                    //Signed message and signature are sent to server
-                    Log.i(TAG, "Message: $mToBeSignedMessage");
-                    Log.i(TAG, "Signature (Base64 Encoded): $signatureString");
-                    this@FingerprintUtils.result.invoke(FingerprintResult(result = result))
+                    this@FingerprintUtils.result
+                        .invoke(FingerprintResult(cryptoObject = result.cryptoObject))
 
                 }catch (e: SignatureException){
                     this@FingerprintUtils.result.invoke(FingerprintResult(errorString = e.message))
