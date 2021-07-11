@@ -1,5 +1,6 @@
 package com.example.myapplication.utils
 
+import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -22,7 +23,10 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import android.util.Base64
 import androidx.biometric.BiometricManager
+import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.example.myapplication.features.managepassword.AddPasswordActivity
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ActivityContext
 import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
@@ -38,8 +42,7 @@ class MainThreadExecutor: Executor {
 
 }
 
-class FingerprintUtils @Inject constructor(private val encrptedUtils: EncryptionUtils,
-                                               private val activity: AddPasswordActivity){
+class FingerprintUtils @Inject constructor(private val encrptedUtils: EncryptionUtils){
 
     lateinit var executor: Executor
     lateinit var biometricPrompt: BiometricPrompt
@@ -47,12 +50,9 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private var isEncrypt : Boolean = false
     private var passwordEntity: PasswordEntity? =null
     private var mToBeSignedMessage: String? = null
-    private lateinit var result: (FingerprintResult) -> Unit
+    private var mutableLiveAuthResult: MutableLiveData<FingerprintResult> = MutableLiveData()
 
-
-    fun authenticate(result: (FingerprintResult) -> Unit){
-        this.result = result
-        Log.d("fingerprintUtils", "___> ${canUseBiometric(activity)}")
+    fun authenticate(activity: FragmentActivity,result: (FingerprintResult) -> Unit){
         if (canUseBiometric(activity)){
             var signature: Signature? = null
 
@@ -86,8 +86,8 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         return keyPairGenerator.generateKeyPair()
     }
 
-    fun register(registerFingerResult: (FingerprintResult) -> Unit){
-        this.result = registerFingerResult
+    fun register(activity: FragmentActivity): LiveData<FingerprintResult> {
+
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
@@ -98,13 +98,14 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             }catch (e: java.lang.Exception){
                 throw RuntimeException()
             }
-            showBiometricPrompt(cipher = cipher)
+            showBiometricPrompt(activity = activity,cipher = cipher)
         }else{
-            result.invoke(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
+            mutableLiveAuthResult.value = FingerprintResult(errorString = DEFAULT_ERROR_MSG)
         }
+        return mutableLiveAuthResult
     }
 
-    private fun showBiometricPrompt(cipher: Cipher?){
+    private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
 
         val biometricPrompt = BiometricPrompt(activity, getMainThreadExecutor, authenticationCallback)
 
@@ -152,27 +153,34 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
-            this@FingerprintUtils.result.invoke(FingerprintResult(errorString = errString.toString()))
+            mutableLiveAuthResult.value =  FingerprintResult(errorString = errString.toString())
             super.onAuthenticationError(errorCode, errString)
         }
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
+
             if (result.cryptoObject != null){
                 try{
-                    this@FingerprintUtils.result
-                        .invoke(FingerprintResult(cryptoObject = result.cryptoObject))
-
+                    Log.d("DefaultTextField", "THIS ${result.cryptoObject}")
+                    mutableLiveAuthResult.value = FingerprintResult(cryptoObject = result.cryptoObject)
                 }catch (e: SignatureException){
-                    this@FingerprintUtils.result.invoke(FingerprintResult(errorString = e.message))
+                    Log.e("DefaultTextField", "THIS ${e.message}")
+
+                    mutableLiveAuthResult.value = FingerprintResult(errorString = e.message)
                 }
             }
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            this@FingerprintUtils.result.invoke(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
+            mutableLiveAuthResult.value = FingerprintResult(errorString = DEFAULT_ERROR_MSG)
         }
+    }
+
+
+    fun dispose(observer: LifecycleOwner){
+        mutableLiveAuthResult.removeObservers(observer)
     }
 
     companion object{

@@ -9,6 +9,7 @@ import com.example.myapplication.utils.EncryptionUtils
 import com.example.myapplication.utils.FingerprintUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.crypto.Cipher
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,17 +18,11 @@ class AddPaswordActivityViewModel @Inject constructor(private val repository: Fo
 
 
     fun savePassword(website: String, websiteName: String,
-                     password: String, buzzWord: String){
+                     password: String, buzzWord: String,cipher: Cipher){
         val passwordEntity = FortressModel( website,
             null, password, websiteName, buzzWord)
-        fingerprintUtil.authenticate {
-            viewModelScope.launch {
-                it.cryptoObject?.cipher?.apply{
-                    repository.savePassword(this, passwordEntity)
-                }.takeIf { cipher ->  cipher == null}.apply {
-                    Log.d("AddPaswordA", "Cipher is null")
-                }
-            }
+        viewModelScope.launch {
+            repository.savePassword(cipher, passwordEntity)
         }
     }
 }

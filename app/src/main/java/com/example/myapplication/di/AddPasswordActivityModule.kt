@@ -29,10 +29,10 @@ class AddPasswordActivityModule {
 //            .get(AddPaswordActivityViewModel::class.java)
 //    }
 
-    @Provides
-    fun provideFingerprintUtils(encryptionUtils: EncryptionUtils,
-                                @ActivityContext activity: AddPasswordActivity):FingerprintUtils{
-        return FingerprintUtils(encryptionUtils, activity)
-    }
+//    @Provides
+//    fun provideFingerprintUtils(encryptionUtils: EncryptionUtils,
+//                                @ActivityContext activity: AddPasswordActivity):FingerprintUtils{
+//        return FingerprintUtils(encryptionUtils, activity)
+//    }
 
 }

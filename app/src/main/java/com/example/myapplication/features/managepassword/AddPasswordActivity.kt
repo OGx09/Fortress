@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.features.ui.DefaultTextField
 import com.example.myapplication.features.ui.ThemeBaseActivity
@@ -36,6 +37,7 @@ import com.example.myapplication.utils.FingerprintUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -43,7 +45,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
 
     private val viewModel : AddPaswordActivityViewModel by viewModels()
 
-   // @Inject lateinit var fingerPrintUtils : FingerprintUtils
+    @Inject lateinit var fingerprintUtil : FingerprintUtils
 
     companion object{
         fun start(context: Context){
@@ -133,12 +135,20 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             )
             Spacer(modifier = Modifier.size(30.dp))
             Button(onClick = {
-                viewModel.savePassword(
-                            webTextState.value.text,
-                            webNameTextState.value.text,
-                            passwordTextState.value.text,
-                            buzzWord = buzzTextState.value.text)
-                }, enabled = buttonState.value,
+
+                fingerprintUtil.register(this@AddPasswordActivity)
+                    .observe(this@AddPasswordActivity){
+                        Log.d("DefaultTextField", "T_HIS $it")
+                        it.errorString?.apply {
+                            Log.d("DefaultTextField", "T_HIS $this")
+                        }
+                        it.cryptoObject?.cipher?.apply {
+                            viewModel.savePassword(webTextState.value.text,
+                                webNameTextState.value.text,
+                                passwordTextState.value.text,
+                                buzzWord = buzzTextState.value.text, this)
+                        }
+                }}, enabled = buttonState.value,
                 modifier = Modifier
                     .padding(12.dp)
                     .requiredHeight(50.dp)
