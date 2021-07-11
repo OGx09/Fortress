@@ -8,18 +8,22 @@ import javax.crypto.Cipher
 
 class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : FortressRepository{
 
-    override suspend fun fetchAllPasswords(): List<PasswordEntity> {
-        return encryptionUtils.getDao.getAll()
+    override suspend fun fetchAllEncryptedPasswords(): List<PasswordEntity> {
+        return encryptionUtils.getDao.getAllEncryptedPassword()
     }
 
-    override suspend fun fetchPasswordDetails(id: Int): FortressModel?{
-        return encryptionUtils.decryptSecretInformation(id)
+    override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int): FortressModel?{
+        return encryptionUtils.decryptSecretInformation(cipher, id)
     }
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao.delete(passwordEntity = passwordEntity)
 
-    override suspend fun savePassword(cipher: Cipher, passwordEntity: FortressModel){
+    override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity){
         encryptionUtils.encryptSecretInformation(cipher = cipher, passwordEntity = passwordEntity)
     }
+
+//    override suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel> {
+//
+//    }
 
 }

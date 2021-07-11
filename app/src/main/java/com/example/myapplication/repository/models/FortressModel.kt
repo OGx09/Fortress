@@ -2,8 +2,7 @@ package com.example.myapplication.repository.models
 
 import com.google.gson.Gson
 
-data class FortressModel(val platformWebsite: String?, val platformLogo: String?,
-                         val platformPassword: String?, val platformName: String?,
+data class FortressModel(val platformPassword: String?, val userName: String?,
                           val otherInfo: String?
 ){
     override fun toString(): String {

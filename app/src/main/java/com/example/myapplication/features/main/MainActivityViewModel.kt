@@ -9,29 +9,41 @@ import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.crypto.Cipher
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(){
 
-    private val _savePasswordLiveData = MutableLiveData<List<PasswordEntity>>()
-    val savePassword : LiveData<List<PasswordEntity>> = _savePasswordLiveData
+    private val _savePasswordEntityLiveData = MutableLiveData<List<PasswordEntity>>()
+    val savePasswordEntityLiveData : LiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
 
-    init {
-        readSavedPasswords()
+    private val _savePasswordDataLiveData = MutableLiveData<List<FortressModel>>()
+    val savePasswordDataLiveData : LiveData<List<FortressModel>> = _savePasswordDataLiveData
+
+
+    fun readSavedPasswords(cipher: Cipher, id: Int){
+        viewModelScope.launch(Dispatchers.Main) {
+            val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
+            Log.d("FortressRepository", "FortressRepositoryImpl ${allPasswords}")
+            allPasswords?.apply {
+                _savePasswordDataLiveData.postValue( this)
+            }
+        }
     }
 
-    fun readSavedPasswords(){
-        viewModelScope.launch(Dispatchers.Main) {
-            val allPasswords =repository.fetchAllPasswords()
-            Log.d("FortressRepository", "FortressRepositoryImpl ${allPasswords.size}")
-            _savePasswordLiveData.postValue( allPasswords)
+
+    fun readSavedPasswordDetails(){
+        viewModelScope.launch{
+            val allPasswords = repository.fetchAllEncryptedPasswords()
+            //Log.d("FortressRepository", "FortressRepositoryImpl ${allPasswords}")
+            allPasswords.apply {
+                _savePasswordEntityLiveData.postValue( this)
+            }
         }
     }
 }

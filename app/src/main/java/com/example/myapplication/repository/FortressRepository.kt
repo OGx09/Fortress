@@ -6,11 +6,13 @@ import javax.crypto.Cipher
 
 interface FortressRepository {
 
-    suspend fun fetchAllPasswords(): List<PasswordEntity>
+    suspend fun fetchAllEncryptedPasswords(): List<PasswordEntity>
 
-    suspend fun fetchPasswordDetails(id: Int) : FortressModel?
+    suspend fun fetchPasswordDetails(cipher: Cipher, id: Int) : FortressModel?
 
     suspend fun removePassword(passwordEntity: PasswordEntity)
 
-    suspend fun savePassword(cipher: Cipher, passwordEntity: FortressModel)
+    suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity)
+
+    //suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel>
 }

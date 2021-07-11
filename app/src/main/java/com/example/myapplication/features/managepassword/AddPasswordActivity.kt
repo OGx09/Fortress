@@ -128,7 +128,31 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
                 textState = buzzTextState,
                 statesToCheck= statesToCheck,
                 buttonState = buttonState,
+                label = {Text(stringResource(R.string.title_username))},
+                leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
+                    contentDescription =null )},
+                keyboardOptions = KeyboardOptions
+                    .Default.copy(keyboardType = KeyboardType.Text)
+            )
+            Spacer(modifier = Modifier.size(30.dp))
+
+            DefaultTextField(
+                textState = buzzTextState,
+                statesToCheck= statesToCheck,
+                buttonState = buttonState,
                 label = {Text(stringResource(R.string.title_other_info))},
+                leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
+                    contentDescription =null )},
+                keyboardOptions = KeyboardOptions
+                    .Default.copy(keyboardType = KeyboardType.Text)
+            )
+            Spacer(modifier = Modifier.size(30.dp))
+
+            DefaultTextField(
+                textState = buzzTextState,
+                statesToCheck= statesToCheck,
+                buttonState = buttonState,
+                label = {Text(stringResource(R.string.title_username))},
                 leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
                     contentDescription =null )},
                 keyboardOptions = KeyboardOptions
@@ -147,7 +171,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
                             viewModel.savePassword(webTextState.value.text,
                                 webNameTextState.value.text,
                                 passwordTextState.value.text,
-                                buzzWord = buzzTextState.value.text, this)
+                                buzzWord = buzzTextState.value.text, "null", this)
                         }
                 }}, enabled = buttonState.value,
                 modifier = Modifier
@@ -159,14 +183,6 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             }
         }
     }
-
-//                    if (!fingerprintUtils.isCancelled) {
-//                        viewModel.savePassword(
-//                            webTextState.value.text,
-//                            webNameTextState.value.text,
-//                            passwordTextState.value.text,
-//                            buzzWord = buzzTextState.value.text
-//                        )
 
     val disposable = object : DisposableHandle {
         override fun dispose() {

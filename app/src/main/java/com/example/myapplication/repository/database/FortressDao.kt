@@ -9,7 +9,7 @@ import androidx.room.Query
 interface FortressDao {
 
     @Query("SELECT * FROM passwordentity")
-    suspend fun getAll(): List<PasswordEntity>
+    suspend fun getAllEncryptedPassword(): List<PasswordEntity>
 
     @Query("SELECT * FROM passwordentity WHERE id = :id")
     suspend fun getPasswordDetails(id: Int): PasswordEntity

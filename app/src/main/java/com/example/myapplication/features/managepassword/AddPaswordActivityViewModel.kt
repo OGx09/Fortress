@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
 import com.example.myapplication.utils.EncryptionUtils
 import com.example.myapplication.utils.FingerprintUtils
@@ -17,9 +18,11 @@ class AddPaswordActivityViewModel @Inject constructor(private val repository: Fo
 
 
     fun savePassword(website: String, websiteName: String,
-                     password: String, buzzWord: String,cipher: Cipher){
-        val passwordEntity = FortressModel( website,
-            null, password, websiteName, buzzWord)
+                     password: String, buzzWord: String, username: String, cipher: Cipher){
+        val fortressModel = FortressModel( website,
+            username, password)
+        val passwordEntity = PasswordEntity(null, websiteName =websiteName,
+            website = website, fortressModel = fortressModel, otherInfo = buzzWord)
         viewModelScope.launch {
             repository.savePassword(cipher, passwordEntity)
         }
