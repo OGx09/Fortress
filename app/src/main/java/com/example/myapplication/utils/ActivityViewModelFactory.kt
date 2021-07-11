@@ -17,7 +17,7 @@ class ActivityViewModelFactory(private val repository: FortressRepository,
         }else if(modelClass.isAssignableFrom(AddPaswordActivityViewModel::class.java)){
             Log.d("ActivityViewModelFactory", "_$fingerprintUtils")
             if (fingerprintUtils != null){
-                AddPaswordActivityViewModel(repository = repository, fingerprintUtils) as T
+                AddPaswordActivityViewModel(repository = repository) as T
             }
             throw IllegalArgumentException("fingerprintUtils not found")
         }else{

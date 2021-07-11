@@ -13,8 +13,7 @@ import javax.crypto.Cipher
 import javax.inject.Inject
 
 @HiltViewModel
-class AddPaswordActivityViewModel @Inject constructor(private val repository: FortressRepository,
-                                                      private val fingerprintUtil: FingerprintUtils): ViewModel(){
+class AddPaswordActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(){
 
 
     fun savePassword(website: String, websiteName: String,

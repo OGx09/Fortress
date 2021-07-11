@@ -26,6 +26,7 @@ import androidx.biometric.BiometricManager
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.example.myapplication.features.managepassword.AddPasswordActivity
+import com.example.myapplication.repository.models.FortressModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ActivityContext
 import java.security.spec.ECGenParameterSpec
@@ -86,8 +87,8 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         return keyPairGenerator.generateKeyPair()
     }
 
-    fun register(activity: FragmentActivity): LiveData<FingerprintResult> {
-
+    fun register(activity: FragmentActivity):
+            LiveData<FingerprintResult> {
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
@@ -107,7 +108,9 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
 
     private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
 
-        val biometricPrompt = BiometricPrompt(activity, getMainThreadExecutor, authenticationCallback)
+        val biometricPrompt = BiometricPrompt(activity,
+            getMainThreadExecutor,
+            authenticationCallback)
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Biometric login for my app")
@@ -162,11 +165,9 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
 
             if (result.cryptoObject != null){
                 try{
-                    Log.d("DefaultTextField", "THIS ${result.cryptoObject}")
+
                     mutableLiveAuthResult.value = FingerprintResult(cryptoObject = result.cryptoObject)
                 }catch (e: SignatureException){
-                    Log.e("DefaultTextField", "THIS ${e.message}")
-
                     mutableLiveAuthResult.value = FingerprintResult(errorString = e.message)
                 }
             }

@@ -28,7 +28,8 @@ object Libs{
         "androidx.biometric:biometric:${Versions.biometric}",
         "com.google.dagger:hilt-android:${Versions.hilt_version}",
         "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin_stdlib}",
-        "com.google.code.gson:gson:${Versions.gson}"
+        "com.google.code.gson:gson:${Versions.gson}",
+        "androidx.compose.runtime:runtime-livedata:${Versions.compose}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 

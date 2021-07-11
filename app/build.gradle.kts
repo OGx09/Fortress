@@ -3,7 +3,6 @@ plugins {
     id ("com.android.application")
     kotlin ("android")
     kotlin("kapt")
-
     id("dagger.hilt.android.plugin")
 }
 
@@ -68,7 +67,6 @@ android {
         exclude ("META-INF/ASL2.0")
         exclude("META-INF/*.kotlin_module")
     }
-
 }
 
 dependencies {
@@ -87,5 +85,7 @@ dependencies {
     Libs.kaptDeps.forEach {
         kapt(it)
     }
+
+
 
 }

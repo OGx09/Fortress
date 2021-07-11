@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -127,7 +128,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
                 textState = buzzTextState,
                 statesToCheck= statesToCheck,
                 buttonState = buttonState,
-                label = {Text("Buzz Word")},
+                label = {Text(stringResource(R.string.title_other_info))},
                 leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
                     contentDescription =null )},
                 keyboardOptions = KeyboardOptions

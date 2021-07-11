@@ -1,5 +1,6 @@
 package com.example.myapplication.repository
 
+import android.util.Log
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
 import com.example.myapplication.utils.EncryptionUtils
