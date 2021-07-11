@@ -55,7 +55,7 @@ class MainActivity @Inject constructor() : ThemeBaseActivity() {
     fun ContentBody() {
 
         val savePassword :
-                List<PasswordEntity> by viewModel.savePassword.observeAsState(emptyList())
+                List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(emptyList())
 
         Column(verticalArrangement = Arrangement.Center) {
             SavePasswordContents(list = savePassword)
@@ -72,10 +72,7 @@ class MainActivity @Inject constructor() : ThemeBaseActivity() {
             contentPadding = PaddingValues(all = Dp(value = 20f))
         ) {
             items(list) {passwordEntity ->
-                passwordEntity.encryptedData?.apply {
-
-                    Text(this)
-                }
+                Text(passwordEntity.websiteName)
             }
         }
     }

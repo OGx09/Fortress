@@ -76,11 +76,13 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
 
         val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
 
+        val usernameState = remember { mutableStateOf(TextFieldValue()) }
+
         val buttonState = remember{mutableStateOf(false)}
         val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
 
         val statesToCheck = arrayOf(buzzTextState,
-            webNameTextState, passwordTextState, webTextState)
+            webNameTextState, passwordTextState, webTextState, usernameState)
 
         val scrollableState = rememberScrollableState {delta ->
             delta
@@ -125,7 +127,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             Password(passwordTextState)
 
             DefaultTextField(
-                textState = buzzTextState,
+                textState = usernameState,
                 statesToCheck= statesToCheck,
                 buttonState = buttonState,
                 label = {Text(stringResource(R.string.title_username))},
@@ -134,7 +136,6 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
                 keyboardOptions = KeyboardOptions
                     .Default.copy(keyboardType = KeyboardType.Text)
             )
-            Spacer(modifier = Modifier.size(30.dp))
 
             DefaultTextField(
                 textState = buzzTextState,
@@ -148,17 +149,6 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
             )
             Spacer(modifier = Modifier.size(30.dp))
 
-            DefaultTextField(
-                textState = buzzTextState,
-                statesToCheck= statesToCheck,
-                buttonState = buttonState,
-                label = {Text(stringResource(R.string.title_username))},
-                leadingIcon = { Icon(painter = painterResource(id = (R.drawable.ic_buzz_msg)),
-                    contentDescription =null )},
-                keyboardOptions = KeyboardOptions
-                    .Default.copy(keyboardType = KeyboardType.Text)
-            )
-            Spacer(modifier = Modifier.size(30.dp))
             Button(onClick = {
 
                 fingerprintUtil.register(this@AddPasswordActivity)

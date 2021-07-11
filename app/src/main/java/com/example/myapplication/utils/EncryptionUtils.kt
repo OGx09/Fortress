@@ -65,7 +65,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
         try {
             val encryptedInfo: ByteArray = cipher.doFinal(
-                passwordEntity.toString().toByteArray(Charset.defaultCharset())
+                passwordEntity.fortressModel.toString().toByteArray(Charset.defaultCharset())
             )
             passwordEntity.encryptedData = Arrays.toString(encryptedInfo)
             dao.insertEncryptedEntity(passwordEntity)

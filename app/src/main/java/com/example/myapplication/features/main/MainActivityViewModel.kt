@@ -22,11 +22,15 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _savePasswordEntityLiveData = MutableLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : LiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
 
-    private val _savePasswordDataLiveData = MutableLiveData<List<FortressModel>>()
-    val savePasswordDataLiveData : LiveData<List<FortressModel>> = _savePasswordDataLiveData
+    private val _savePasswordDataLiveData = MutableLiveData<FortressModel>()
+    val savePasswordDataLiveData : LiveData<FortressModel> = _savePasswordDataLiveData
+
+    init {
+        readSavedPasswordDetails()
+    }
 
 
-    fun readSavedPasswords(cipher: Cipher, id: Int){
+    fun readSavedPassword(cipher: Cipher, id: Int){
         viewModelScope.launch(Dispatchers.Main) {
             val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
             Log.d("FortressRepository", "FortressRepositoryImpl ${allPasswords}")
@@ -37,7 +41,7 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     }
 
 
-    fun readSavedPasswordDetails(){
+    private fun readSavedPasswordDetails(){
         viewModelScope.launch{
             val allPasswords = repository.fetchAllEncryptedPasswords()
             //Log.d("FortressRepository", "FortressRepositoryImpl ${allPasswords}")
