@@ -17,6 +17,7 @@
 package com.example.myapplication.features.ui
 
 import androidx.compose.ui.graphics.Color
+import kotlin.random.Random
 
 val purple200 = Color(0xFFBB86FC)
 val purple500 = Color(0xFF6200EE)
@@ -25,3 +26,11 @@ val teal200 = Color(0xFF03DAC5)
 val white100 = Color(0xFFFFFFFF)
 val grey900 = Color(0xff212121)
 val grey800 = Color(0xff424242)
+
+fun randomColor(): Color{
+    val rand = Random(200)
+    val r: Float = rand.nextFloat()
+    val g: Float = rand.nextFloat() / 2f
+    val b: Float = rand.nextFloat() / 2f
+    return Color(r, g, b)
+}

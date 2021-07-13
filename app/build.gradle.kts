@@ -23,9 +23,19 @@ android {
     buildFeatures {
         compose = true
     }
+
+    kapt {
+        javacOptions {
+            // These options are normally set automatically via the Hilt Gradle plugin, but we
+            // set them manually to workaround a bug in the Kotlin 1.5.20
+            option("-Adagger.fastInit=ENABLED")
+            option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
+        }
+    }
+
     composeOptions {
         kotlinCompilerVersion = Versions.kotlin_stdlib
-        kotlinCompilerExtensionVersion = Versions.compose
+        kotlinCompilerExtensionVersion = Versions.composable
 
     }
 
@@ -56,7 +66,17 @@ android {
     }
     ndkVersion = "21.3.6528147"
 
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            val requested = this.requested
+            if(requested.group == "org.jetbrains.kotlin"  && requested.name == "kotlin-reflect"){
+                this.useVersion(Versions.kotlin_stdlib)
+            }
+        }
+    }
+
     packagingOptions {
+        exclude("META-INF/*.kotlin_module")
         exclude ("META-INF/DEPENDENCIES")
         exclude ("META-INF/LICENSE")
         exclude ("META-INF/LICENSE.txt")
@@ -65,7 +85,6 @@ android {
         exclude ("META-INF/NOTICE.txt")
         exclude ("META-INF/notice.txt")
         exclude ("META-INF/ASL2.0")
-        exclude("META-INF/*.kotlin_module")
     }
 }
 

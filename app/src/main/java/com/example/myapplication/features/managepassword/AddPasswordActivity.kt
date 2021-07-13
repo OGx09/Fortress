@@ -25,10 +25,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.features.ui.DefaultTextField
@@ -64,6 +62,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
     }
 
 
+    //@ExperimentalUnitApi
     @ExperimentalCoroutinesApi
     @ExperimentalComposeApi
     @Preview
@@ -95,7 +94,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
         ) {
             Text("Add New Password!",
                 modifier = Modifier.padding(20.dp),
-                fontSize = TextUnit(18F, TextUnitType.Sp),
+                fontSize = 18.sp,
                 color = MaterialTheme.colors.primary,
                 style = TextStyle(fontWeight = FontWeight.Bold)
             )
@@ -151,7 +150,7 @@ class AddPasswordActivity @Inject constructor() : ThemeBaseActivity() {
 
             Button(onClick = {
 
-                fingerprintUtil.register(this@AddPasswordActivity)
+                fingerprintUtil.register(this@AddPasswordActivity as FragmentActivity)
                     .observe(this@AddPasswordActivity){
                         Log.d("DefaultTextField", "T_HIS $it")
                         it.errorString?.apply {

@@ -7,6 +7,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
+import androidx.fragment.app.FragmentActivity
 
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
@@ -14,9 +15,9 @@ import androidx.compose.ui.graphics.toArgb
 fun StateCodelabTheme(
         darkTheme: Boolean = isSystemInDarkTheme(),
         content: @Composable () -> Unit,
-        activity: ThemeBaseActivity
+        activity: FragmentActivity ? = null
 ) {
-    activity.apply {
+    activity?.apply {
         window.statusBarColor = MaterialTheme.colors.primaryVariant.toArgb()
         val colors = if (darkTheme) {
             DarkColorPalette
@@ -38,10 +39,12 @@ private val DarkColorPalette = darkColors(
     primary = white100,
     primaryVariant = purple700,
     secondary = purple200,
+    surface = grey900
 )
 
 private val LightColorPalette = lightColors(
         primary = grey800,
         primaryVariant = purple700,
         secondary = purple200,
+    surface = white100
 )
