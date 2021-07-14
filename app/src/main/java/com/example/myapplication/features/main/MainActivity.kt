@@ -61,7 +61,6 @@ class MainActivity @Inject constructor() : ThemeBaseActivity() {
     }
 
     override fun onFabClick() {
-        navController.navigate(Routes.ADD_NEW_PASSWORD)
     }
 
 

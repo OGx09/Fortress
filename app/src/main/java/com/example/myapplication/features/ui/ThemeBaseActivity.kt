@@ -28,20 +28,7 @@ abstract class ThemeBaseActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent{
-            StateCodelabTheme(content = {Scaffold(
-                modifier = Modifier.background(Color.Blue),
-                floatingActionButtonPosition = FabPosition.End,
-                floatingActionButton = {
-                    fabResId()?.apply {
-                        FloatingActionButton(onClick = { onFabClick() }) {
-                            Icon(painter = painterResource(id = this), contentDescription = "")
-                        }
-                    }
-                },
-                content = {
-                    MainContent()
-                }
-            )}, activity = this)
+            StateCodelabTheme(content = { MainContent() }, activity = this)
         }
     }
 }

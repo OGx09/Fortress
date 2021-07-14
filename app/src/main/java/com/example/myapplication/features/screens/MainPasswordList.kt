@@ -9,8 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -43,9 +43,22 @@ fun MainPasswordList(activity: MainActivity,
     val savePassword :
             List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(emptyList())
 
-    Column(verticalArrangement = Arrangement.Center) {
-        SavePasswordContents(activity, list = savePassword, navController)
-    }
+
+    Scaffold(
+        modifier = Modifier.background(Color.Blue),
+        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navController.navigate(Routes.ADD_NEW_PASSWORD)}) {
+                Icon(painter = painterResource(id = android.R.drawable.ic_input_add), contentDescription = "")
+            }
+        },
+        content = {
+            Column(verticalArrangement = Arrangement.Center) {
+                SavePasswordContents(activity, list = savePassword, navController)
+            }
+        }
+    )
 }
 
 
