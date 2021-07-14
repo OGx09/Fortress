@@ -24,11 +24,6 @@ import javax.inject.Inject
 import android.util.Base64
 import androidx.biometric.BiometricManager
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
-import com.example.myapplication.features.managepassword.AddPasswordActivity
-import com.example.myapplication.repository.models.FortressModel
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ActivityContext
 import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
 import kotlin.coroutines.CoroutineContext

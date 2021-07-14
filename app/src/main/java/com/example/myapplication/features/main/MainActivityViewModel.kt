@@ -50,4 +50,18 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
             }
         }
     }
+
+
+
+    fun savePassword(website: String, websiteName: String,
+                     password: String, buzzWord: String, username: String, cipher: Cipher){
+        val fortressModel = FortressModel( website,
+            username, password)
+        val passwordEntity = PasswordEntity(null, websiteName =websiteName,
+            website = website, otherInfo = buzzWord)
+        passwordEntity.fortressModel = fortressModel
+        viewModelScope.launch {
+            repository.savePassword(cipher, passwordEntity)
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.myapplication.features.detials
+package com.example.myapplication.features.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,22 +21,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
-import java.util.*
 
 
 @Composable
@@ -50,13 +44,13 @@ fun MainPasswordList(activity: MainActivity,
             List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(emptyList())
 
     Column(verticalArrangement = Arrangement.Center) {
-        SavePasswordContents(list = savePassword, navController)
+        SavePasswordContents(activity, list = savePassword, navController)
     }
 }
 
 
 @Composable
-fun SavePasswordContents(list: List<PasswordEntity>, navController: NavHostController){
+fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
     //passwordEntityList
 
     val lazyState = rememberLazyListState()
@@ -66,13 +60,13 @@ fun SavePasswordContents(list: List<PasswordEntity>, navController: NavHostContr
     ) {
         items(list) {passwordEntity ->
             //fadeInItemState.setValue()
-            SavedPasswordItem(passwordEntity = passwordEntity, navController)
+            SavedPasswordItem(activity, passwordEntity = passwordEntity, navController)
         }
     }
 }
 
 @Composable
-fun SavedPasswordItem(passwordEntity: PasswordEntity, navController: NavHostController){
+fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
 
     Card(elevation = 5.dp,
         shape = RoundedCornerShape(10),
