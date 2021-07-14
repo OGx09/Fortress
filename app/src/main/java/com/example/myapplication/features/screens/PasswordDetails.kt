@@ -20,20 +20,15 @@ import com.example.myapplication.features.ui.StateCodelabTheme
 
 @Composable
 fun PasswordDetails(activity: MainActivity, viewModel: MainActivityViewModel){
-    StateCodelabTheme(content = {
-        Surface(color = MaterialTheme.colors.primaryVariant) {
-            MainContent(topBar = {TopCornerBar()}, body = { BodyContent()}, viewModel = viewModel)
-        }
-    }, activity = activity)
+    MainContent(viewModel = viewModel)
 }
 
 @Composable
 @SuppressLint("unused expression")
-private fun MainContent(topBar : @Composable Composable.() -> Unit, body: @Composable () -> Unit,
-                        viewModel: MainActivityViewModel){
+private fun MainContent(viewModel: MainActivityViewModel){
     Column(modifier = Modifier.fillMaxSize()) {
-        topBar
-        body
+        TopCornerBar()
+        BodyContent()
     }
 
 }
@@ -53,8 +48,8 @@ private fun TopCornerBar(){
     Box(modifier = Modifier
         .background(
             color =
-            MaterialTheme.colors.primaryVariant
-        )
+            MaterialTheme.colors.secondary
+        ).fillMaxHeight(fraction = 0.2f)
         .clip(
             RoundedCornerShape(
                 0,

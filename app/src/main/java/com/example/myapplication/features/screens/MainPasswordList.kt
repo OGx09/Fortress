@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
+import com.example.myapplication.features.ui.Paddings
 import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
@@ -45,7 +46,21 @@ fun MainPasswordList(activity: MainActivity,
 
 
     Scaffold(
-        modifier = Modifier.background(Color.Blue),
+        topBar = {
+            Row(modifier = Modifier.fillMaxHeight(fraction = 0.1f)
+                .fillMaxWidth(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Icon(painter = painterResource(id = android.R.drawable.ic_input_add),
+                    contentDescription = "Add password",
+                    modifier = Modifier.size(30.dp))
+                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(30.dp)) {
+                    Icon(painter = painterResource(id = android.R.drawable.ic_menu_search), contentDescription = "Search")
+                }
+            }
+        },
+        modifier = Modifier.background(Color.Blue)
+            .padding(paddingValues = Paddings.mediumAll).background(Color.White),
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -55,6 +70,9 @@ fun MainPasswordList(activity: MainActivity,
         },
         content = {
             Column(verticalArrangement = Arrangement.Center) {
+                Text("Your Passwords In One Secure Place",
+                    fontWeight = FontWeight.Bold, fontSize = 30.sp)
+                Spacer(modifier = Modifier.size(10.dp))
                 SavePasswordContents(activity, list = savePassword, navController)
             }
         }

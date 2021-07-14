@@ -39,12 +39,14 @@ private val DarkColorPalette = darkColors(
     primary = white100,
     primaryVariant = purple700,
     secondary = purple200,
-    surface = grey900
+    surface = grey900,
+    background = grey900
 )
 
 private val LightColorPalette = lightColors(
         primary = grey800,
         primaryVariant = purple700,
         secondary = purple200,
-    surface = white100
+    surface = white100,
+    background = white100
 )
