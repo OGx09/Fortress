@@ -3,6 +3,7 @@ package com.example.myapplication.repository
 import android.util.Log
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
+import com.example.myapplication.repository.models.GroInvestmentResponse
 import com.example.myapplication.utils.EncryptionUtils
 import javax.crypto.Cipher
 
@@ -20,6 +21,10 @@ class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : For
 
     override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity){
         encryptionUtils.encryptSecretInformation(cipher = cipher, passwordEntity = passwordEntity)
+    }
+
+    override suspend fun fetchwebsiteDetails(): GroInvestmentResponse {
+        TODO("Not yet implemented")
     }
 
 //    override suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel> {

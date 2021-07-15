@@ -29,6 +29,7 @@ import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.Paddings
+import com.example.myapplication.features.ui.iconColor
 import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
@@ -47,20 +48,22 @@ fun MainPasswordList(activity: MainActivity,
 
     Scaffold(
         topBar = {
-            Row(modifier = Modifier.fillMaxHeight(fraction = 0.1f)
+            Row(modifier = Modifier
+                .fillMaxHeight(fraction = 0.1f)
                 .fillMaxWidth(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Icon(painter = painterResource(id = android.R.drawable.ic_input_add),
                     contentDescription = "Add password",
                     modifier = Modifier.size(30.dp))
-                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(30.dp)) {
+                IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(25.dp)) {
                     Icon(painter = painterResource(id = android.R.drawable.ic_menu_search), contentDescription = "Search")
                 }
             }
         },
-        modifier = Modifier.background(Color.Blue)
-            .padding(paddingValues = Paddings.mediumAll).background(Color.White),
+        modifier = Modifier
+            .padding(paddingValues = Paddings.normalAll)
+            .background(Color.White),
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -71,8 +74,8 @@ fun MainPasswordList(activity: MainActivity,
         content = {
             Column(verticalArrangement = Arrangement.Center) {
                 Text("Your Passwords In One Secure Place",
-                    fontWeight = FontWeight.Bold, fontSize = 30.sp)
-                Spacer(modifier = Modifier.size(10.dp))
+                    fontWeight = FontWeight.Bold, fontSize = 30.sp, modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.size(20.dp))
                 SavePasswordContents(activity, list = savePassword, navController)
             }
         }
@@ -99,35 +102,37 @@ fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, nav
 @Composable
 fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
 
-    Card(elevation = 5.dp,
-        shape = RoundedCornerShape(10),
-        modifier = Modifier.clickable {
-            navController.navigate(Routes.PASSWORD_DETAILS)
-        }
-    ) {
-        Row(modifier =
-        Modifier
-            .fillMaxSize()
-            .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box( modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .border(2.dp, randomColor(), CircleShape)
-                .background(randomColor())) {
-                Center {
-                    Text(passwordEntity.websiteName[0].toString().uppercase(),
-                        textAlign = TextAlign.Center,
-                        fontSize = 17.sp,
-                        color = colorResource(id = R.color.white),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.wrapContentSize())
-                }
+    Box(modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)) {
+        Card(elevation = 10.dp,
+            shape = RoundedCornerShape(10),
+            modifier = Modifier.clickable {
+                navController.navigate(Routes.PASSWORD_DETAILS)
             }
-            Column(modifier = Modifier.padding(start = 10.dp)) {
-                Text(text = passwordEntity.websiteName, fontWeight = FontWeight.Bold)
-                Text(text = passwordEntity.website, color = Color.Gray)
+        ) {
+            Row(modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box( modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, randomColor(), CircleShape)
+                    .background(color = iconColor)) {
+                    Center {
+                        Text(passwordEntity.websiteName[0].toString().uppercase(),
+                            textAlign = TextAlign.Center,
+                            fontSize = 17.sp,
+                            color = colorResource(id = R.color.white),
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.wrapContentSize())
+                    }
+                }
+                Column(modifier = Modifier.padding(start = 10.dp)) {
+                    Text(text = passwordEntity.websiteName, fontWeight = FontWeight.Bold)
+                    Text(text = passwordEntity.website, color = Color.Gray)
+                }
             }
         }
     }

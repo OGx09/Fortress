@@ -26,6 +26,7 @@ val teal200 = Color(0xFF03DAC5)
 val white100 = Color(0xFFFFFFFF)
 val grey900 = Color(0xff212121)
 val grey800 = Color(0xff424242)
+val iconColor = Color(0xFFeceff1)
 
 fun randomColor(): Color{
     val rand = Random(200)
