@@ -1,15 +1,15 @@
 package com.example.myapplication.repository
 
-import android.util.Log
+import androidx.lifecycle.LiveData
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
-import com.example.myapplication.repository.models.GroInvestmentResponse
+import com.example.myapplication.repository.models.WebsiteLogo
 import com.example.myapplication.utils.EncryptionUtils
 import javax.crypto.Cipher
 
-class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : FortressRepository{
+class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils, private val websiteLogoService: WebsiteLogoService) : FortressRepository{
 
-    override suspend fun fetchAllEncryptedPasswords(): List<PasswordEntity> {
+    override fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>> {
         return encryptionUtils.getDao.getAllEncryptedPassword()
     }
 
@@ -23,8 +23,8 @@ class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils) : For
         encryptionUtils.encryptSecretInformation(cipher = cipher, passwordEntity = passwordEntity)
     }
 
-    override suspend fun fetchwebsiteDetails(): GroInvestmentResponse {
-        TODO("Not yet implemented")
+    override suspend fun fetchwebsiteIcon(websiteUrl: String): WebsiteLogo {
+        return websiteLogoService.getWebsiteLogo(websiteUrl = websiteUrl)
     }
 
 //    override suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel> {

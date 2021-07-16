@@ -4,13 +4,19 @@ import android.content.Context
 import androidx.room.Room
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.FortressRepositoryImpl
+import com.example.myapplication.repository.WebApi
+import com.example.myapplication.repository.WebsiteLogoService
 import com.example.myapplication.repository.database.FortressDatabase
+import com.example.myapplication.repository.models.WebsiteLogo
 import com.example.myapplication.utils.EncryptionUtils
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -31,9 +37,21 @@ object AppModule {
     @Singleton
     fun provideEncryptionUtils(db: FortressDatabase) = EncryptionUtils(db.passwordDao())
 
+
+
     @Provides
     @Singleton
-    fun provideFortressRepository(encryptionUtils: EncryptionUtils): FortressRepository{
-        return FortressRepositoryImpl(encryptionUtils)
+    fun provideRetrofit(): WebsiteLogoService{
+        val retrofit = Retrofit.Builder()
+            .baseUrl(WebApi.BEST_ICON)
+            .addConverterFactory(GsonConverterFactory.create(Gson()))
+            .build()
+        return retrofit.create(WebsiteLogoService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFortressRepository(encryptionUtils: EncryptionUtils, websiteLogoService: WebsiteLogoService): FortressRepository{
+        return FortressRepositoryImpl(encryptionUtils, websiteLogoService)
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.DefaultTextField
+import com.example.myapplication.repository.models.LoadingState
 import com.example.myapplication.utils.FingerprintUtils
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,6 +71,12 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
     val usernameState = remember { mutableStateOf(TextFieldValue()) }
 
     val buttonState = remember{ mutableStateOf(false) }
+    val savePasswordToDbState = viewModel
+        .savePasswordDataLiveData.observeAsState(initial = LoadingState(data = false))
+    savePasswordToDbState.value.apply {
+        Log.d("savePasswordToDbState", "$this")
+    }
+
     val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
 
     val statesToCheck = arrayOf(buzzTextState,

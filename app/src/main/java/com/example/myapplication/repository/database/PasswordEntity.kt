@@ -17,7 +17,8 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
                           @ColumnInfo(name ="encryptedData") var encryptedData: String?=null,
                           @ColumnInfo var websiteName: String,
                           @ColumnInfo var website: String,
-                          @ColumnInfo var otherInfo: String){
+                          @ColumnInfo var otherInfo: String,
+                          @ColumnInfo var iconBytes: String){
 
 
     @Ignore var fortressModel: FortressModel? = null

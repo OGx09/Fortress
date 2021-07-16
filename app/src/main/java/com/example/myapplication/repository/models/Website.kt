@@ -3,14 +3,14 @@ package com.example.myapplication.repository.models
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-class GroInvestmentResponse {
+class WebsiteLogo {
     @SerializedName("url")
     @Expose
     var url: String? = null
 
     @SerializedName("icons")
     @Expose
-    var icons: List<Icon>? = null
+    var icons: List<Icon?> = emptyList()
 }
 
 class Icon {

@@ -1,13 +1,14 @@
 package com.example.myapplication.repository
 
+import androidx.lifecycle.LiveData
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
-import com.example.myapplication.repository.models.GroInvestmentResponse
+import com.example.myapplication.repository.models.WebsiteLogo
 import javax.crypto.Cipher
 
 interface FortressRepository {
 
-    suspend fun fetchAllEncryptedPasswords(): List<PasswordEntity>
+    fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>>
 
     suspend fun fetchPasswordDetails(cipher: Cipher, id: Int) : FortressModel?
 
@@ -15,7 +16,7 @@ interface FortressRepository {
 
     suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity)
 
-    suspend fun fetchwebsiteDetails() : GroInvestmentResponse
+    suspend fun fetchwebsiteIcon(websiteUrl: String) : WebsiteLogo
 
     //suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel>
 }

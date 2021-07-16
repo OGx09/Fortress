@@ -38,7 +38,6 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
 
     @ExperimentalCoroutinesApi
     @ExperimentalComposeApi
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()

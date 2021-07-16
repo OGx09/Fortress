@@ -9,6 +9,7 @@ object Versions {
     const val gson ="2.8.7"
     const val composable ="1.0.0-beta09"
     const val navigation ="2.3.5"
+    const val retrofit ="2.9.0"
 }
 
 object Libs{
@@ -31,7 +32,9 @@ object Libs{
         "com.google.code.gson:gson:${Versions.gson}",
         "androidx.compose.runtime:runtime-livedata:${Versions.composable}",
         "androidx.navigation:navigation-ui-ktx:${Versions.navigation}",
-        "androidx.navigation:navigation-compose:2.4.0-alpha04"
+        "androidx.navigation:navigation-compose:2.4.0-alpha04",
+        "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
+        "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 

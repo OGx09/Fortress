@@ -1,5 +1,6 @@
 package com.example.myapplication.repository.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -10,10 +11,10 @@ import com.example.myapplication.repository.models.FortressModel
 interface FortressDao {
 
     @Query("SELECT * FROM passwordentity")
-    suspend fun getAllEncryptedPassword(): List<PasswordEntity>
+    fun getAllEncryptedPassword(): LiveData<List<PasswordEntity>>
 
     @Query("SELECT * FROM passwordentity WHERE id = :id")
-    suspend fun getPasswordDetails(id: Int): PasswordEntity
+    fun getPasswordDetails(id: Int): LiveData<PasswordEntity>
 
 
     @Query("SELECT encryptedData FROM passwordentity WHERE id = :id")

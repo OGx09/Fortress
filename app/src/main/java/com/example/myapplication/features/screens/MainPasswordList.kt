@@ -32,6 +32,7 @@ import com.example.myapplication.features.ui.Paddings
 import com.example.myapplication.features.ui.iconColor
 import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
+import com.example.myapplication.repository.models.LoadingState
 import com.example.myapplication.utils.Routes
 
 
@@ -42,8 +43,9 @@ fun MainPasswordList(activity: MainActivity,
 
 
 
-    val savePassword :
-            List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(emptyList())
+    val savePassword : List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(
+        emptyList()
+    )
 
 
     Scaffold(
@@ -92,6 +94,7 @@ fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, nav
         state = lazyState,
         contentPadding = PaddingValues(all = Dp(value = 10f))
     ) {
+
         items(list) {passwordEntity ->
             //fadeInItemState.setValue()
             SavedPasswordItem(activity, passwordEntity = passwordEntity, navController)
