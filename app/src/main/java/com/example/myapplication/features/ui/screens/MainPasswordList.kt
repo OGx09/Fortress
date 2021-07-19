@@ -37,17 +37,6 @@ import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.Role.Companion.Image
-import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
-import com.google.accompanist.coil.rememberCoilPainter
 
 
 @Composable
@@ -139,14 +128,14 @@ fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, na
                     .border(2.dp, randomColor(), CircleShape)
                     .background(color = iconColor)) {
                     Center {
-                        Image(
-                            painter = rememberImagePainter(
-                                data = "https://www.example.com/image.jpg",
-                                builder = {
-                                    transformations(CircleCropTransformation())
-                                }
-                            )
-                        )
+//                        Image(
+//                            painter = rememberImagePainter(
+//                                data = "https://www.example.com/image.jpg",
+//                                builder = {
+//                                    transformations(CircleCropTransformation())
+//                                }
+//                            )
+//                        )
 
                         Text(passwordEntity.websiteName[0].toString().uppercase(),
                             textAlign = TextAlign.Center,
