@@ -1,4 +1,4 @@
-package com.example.myapplication.features.screens
+package com.example.myapplication.features.ui.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
-import com.example.myapplication.features.ui.StateCodelabTheme
 
 @Composable
 fun PasswordDetails(activity: MainActivity, viewModel: MainActivityViewModel){

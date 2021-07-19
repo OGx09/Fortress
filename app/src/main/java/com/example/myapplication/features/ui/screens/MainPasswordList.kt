@@ -1,4 +1,4 @@
-package com.example.myapplication.features.screens
+package com.example.myapplication.features.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +32,6 @@ import com.example.myapplication.features.ui.Paddings
 import com.example.myapplication.features.ui.iconColor
 import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.repository.models.LoadingState
 import com.example.myapplication.utils.Routes
 
 

@@ -16,9 +16,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.features.screens.AddNewPassword
-import com.example.myapplication.features.screens.MainPasswordList
-import com.example.myapplication.features.screens.PasswordDetails
+import com.example.myapplication.features.ui.screens.AddNewPassword
+import com.example.myapplication.features.ui.screens.MainPasswordList
+import com.example.myapplication.features.ui.screens.PasswordDetails
 import com.example.myapplication.features.ui.StateCodelabTheme
 import com.example.myapplication.utils.FingerprintUtils
 import com.example.myapplication.utils.Routes
@@ -52,6 +52,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     @Composable
     private fun MainContent() {
         navController = rememberNavController()
+        val snackbarHostState = remember { SnackbarHostState() }
 
         var screenChangeAnimState by  remember { mutableStateOf(0F) }
 
@@ -61,7 +62,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
             composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
             composable(Routes.ADD_NEW_PASSWORD) {
                 screenChangeAnimState = 1f
-                AddNewPassword(fingerprintUtil, this@MainActivity, viewModel, screenChangeAnimState)
+                AddNewPassword(fingerprintUtil, this@MainActivity, viewModel, screenChangeAnimState, snackbarHostState)
             }
         }
 

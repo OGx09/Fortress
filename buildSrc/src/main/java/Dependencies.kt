@@ -34,7 +34,7 @@ object Libs{
         "androidx.navigation:navigation-ui-ktx:${Versions.navigation}",
         "androidx.navigation:navigation-compose:2.4.0-alpha04",
         "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
-        "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
+        "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 

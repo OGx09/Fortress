@@ -105,6 +105,8 @@ dependencies {
         kapt(it)
     }
 
-
+//    Libs.debugLibs.forEach {libs ->
+//        debugImplementation(libs)
+//    }
 
 }

@@ -1,12 +1,8 @@
-package com.example.myapplication.features.screens
+package com.example.myapplication.features.ui.screens
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -17,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -25,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
@@ -37,30 +31,26 @@ import com.example.myapplication.repository.models.LoadingState
 import com.example.myapplication.utils.FingerprintUtils
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import javax.inject.Inject
-
 
 
 //@ExperimentalUnitApi
 @ExperimentalCoroutinesApi
 @ExperimentalComposeApi
 @Composable
-fun AddNewPassword(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity, viewModel: MainActivityViewModel, alphaState: Float){
+fun AddNewPassword(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity,
+                   viewModel: MainActivityViewModel, alphaState: Float, scaffdoldState: SnackbarHostState?){
 
-
-    Crossfade(targetState = alphaState,
-        animationSpec = tween(3000)) { alpha ->
-        Surface(modifier = Modifier.alpha(alpha)) {
-            MainContent(fingerprintUtil = fingerprintUtil, mainActivity = mainActivity, viewModel = viewModel)
-        }
+    val scaffoldState = rememberScaffoldState()
+    Scaffold(scaffoldState = scaffoldState) {
+        MainContent(fingerprintUtil = fingerprintUtil,
+            mainActivity = mainActivity,
+            viewModel = viewModel, scaffoldState = scaffoldState)
     }
-
-
-    
 }
 
 @Composable
-private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity, viewModel: MainActivityViewModel){
+private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity, viewModel: MainActivityViewModel,
+                        scaffoldState: ScaffoldState?){
 
     val webTextState = remember { mutableStateOf(TextFieldValue()) }
 
@@ -73,14 +63,20 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
     val buttonState = remember{ mutableStateOf(false) }
     val savePasswordToDbState = viewModel
         .savePasswordDataLiveData.observeAsState(initial = LoadingState(data = false))
-    savePasswordToDbState.value.apply {
-        Log.d("savePasswordToDbState", "$this")
+
+    savePasswordToDbState.value.error?.apply {
+        Log.d("savePasswordToDbState", this)
+
+        LaunchedEffect(key1 =  scaffoldState){
+            scaffoldState?.snackbarHostState?.showSnackbar(this@apply)
+        }
     }
 
     val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
 
     val statesToCheck = arrayOf(buzzTextState,
         webNameTextState, passwordTextState, webTextState, usernameState)
+
 
     val scrollableState = rememberScrollableState {delta ->
         delta
@@ -154,18 +150,21 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         Spacer(modifier = Modifier.size(30.dp))
 
         Button(onClick = {
-
             fingerprintUtil.register(mainActivity as FragmentActivity)
                 .observe(mainActivity){
                     Log.d("DefaultTextField", "T_HIS $it")
                     it.errorString?.apply {
-                        Log.d("DefaultTextField", "T_HIS $this")
+                        viewModel.showMessage(this)
                     }
+
                     it.cryptoObject?.cipher?.apply {
+                        Log.d("CypherText", "Cypher $this")
+
                         viewModel.savePassword(webTextState.value.text,
                             webNameTextState.value.text,
                             passwordTextState.value.text,
-                            buzzWord = buzzTextState.value.text, "null", this)
+                            buzzWord = buzzTextState.value.text,
+                            username = usernameState.value.text, this)
                     }
                 }}, enabled = buttonState.value,
             modifier = Modifier
@@ -175,6 +174,23 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         ) {
             Text("Save Password", fontSize = 18.sp)
         }
+    }
+
+
+    val snackbarState =viewModel.msgLiveData.observeForever {
+        Log.d("DefaultTextFie__ldd", "T_HIS $it")
+    }
+//    snackbarState.value?.apply {
+//        ShowMessage(scaffoldState = scaffoldState, msg = this)
+//    }
+}
+
+
+@Composable
+fun ShowMessage(scaffoldState: SnackbarHostState?, msg: String){
+
+    LaunchedEffect(key1 =  scaffoldState){
+        scaffoldState?.showSnackbar(msg)
     }
 }
 
