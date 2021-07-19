@@ -52,7 +52,6 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     @Composable
     private fun MainContent() {
         navController = rememberNavController()
-        val snackbarHostState = remember { SnackbarHostState() }
 
         var screenChangeAnimState by  remember { mutableStateOf(0F) }
 
@@ -62,7 +61,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
             composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
             composable(Routes.ADD_NEW_PASSWORD) {
                 screenChangeAnimState = 1f
-                AddNewPassword(fingerprintUtil, this@MainActivity, viewModel, screenChangeAnimState, snackbarHostState)
+                AddNewPassword(fingerprintUtil, this@MainActivity, viewModel)
             }
         }
 

@@ -1,5 +1,8 @@
 package com.example.myapplication.features.ui.screens
 
+import android.graphics.Bitmap
+import android.util.Base64
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,6 +36,18 @@ import com.example.myapplication.features.ui.iconColor
 import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role.Companion.Image
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
+import com.google.accompanist.coil.rememberCoilPainter
 
 
 @Composable
@@ -111,6 +126,7 @@ fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, na
                 navController.navigate(Routes.PASSWORD_DETAILS)
             }
         ) {
+
             Row(modifier =
             Modifier
                 .fillMaxSize()
@@ -123,6 +139,15 @@ fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, na
                     .border(2.dp, randomColor(), CircleShape)
                     .background(color = iconColor)) {
                     Center {
+                        Image(
+                            painter = rememberImagePainter(
+                                data = "https://www.example.com/image.jpg",
+                                builder = {
+                                    transformations(CircleCropTransformation())
+                                }
+                            )
+                        )
+
                         Text(passwordEntity.websiteName[0].toString().uppercase(),
                             textAlign = TextAlign.Center,
                             fontSize = 17.sp,

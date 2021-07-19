@@ -38,7 +38,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalComposeApi
 @Composable
 fun AddNewPassword(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity,
-                   viewModel: MainActivityViewModel, alphaState: Float, scaffdoldState: SnackbarHostState?){
+                   viewModel: MainActivityViewModel){
 
     val scaffoldState = rememberScaffoldState()
     Scaffold(scaffoldState = scaffoldState) {

@@ -68,17 +68,17 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
             _savePasswordDataLiveData.value = (LoadingState(isLoading = true))
             try {
                 val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
-                val icon: String? = websiteIcon.icons[2]?.url
-                val base64 = encodeToString(icon?.encodeToByteArray(), Base64.DEFAULT)
+                val iconUrl: String? = websiteIcon.icons[2]?.url
+
                 val fortressModel = FortressModel(
                     websiteUrl,
-                    username, password, base64
+                    username, password, iconUrl
                 )
                 val passwordEntity = PasswordEntity(
                     null,
                     websiteName = websiteName,
                     website = websiteUrl, otherInfo = buzzWord,
-                    iconBytes = base64
+                    iconBytes = iconUrl ?: ""
                 )
                 passwordEntity.fortressModel = fortressModel
                 repository.savePassword(cipher, passwordEntity)

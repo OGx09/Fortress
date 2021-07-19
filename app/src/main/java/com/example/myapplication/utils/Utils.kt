@@ -1,4 +1,4 @@
 package com.example.myapplication.utils
-
-class Utils {
-}
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.foundation.Image
