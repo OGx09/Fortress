@@ -1,8 +1,5 @@
 package com.example.myapplication.features.ui.screens
 
-import android.graphics.Bitmap
-import android.util.Base64
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +34,9 @@ import com.example.myapplication.features.ui.randomColor
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 
 
 @Composable
@@ -128,21 +128,13 @@ fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, na
                     .border(2.dp, randomColor(), CircleShape)
                     .background(color = iconColor)) {
                     Center {
-//                        Image(
-//                            painter = rememberImagePainter(
-//                                data = "https://www.example.com/image.jpg",
-//                                builder = {
-//                                    transformations(CircleCropTransformation())
-//                                }
-//                            )
-//                        )
+                        Image(painter  = rememberImagePainter(
+                            data = passwordEntity.iconBytes,
+                            builder = {
+                                transformations(CircleCropTransformation())
+                            }
+                        ), "")
 
-                        Text(passwordEntity.websiteName[0].toString().uppercase(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 17.sp,
-                            color = colorResource(id = R.color.white),
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.wrapContentSize())
                     }
                 }
                 Column(modifier = Modifier.padding(start = 10.dp)) {
