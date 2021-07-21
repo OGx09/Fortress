@@ -10,6 +10,7 @@ object Versions {
     const val composable ="1.0.0-beta09"
     const val navigation ="2.3.5"
     const val retrofit ="2.9.0"
+    const val coil ="1.3.0"
 }
 
 object Libs{
@@ -35,6 +36,7 @@ object Libs{
         "androidx.navigation:navigation-compose:2.4.0-alpha04",
         "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
+        "io.coil-kt:coil-compose:${Versions.coil}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 
