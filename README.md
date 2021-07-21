@@ -1,7 +1,7 @@
 # Fortress
 
 Fortress is a small project which demonstrate how to use Jetpack Compose and other latest Android libraries. The architecture used in Fortress is the well known MVVM.
-Some libraries used in the project include but not limited to:
+<br/><br/>Some libraries used in the project include but not limited to:
 
 - Coil - For loading images
 - Android Biometric
