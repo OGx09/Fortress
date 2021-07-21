@@ -15,4 +15,4 @@ Fortress is a small project which demonstrate how to use Jetpack Compose and oth
 I'm using the `buildSrc` for dependency management. I know, I know, it's not a multi-module project yet.
 
 Image credits:
-<a href='https://www.freepik.com/vectors/business'>Business vector created by jcomp - www.freepik.com</a>
+<a href='https://www.freepik.com/vectors/business'>jcomp</a>
