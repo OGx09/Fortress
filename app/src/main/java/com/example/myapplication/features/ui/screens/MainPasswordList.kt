@@ -80,7 +80,7 @@ fun MainPasswordList(activity: MainActivity,
         },
         content = {
             Column(verticalArrangement = Arrangement.Center) {
-                Text("Welcome, Gbenga", // To be replaced with data store value
+                Text("Welcome, Gbenga", // To be replaced with data store value later
                     fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(10.dp))
                 Text("Your Passwords In One Secure Place",
                     fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(10.dp))
