@@ -35,6 +35,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.sharp.Add
 import androidx.compose.ui.draw.shadow
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
@@ -60,11 +61,14 @@ fun MainPasswordList(activity: MainActivity,
                 .fillMaxWidth(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Icon(Icons.Rounded.Menu,
-                    contentDescription = "Add password",
-                    modifier = Modifier.size(30.dp))
-                //.background(Color.White).shadow(elevation = 5.dp)
-                PoppedButton()
+                Box(modifier = Modifier.padding(top = 1.dp)) {
+                    Icon(Icons.Rounded.Menu,
+                        contentDescription = "Add password",
+                        modifier = Modifier.size(30.dp))
+                }
+                PoppedButton(clickable = {
+                    //Show search box
+                })
 
             }
         },
@@ -75,16 +79,19 @@ fun MainPasswordList(activity: MainActivity,
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 navController.navigate(Routes.ADD_NEW_PASSWORD)}) {
-                Icon(painter = painterResource(id = android.R.drawable.ic_input_add), contentDescription = "")
+                Icon(Icons.Sharp.Add, contentDescription = "")
             }
         },
         content = {
             Column(verticalArrangement = Arrangement.Center) {
+                Spaces.Small()
                 Text("Welcome, Gbenga", // To be replaced with data store value later
-                    fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(10.dp))
+                    fontWeight = FontWeight.Bold, fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 10.dp,
+                        end = 10.dp))
                 Text("Your Passwords In One Secure Place",
                     fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(10.dp))
-                Spacer(modifier = Modifier.size(15.dp))
+                Spaces.Small()
                 SavePasswordContents(activity, list = savePassword, navController)
             }
         }
@@ -92,9 +99,15 @@ fun MainPasswordList(activity: MainActivity,
 }
 
 @Composable
-fun PoppedButton() = Card(modifier = Modifier.background(Color.White)
-    .shadow(elevation = 5.dp, shape = RoundedCornerShape(5.dp)).size(width = 55.dp,
-        height = 30.dp)){
+@Suppress("unused")
+fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
+    .padding(10.dp)
+    .clickable { clickable }
+    .shadow(elevation = 5.dp, shape = RoundedCornerShape(5.dp))
+    .size(
+        width = 55.dp,
+        height = 30.dp
+    )){
     Icon(
         Icons.Rounded.Search,
         contentDescription = "Search", modifier = Modifier.size(30.dp
