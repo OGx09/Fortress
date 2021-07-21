@@ -27,6 +27,7 @@ val white100 = Color(0xFFFFFFFF)
 val grey900 = Color(0xff212121)
 val grey800 = Color(0xff424242)
 val iconColor = Color(0xFFeceff1)
+val scaffoldColor = Color(0xFFe5e1e6)
 
 fun randomColor(): Color{
     val rand = Random(200)
