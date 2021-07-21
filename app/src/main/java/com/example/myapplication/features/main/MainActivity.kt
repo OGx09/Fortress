@@ -20,6 +20,7 @@ import com.example.myapplication.features.ui.screens.AddNewPassword
 import com.example.myapplication.features.ui.screens.MainPasswordList
 import com.example.myapplication.features.ui.screens.PasswordDetails
 import com.example.myapplication.features.ui.StateCodelabTheme
+import com.example.myapplication.features.ui.screens.WelcomePage
 import com.example.myapplication.utils.FingerprintUtils
 import com.example.myapplication.utils.Routes
 import java.util.*
@@ -56,7 +57,8 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
         var screenChangeAnimState by  remember { mutableStateOf(0F) }
 
         NavHost(navController = navController,
-            startDestination = Routes.PASSWORD_MAIN) {
+            startDestination = Routes.WELCOME) {
+            composable(Routes.WELCOME) {WelcomePage(this@MainActivity, viewModel, navController)}
             composable(Routes.PASSWORD_MAIN) {MainPasswordList(this@MainActivity, viewModel, navController) }
             composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
             composable(Routes.ADD_NEW_PASSWORD) {

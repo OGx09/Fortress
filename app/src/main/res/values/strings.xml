@@ -3,4 +3,7 @@
     <string name="title_other_info">Other Info</string>
     <string name="title_username">Username/Email</string>
     <string name="action_back">Back</string>
+    <string name="welcome_intro">Welcome, new user. This open source password manager app saves your plain password by encrypting it with your fingerprint making it almost impossible for anyone to access.</string>
+    <string name="title_welcome_fortress">Welcome to Fortress</string>
+    <string name="action_getting_started">Get Started</string>
 </resources>

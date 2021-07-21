@@ -10,4 +10,8 @@ object Spaces {
 
     @Composable
     fun Small() = Spacer(modifier = Modifier.size(15.dp))
+    @Composable
+    fun Medium() = Spacer(modifier = Modifier.size(20.dp))
+    @Composable
+    fun Large() = Spacer(modifier = Modifier.size(30.dp))
 }

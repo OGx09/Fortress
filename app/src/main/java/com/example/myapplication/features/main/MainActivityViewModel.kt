@@ -5,6 +5,7 @@ import android.util.Base64.encodeToString
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.repository.models.FortressModel
@@ -19,7 +20,7 @@ import javax.inject.Inject
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21. /storage/emulated/0/Android/data/com.appzonegroup.fcmb.dev/files/Pictures/JPEG_20210718_183510_3308039024051686293.jpg
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(){
+class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
 
     private val _savePasswordEntityLiveData = MediatorLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : MediatorLiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
@@ -30,18 +31,38 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _msgLiveData = MutableLiveData<String>()
     val msgLiveData : LiveData<String> = _msgLiveData
 
+    private val _welcomeUsername = MutableLiveData<String>()
+    val welcomeUsername: LiveData<String> = _welcomeUsername
+
+    private val _openPasswordMain = MutableLiveData<Boolean>()
+    val openPasswordMain: LiveData<Boolean> = _openPasswordMain
+
     init {
         readSavedPasswordDetails()
+    }
+
+    override fun welcome(username: String){
+        _welcomeUsername.value = username
+    }
+
+    override fun saveWelcomeUsername(username: String) {
+        viewModelScope.launch {
+            repository.saveToDataStore(username)
+        }
     }
 
     fun showMessage(msg: String){
         _msgLiveData.value = msg
     }
 
+    fun openPasswordMain(hasUsername : Boolean){
+        _openPasswordMain.value = hasUsername
+        Log.d("FortressRepository", "FortressRepositoryImpl $hasUsername")
+    }
+
     fun readSavedPassword(cipher: Cipher, id: Int){
         viewModelScope.launch(Dispatchers.Main) {
             val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
-            Log.d("FortressRepository", "FortressRepositoryImpl ${allPasswords}")
             allPasswords?.apply {
               //  _savePasswordDataLiveData.postValue( this)
             }

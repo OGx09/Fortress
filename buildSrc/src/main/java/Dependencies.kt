@@ -11,10 +11,13 @@ object Versions {
     const val navigation ="2.3.5"
     const val retrofit ="2.9.0"
     const val coil ="1.3.0"
+    const val datastore ="1.0.0-rc01"
 }
 
 object Libs{
     val deps = arrayOf(
+        "androidx.datastore:datastore-preferences:${Versions.datastore}",
+        "androidx.datastore:datastore-preferences-core:${Versions.datastore}",
         "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin_stdlib}",
         "androidx.core:core-ktx:1.3.2",
         "androidx.appcompat:appcompat:1.2.0",

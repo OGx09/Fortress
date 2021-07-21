@@ -1,6 +1,9 @@
 package com.example.myapplication.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.FortressRepositoryImpl
@@ -9,6 +12,7 @@ import com.example.myapplication.repository.WebsiteLogoService
 import com.example.myapplication.repository.database.FortressDatabase
 import com.example.myapplication.repository.models.WebsiteLogo
 import com.example.myapplication.utils.EncryptionUtils
+import com.example.myapplication.utils.dataStore
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -18,6 +22,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import kotlin.properties.ReadOnlyProperty
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -51,7 +56,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFortressRepository(encryptionUtils: EncryptionUtils, websiteLogoService: WebsiteLogoService): FortressRepository{
-        return FortressRepositoryImpl(encryptionUtils, websiteLogoService)
+    fun provideFortressRepository(encryptionUtils: EncryptionUtils,
+                                  websiteLogoService: WebsiteLogoService,
+                                  dataStore: DataStore<Preferences> ): FortressRepository{
+        return FortressRepositoryImpl(encryptionUtils, websiteLogoService, dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatastore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
     }
 }

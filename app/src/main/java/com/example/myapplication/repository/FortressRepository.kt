@@ -18,5 +18,7 @@ interface FortressRepository {
 
     suspend fun fetchwebsiteIcon(websiteUrl: String) : WebsiteLogo
 
+    suspend fun saveToDataStore(value: String)
+
     //suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel>
 }

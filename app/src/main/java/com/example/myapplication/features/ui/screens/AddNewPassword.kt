@@ -65,8 +65,6 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         .savePasswordDataLiveData.observeAsState(initial = LoadingState(data = false))
 
     savePasswordToDbState.value.error?.apply {
-        Log.d("savePasswordToDbState", this)
-
         LaunchedEffect(key1 =  scaffoldState){
             scaffoldState?.snackbarHostState?.showSnackbar(this@apply)
         }
