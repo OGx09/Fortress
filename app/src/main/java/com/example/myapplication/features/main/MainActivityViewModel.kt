@@ -12,6 +12,8 @@ import com.example.myapplication.repository.models.FortressModel
 import com.example.myapplication.repository.models.LoadingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.crypto.Cipher
@@ -34,8 +36,8 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _welcomeUsername = MutableLiveData<String>()
     val welcomeUsername: LiveData<String> = _welcomeUsername
 
-    private val _openPasswordMain = MutableLiveData<Boolean>()
-    val openPasswordMain: LiveData<Boolean> = _openPasswordMain
+    private val _openPasswordMain = MutableSharedFlow<String>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    val openPasswordMain: SharedFlow<String> = _openPasswordMain.asSharedFlow()
 
     init {
         readSavedPasswordDetails()
@@ -55,9 +57,13 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
         _msgLiveData.value = msg
     }
 
+
     fun openPasswordMain(hasUsername : Boolean){
-        _openPasswordMain.value = hasUsername
-        Log.d("FortressRepository", "FortressRepositoryImpl $hasUsername")
+       if (hasUsername){
+           //Save to the data store and proceed!
+       }else{
+           _openPasswordMain.tryEmit("hasUsername $hasUsername")
+       }
     }
 
     fun readSavedPassword(cipher: Cipher, id: Int){

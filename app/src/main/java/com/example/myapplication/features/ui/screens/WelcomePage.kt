@@ -5,16 +5,17 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowForward
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,53 +33,76 @@ import com.example.myapplication.features.ui.Spaces
 import com.example.myapplication.features.ui.StateCodelabTheme
 import com.example.myapplication.features.ui.white100
 import com.example.myapplication.utils.Routes
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 
 @Composable
 fun WelcomePage (activity: MainActivity, viewModel: MainActivityViewModel, navController: NavController){
 
-
     val scaffoldState = rememberScaffoldState()
     Scaffold( scaffoldState = scaffoldState) {
-        WelcomePageComponents(viewModel, scaffoldState, navController = navController)
+        WelcomePageComponents(activity = activity, viewModel, scaffoldState, navController = navController)
     }
 }
 
 @Composable
-fun WelcomePageComponents(viewModel: MainActivityViewModel, scaffoldState: ScaffoldState, navController: NavController){
+fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewModel, scaffoldState: ScaffoldState, navController: NavController){
 
     val username: String = viewModel.welcomeUsername.observeAsState("").value
+    val buttonState = remember{mutableStateOf(false)}
+    val focusManager = LocalFocusManager.current
+    val openPasswordState = viewModel.openPasswordMain
+
+    //This is now working
+    LaunchedEffect(viewModel.openPasswordMain){
+        openPasswordState.collect {
+            scaffoldState.snackbarHostState.showSnackbar(it)
+        }
+    }
+
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween) {
         BoxWithConstraints(modifier = Modifier
-            .fillMaxHeight(0.55f)
+            .fillMaxHeight(0.53f)
             .background(white100)) {
             Image(painter = painterResource(id = R.drawable.data_security_img),
-                contentDescription = "")
+                contentDescription = "", modifier = Modifier.align(Alignment.Center))
         }
-        Spaces.Large()
         Text(stringResource(R.string.title_welcome_fortress),
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.welcome_intro),
             modifier = Modifier.padding(10.dp),
-            fontSize = 14.sp, textAlign = TextAlign.Center)
+            fontSize = 14.sp, textAlign = TextAlign.Center, color = Color.Gray)
         Spaces.Small()
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             value = username,
             onValueChange =  {
                 viewModel.welcome(it)
             },
-            label = {Text("Welcome username")}
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            label = {Text("Welcome username")},
+            singleLine = true
         )
-        Spaces.Small()
-        Button(onClick = { viewModel.openPasswordMain(!TextUtils.isEmpty(username)) },
-            modifier = Modifier.size(height = 60.dp, width = Dp.Infinity)
-                .padding(start = 20.dp,
-                end = 20.dp, top = 20.dp)) {
+        Spaces.Medium()
+        Button(onClick = {
+            buttonState.value = true
+            viewModel.openPasswordMain(!TextUtils.isEmpty(username))
+                         },
+            modifier = Modifier
+                .size(height = 60.dp, width = Dp.Infinity)
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp,
+                ),) {
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(stringResource(R.string.action_getting_started))
@@ -87,15 +111,4 @@ fun WelcomePageComponents(viewModel: MainActivityViewModel, scaffoldState: Scaff
         }
     }
 
-    val openPasswordState = viewModel.openPasswordMain.observeAsState(null)
-    LaunchedEffect(key1 =  openPasswordState){
-        openPasswordState.value?.apply {
-            Log.d("FortressMainActio", "FortressRepositoryImpl $this")
-            if(this){
-                navController.navigate(Routes.PASSWORD_MAIN)
-            }else{
-                scaffoldState.snackbarHostState.showSnackbar("")
-            }
-        }
-    }
 }
