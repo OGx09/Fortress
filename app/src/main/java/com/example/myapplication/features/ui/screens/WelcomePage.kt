@@ -56,8 +56,8 @@ fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewMod
     val focusManager = LocalFocusManager.current
 
     //This is now working
-    LaunchedEffect(viewModel.messageState){
-        viewModel.messageState.collect {
+    LaunchedEffect(viewModel.openPasswordMain){
+        viewModel.openPasswordMain.collect {
             // scaffoldState.snackbarHostState.showSnackbar(it)
 //            viewModel.messageState.
         }

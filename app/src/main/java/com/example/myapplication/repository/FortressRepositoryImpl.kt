@@ -11,12 +11,18 @@ import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.data.FortressModel
 import com.example.myapplication.data.WebsiteLogo
 import com.example.myapplication.utils.EncryptionUtils
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
+import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "username_store")
 
-class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils,
+class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
                              private val websiteLogoService: WebsiteLogoService,
+                             private val dispatcher: CoroutineDispatcher,
                              private val datastore: DataStore<Preferences>) : FortressRepository{
 
     companion object{
@@ -33,8 +39,12 @@ class FortressRepositoryImpl(private val encryptionUtils: EncryptionUtils,
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao.delete(passwordEntity = passwordEntity)
 
-    override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity){
-        encryptionUtils.encryptSecretInformation(cipher = cipher, passwordEntity = passwordEntity)
+    override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity) =
+        withContext(dispatcher){
+        encryptionUtils.encryptSecretInformation(
+            cipher = cipher,
+            passwordEntity = passwordEntity
+        )
     }
 
     override suspend fun fetchwebsiteIcon(websiteUrl: String): WebsiteLogo {

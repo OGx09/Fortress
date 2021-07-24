@@ -17,8 +17,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -51,12 +54,19 @@ object AppModule {
         return retrofit.create(WebsiteLogoService::class.java)
     }
 
+
+    @Provides
+    @DefaultDispatcher
+    fun provideDefaultDispatchers() : CoroutineDispatcher = Dispatchers.Default
+
+
     @Provides
     @Singleton
     fun provideFortressRepository(encryptionUtils: EncryptionUtils,
                                   websiteLogoService: WebsiteLogoService,
-                                  dataStore: DataStore<Preferences> ): FortressRepository{
-        return FortressRepositoryImpl(encryptionUtils, websiteLogoService, dataStore)
+                                  dataStore: DataStore<Preferences>,
+                                  @DefaultDispatcher dispatcher: CoroutineDispatcher): FortressRepository{
+        return FortressRepositoryImpl(encryptionUtils, websiteLogoService, dispatcher, dataStore)
     }
 
     @Provides
@@ -64,4 +74,11 @@ object AppModule {
     fun provideDatastore(@ApplicationContext context: Context): DataStore<Preferences> {
         return context.dataStore
     }
+
 }
+
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class DefaultDispatcher
+

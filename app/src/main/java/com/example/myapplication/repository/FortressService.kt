@@ -12,5 +12,4 @@ interface WebsiteLogoService {
 
     @GET("allicons.json")
     suspend fun getWebsiteLogo(@Query("url") websiteUrl: String): WebsiteLogo
-
 }

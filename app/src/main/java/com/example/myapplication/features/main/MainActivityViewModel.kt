@@ -6,7 +6,9 @@ import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.data.FortressModel
 import com.example.myapplication.data.LoadingState
+import com.example.myapplication.features.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -32,8 +34,8 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _welcomeUsername = MutableLiveData<String>()
     val welcomeUsername: LiveData<String> = _welcomeUsername
 
-    private val _openPasswordMain = MutableSharedFlow<String>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
-    val openPasswordMain: SharedFlow<String> = _openPasswordMain.asSharedFlow()
+    private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
     init {
         readSavedPasswordDetails()
@@ -54,23 +56,18 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     }
 
 
-    fun openPasswordMain(username : String?){
-        try {
-            if (username != null && username.length > 2) {
-                //Save to the data store and proceed!
-                viewModelScope.launch {
-                    repository.saveToDataStore(username)
-                    _openPasswordMain.tryEmit(username)
-                }
-            } else {
-                _messageState.tryEmit("Your username length must be more than two")
+    fun openPasswordMain(username : String?) {
+        if (username != null && username.length > 2) {
+            //Save to the data store and proceed!
+            viewModelScope.launch {
+                repository.saveToDataStore(username)
+                _openPasswordMain.tryEmit(UiState(data = username))
             }
-        }catch (e: Exception){
-            e.message?.apply {
-                _messageState.tryEmit(this)
-            }
+        } else {
+            _openPasswordMain.tryEmit(UiState(error = "Your username length must be more than two"))
         }
     }
+
 
     fun readSavedPassword(cipher: Cipher, id: Int){
         viewModelScope.launch(Dispatchers.Main) {
