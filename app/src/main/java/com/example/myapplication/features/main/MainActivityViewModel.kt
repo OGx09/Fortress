@@ -13,10 +13,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 import javax.crypto.Cipher
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.Throws
 
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21. /storage/emulated/0/Android/data/com.appzonegroup.fcmb.dev/files/Pictures/JPEG_20210718_183510_3308039024051686293.jpg
+
+
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
@@ -37,12 +42,33 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
+
+    private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
+    val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
+
     init {
         readSavedPasswordDetails()
+        checkForExistingLogin()
     }
 
     override fun welcome(username: String){
         _welcomeUsername.value = username
+    }
+
+    private fun checkForExistingLogin(){
+        viewModelScope.launch(handleError {
+            _openWelcomeOrPasswordMain.value = ( UiState(error = it.message))
+        }) {
+            repository.fetchUsername().collect {username ->
+                username.apply {
+                    if (this != null){
+                        _openWelcomeOrPasswordMain.value = ( UiState(data = this))
+                    }else{
+                        throw IllegalArgumentException("No username")
+                    }
+                }
+            }
+        }
     }
 
     override fun saveWelcomeUsername(username: String) {
@@ -55,17 +81,23 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
         _messageState.tryEmit(msg)
     }
 
+    private fun handleError(errorContent: (Throwable) -> Unit) = CoroutineExceptionHandler { _, exception ->
+        errorContent(exception)
+    }
 
     fun openPasswordMain(username : String?) {
-        if (username != null && username.length > 2) {
-            //Save to the data store and proceed!
-            viewModelScope.launch {
+        viewModelScope.launch(handleError{
+            _openPasswordMain.tryEmit(UiState(error = it.message))
+        }) {
+            if (username != null && username.length > 2) {
+                //Save to the data store and proceed!
                 repository.saveToDataStore(username)
                 _openPasswordMain.tryEmit(UiState(data = username))
+            } else {
+                throw IllegalArgumentException("Your username length must be more than two")
             }
-        } else {
-            _openPasswordMain.tryEmit(UiState(error = "Your username length must be more than two"))
         }
+
     }
 
 

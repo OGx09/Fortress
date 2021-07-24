@@ -52,16 +52,9 @@ fun WelcomePage (activity: MainActivity, viewModel: MainActivityViewModel, navCo
 fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewModel, scaffoldState: ScaffoldState, navController: NavController){
 
     val username: String = viewModel.welcomeUsername.observeAsState("").value
-    val buttonState = remember{mutableStateOf(false)}
     val focusManager = LocalFocusManager.current
 
-    //This is now working
-    LaunchedEffect(viewModel.openPasswordMain){
-        viewModel.openPasswordMain.collect {
-            // scaffoldState.snackbarHostState.showSnackbar(it)
-//            viewModel.messageState.
-        }
-    }
+    StartPasswordMain(viewModel, navController = navController, scaffoldState = scaffoldState)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween) {
@@ -108,5 +101,21 @@ fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewMod
             }
         }
     }
+}
 
+
+@Composable
+fun StartPasswordMain(viewModel: MainActivityViewModel, navController: NavController, scaffoldState: ScaffoldState){
+    //This is now working
+    LaunchedEffect(viewModel.openPasswordMain){
+        viewModel.openPasswordMain.collect {
+            it.data?.apply {
+                navController.popBackStack()
+                navController.navigate(Routes.PASSWORD_MAIN)
+            }
+            it.error?.apply {
+                scaffoldState.snackbarHostState.showSnackbar(this)
+            }
+        }
+    }
 }

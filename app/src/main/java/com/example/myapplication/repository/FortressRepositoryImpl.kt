@@ -14,6 +14,8 @@ import com.example.myapplication.utils.EncryptionUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
 import javax.inject.Inject
@@ -57,6 +59,10 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
         }
     }
 
+    override suspend fun fetchUsername(): Flow<String?> = dataStoreValue(DATASTORE_USERNAME)
+
+    @Suppress("Unchecked")
+    fun<T> dataStoreValue(key : Preferences.Key<*>) : Flow<T?> = datastore.data.map { pref -> pref[key] } as Flow<T?>
 
 //    override suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel> {
 //
