@@ -1,6 +1,6 @@
 package com.example.myapplication.repository
 
-import com.example.myapplication.repository.models.WebsiteLogo
+import com.example.myapplication.data.WebsiteLogo
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -12,5 +12,4 @@ interface WebsiteLogoService {
 
     @GET("allicons.json")
     suspend fun getWebsiteLogo(@Query("url") websiteUrl: String): WebsiteLogo
-
 }

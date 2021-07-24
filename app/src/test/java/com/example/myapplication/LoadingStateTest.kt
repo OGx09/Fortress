@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import com.example.myapplication.repository.models.LoadingState
+import com.example.myapplication.data.LoadingState
 import junit.framework.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

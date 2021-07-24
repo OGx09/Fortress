@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.example.myapplication.repository.models.FortressModel
+import com.example.myapplication.data.FortressModel
 import com.google.gson.Gson
 
 

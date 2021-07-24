@@ -35,7 +35,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.sharp.Add
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
@@ -46,8 +48,6 @@ fun MainPasswordList(activity: MainActivity,
                      viewModel : MainActivityViewModel,
                      navController: NavHostController) {
 
-
-
     val savePassword : List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(
         emptyList()
     )
@@ -57,34 +57,42 @@ fun MainPasswordList(activity: MainActivity,
         topBar = {
             Row(modifier = Modifier
                 .fillMaxHeight(fraction = 0.1f)
-                .fillMaxWidth(1f),
+                .fillMaxWidth(1f)
+                .padding(paddingValues = Paddings.normalAll),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                Icon(Icons.Rounded.Menu,
-                    contentDescription = "Add password",
-                    modifier = Modifier.size(30.dp))
-                //.background(Color.White).shadow(elevation = 5.dp)
-                PoppedButton()
+                Box(modifier = Modifier.padding(top = 5.dp, start = 8.dp)) {
+                    Icon(Icons.Rounded.Menu,
+                        contentDescription = "Add password",
+                        modifier = Modifier.size(30.dp))
+                }
+                PoppedButton(clickable = {
+                    //Show search box
+                })
 
             }
         },
+        //scaffoldColor
         modifier = Modifier
-            .padding(paddingValues = Paddings.normalAll)
-            .background(scaffoldColor),
+            .background(brush = Brush.linearGradient(colors = listOf(Color.White, Color.Blue, Color.Yellow))),
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 navController.navigate(Routes.ADD_NEW_PASSWORD)}) {
-                Icon(painter = painterResource(id = android.R.drawable.ic_input_add), contentDescription = "")
+                Icon(Icons.Sharp.Add, contentDescription = "")
             }
         },
         content = {
-            Column(verticalArrangement = Arrangement.Center) {
-                Text("Welcome, Gbenga", // To be replaced with data store value later
-                    fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(10.dp))
+            val username = viewModel.openWelcomeOrPasswordMain.observeAsState()
+            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(paddingValues = Paddings.normalAll)) {
+                Spaces.Small()
+                Text("Welcome, ${username.value?.data}", // To be replaced with data store value later
+                    fontWeight = FontWeight.Bold, fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 10.dp,
+                        end = 10.dp))
                 Text("Your Passwords In One Secure Place",
-                    fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(10.dp))
-                Spacer(modifier = Modifier.size(15.dp))
+                    fontWeight = FontWeight.Bold, fontSize = 28.sp, modifier = Modifier.padding(10.dp))
+                Spaces.Small()
                 SavePasswordContents(activity, list = savePassword, navController)
             }
         }
@@ -92,9 +100,15 @@ fun MainPasswordList(activity: MainActivity,
 }
 
 @Composable
-fun PoppedButton() = Card(modifier = Modifier.background(Color.White)
-    .shadow(elevation = 5.dp, shape = RoundedCornerShape(5.dp)).size(width = 55.dp,
-        height = 30.dp)){
+@Suppress("unused")
+fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
+    .padding(10.dp)
+    .clickable { clickable }
+    .shadow(elevation = 5.dp, shape = RoundedCornerShape(5.dp))
+    .size(
+        width = 55.dp,
+        height = 30.dp
+    )){
     Icon(
         Icons.Rounded.Search,
         contentDescription = "Search", modifier = Modifier.size(30.dp
