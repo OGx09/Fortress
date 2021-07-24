@@ -1,21 +1,16 @@
 package com.example.myapplication.features.main
 
-import android.util.Base64
-import android.util.Base64.encodeToString
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.repository.models.FortressModel
-import com.example.myapplication.repository.models.LoadingState
+import com.example.myapplication.data.FortressModel
+import com.example.myapplication.data.LoadingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.crypto.Cipher
 import javax.inject.Inject
 
@@ -30,8 +25,9 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _savePasswordDataLiveData = MutableLiveData<LoadingState<Boolean>>()
     val savePasswordDataLiveData : LiveData<LoadingState<Boolean>> = _savePasswordDataLiveData
 
-    private val _msgLiveData = MutableLiveData<String>()
-    val msgLiveData : LiveData<String> = _msgLiveData
+
+    private val _messageState = MutableSharedFlow<String>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    val messageState: SharedFlow<String> = _messageState.asSharedFlow()
 
     private val _welcomeUsername = MutableLiveData<String>()
     val welcomeUsername: LiveData<String> = _welcomeUsername
@@ -54,16 +50,26 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     }
 
     fun showMessage(msg: String){
-        _msgLiveData.value = msg
+        _messageState.tryEmit(msg)
     }
 
 
-    fun openPasswordMain(hasUsername : Boolean){
-       if (hasUsername){
-           //Save to the data store and proceed!
-       }else{
-           _openPasswordMain.tryEmit("hasUsername $hasUsername")
-       }
+    fun openPasswordMain(username : String?){
+        try {
+            if (username != null && username.length > 2) {
+                //Save to the data store and proceed!
+                viewModelScope.launch {
+                    repository.saveToDataStore(username)
+                    _openPasswordMain.tryEmit(username)
+                }
+            } else {
+                _messageState.tryEmit("Your username length must be more than two")
+            }
+        }catch (e: Exception){
+            e.message?.apply {
+                _messageState.tryEmit(this)
+            }
+        }
     }
 
     fun readSavedPassword(cipher: Cipher, id: Int){

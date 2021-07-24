@@ -2,8 +2,8 @@ package com.example.myapplication.repository
 
 import androidx.lifecycle.LiveData
 import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.repository.models.FortressModel
-import com.example.myapplication.repository.models.WebsiteLogo
+import com.example.myapplication.data.FortressModel
+import com.example.myapplication.data.WebsiteLogo
 import javax.crypto.Cipher
 
 interface FortressRepository {

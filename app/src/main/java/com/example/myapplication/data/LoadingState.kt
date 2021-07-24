@@ -1,4 +1,4 @@
-package com.example.myapplication.repository.models
+package com.example.myapplication.data
 
 data class LoadingState<D>(val data: D? =null, val error: String? = null, var isLoading: Boolean = true){
     init {

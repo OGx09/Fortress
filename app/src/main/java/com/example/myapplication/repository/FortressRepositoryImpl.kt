@@ -2,19 +2,16 @@ package com.example.myapplication.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.LiveData
-import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.repository.models.FortressModel
-import com.example.myapplication.repository.models.WebsiteLogo
+import com.example.myapplication.data.FortressModel
+import com.example.myapplication.data.WebsiteLogo
 import com.example.myapplication.utils.EncryptionUtils
 import javax.crypto.Cipher
-import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "username_store")
 

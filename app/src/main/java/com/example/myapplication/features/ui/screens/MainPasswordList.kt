@@ -47,8 +47,6 @@ fun MainPasswordList(activity: MainActivity,
                      viewModel : MainActivityViewModel,
                      navController: NavHostController) {
 
-
-
     val savePassword : List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(
         emptyList()
     )

@@ -1,6 +1,6 @@
 package com.example.myapplication.repository
 
-import com.example.myapplication.repository.models.WebsiteLogo
+import com.example.myapplication.data.WebsiteLogo
 import retrofit2.http.GET
 import retrofit2.http.Query
 

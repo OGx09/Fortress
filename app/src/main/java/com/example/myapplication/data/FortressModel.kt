@@ -1,4 +1,4 @@
-package com.example.myapplication.repository.models
+package com.example.myapplication.data
 
 import com.google.gson.Gson
 

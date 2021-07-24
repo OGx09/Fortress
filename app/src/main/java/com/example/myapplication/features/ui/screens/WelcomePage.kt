@@ -54,15 +54,14 @@ fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewMod
     val username: String = viewModel.welcomeUsername.observeAsState("").value
     val buttonState = remember{mutableStateOf(false)}
     val focusManager = LocalFocusManager.current
-    val openPasswordState = viewModel.openPasswordMain
 
     //This is now working
-    LaunchedEffect(viewModel.openPasswordMain){
-        openPasswordState.collect {
-            scaffoldState.snackbarHostState.showSnackbar(it)
+    LaunchedEffect(viewModel.messageState){
+        viewModel.messageState.collect {
+            // scaffoldState.snackbarHostState.showSnackbar(it)
+//            viewModel.messageState.
         }
     }
-
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween) {
@@ -94,8 +93,7 @@ fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewMod
         )
         Spaces.Medium()
         Button(onClick = {
-            buttonState.value = true
-            viewModel.openPasswordMain(!TextUtils.isEmpty(username))
+            viewModel.openPasswordMain(username)
                          },
             modifier = Modifier
                 .size(height = 60.dp, width = Dp.Infinity)

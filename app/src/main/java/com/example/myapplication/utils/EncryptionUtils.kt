@@ -6,7 +6,7 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.util.Log
 import com.example.myapplication.repository.database.FortressDao
 import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.repository.models.FortressModel
+import com.example.myapplication.data.FortressModel
 import com.google.gson.Gson
 import java.nio.charset.Charset
 import java.security.InvalidKeyException

@@ -1,8 +1,6 @@
 package com.example.myapplication.features.ui.screens
 
 import android.util.Log
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -12,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -27,7 +24,7 @@ import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.DefaultTextField
-import com.example.myapplication.repository.models.LoadingState
+import com.example.myapplication.data.LoadingState
 import com.example.myapplication.utils.FingerprintUtils
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -175,9 +172,9 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
     }
 
 
-    val snackbarState =viewModel.msgLiveData.observeForever {
-        Log.d("DefaultTextFie__ldd", "T_HIS $it")
-    }
+//    val snackbarState =viewModel.messageState.observeForever {
+//        Log.d("DefaultTextFie__ldd", "T_HIS $it")
+//    }
 //    snackbarState.value?.apply {
 //        ShowMessage(scaffoldState = scaffoldState, msg = this)
 //    }
