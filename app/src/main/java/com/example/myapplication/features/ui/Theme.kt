@@ -40,7 +40,7 @@ fun StateCodelabTheme(
 }
 
 @Composable
-fun DefaultTopbar(mainActivity: MainActivity, title: String? = null,
+fun DefaultTopbar(mainActivity: MainActivity, backgroundColor: Color? =null,  title: String? = null,
                   onClick: (() -> Unit)? = null) = TopAppBar(
     title = {
         Text(text = title ?: "Back")
@@ -58,7 +58,7 @@ fun DefaultTopbar(mainActivity: MainActivity, title: String? = null,
                 contentDescription = "Back Btn")
         }
     },
-    backgroundColor = MaterialTheme.colors.background,
+    backgroundColor = backgroundColor ?: MaterialTheme.colors.background,
     contentColor = MaterialTheme.colors.primary,
     elevation = 0.dp
 )
