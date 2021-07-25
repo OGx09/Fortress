@@ -52,5 +52,5 @@ private val LightColorPalette = lightColors(
         primaryVariant = purple700,
         secondary = grey800,
     surface = white100,
-    background = white100
+    background = white100,
 )

@@ -7,6 +7,7 @@ import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.data.FortressModel
 import com.example.myapplication.data.LoadingState
 import com.example.myapplication.features.ui.UiState
+import com.example.myapplication.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -29,8 +30,8 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _savePasswordEntityLiveData = MediatorLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : MediatorLiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
 
-    private val _savePasswordDataLiveData = MutableLiveData<LoadingState<Boolean>>()
-    val savePasswordDataLiveData : LiveData<LoadingState<Boolean>> = _savePasswordDataLiveData
+    private val _savePasswordDataLiveData = SingleLiveEvent<UiState<Boolean?>>()
+    val savePasswordDataLiveData : SingleLiveEvent<UiState<Boolean?>> = _savePasswordDataLiveData
 
 
     private val _messageState = MutableSharedFlow<String>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
@@ -127,7 +128,7 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
                      username: String, cipher: Cipher){
 
         viewModelScope.launch {
-            _savePasswordDataLiveData.value = (LoadingState(isLoading = true))
+            _savePasswordDataLiveData.value = (UiState(isLoading = true))
             try {
                 val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
                 val iconUrl: String? = websiteIcon.icons[2]?.url
@@ -144,11 +145,11 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
                 )
                 passwordEntity.fortressModel = fortressModel
                 repository.savePassword(cipher, passwordEntity)
-                _savePasswordDataLiveData.value = LoadingState(data = true)
+                _savePasswordDataLiveData.value = UiState(data = true)
             }catch (e : Exception){
                 e.printStackTrace()
                 Log.e("MyException", "${e.stackTrace}")
-                _savePasswordDataLiveData.value = LoadingState(error = e.message)
+                _savePasswordDataLiveData.value = UiState(error = e.message)
             }
         }
     }

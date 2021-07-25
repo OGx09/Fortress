@@ -49,8 +49,8 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
         )
     }
 
-    override suspend fun fetchwebsiteIcon(websiteUrl: String): WebsiteLogo {
-        return websiteLogoService.getWebsiteLogo(websiteUrl = websiteUrl)
+    override suspend fun fetchwebsiteIcon(websiteUrl: String): WebsiteLogo = withContext(dispatcher){
+        websiteLogoService.getWebsiteLogo(websiteUrl = websiteUrl)
     }
 
     override suspend fun saveToDataStore(value: String) {
@@ -64,8 +64,5 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
     @Suppress("Unchecked")
     fun<T> dataStoreValue(key : Preferences.Key<*>) : Flow<T?> = datastore.data.map { pref -> pref[key] } as Flow<T?>
 
-//    override suspend fun fetchDecryptedPasswords(cipher: Cipher): List<FortressModel> {
-//
-//    }
 
 }
