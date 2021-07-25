@@ -17,8 +17,9 @@ import java.util.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
 import androidx.biometric.BiometricManager
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
 
@@ -32,6 +33,17 @@ class MainThreadExecutor: Executor {
 
 }
 
+var hasCalled : Boolean = false
+
+suspend fun SharedFlow<FingerprintResult>.collectData(method: suspend  (FingerprintResult) -> Unit){
+
+    collect{
+        if (!hasCalled){
+            method.invoke(it)
+            hasCalled = true
+        }
+    }
+}
 
 class FingerprintUtils @Inject constructor(private val encrptedUtils: EncryptionUtils){
 
@@ -42,8 +54,10 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private var passwordEntity: PasswordEntity? =null
     private var mToBeSignedMessage: String? = null
 
-    val _mutableLiveAuthResultChannel: Channel<FingerprintResult> = Channel<FingerprintResult>(Channel.BUFFERED)
-    val mutableLiveAuthResultFlow = _mutableLiveAuthResultChannel.receiveAsFlow()
+    private val _mutableLiveAuthResultChannel: MutableSharedFlow<FingerprintResult> =
+        MutableSharedFlow<FingerprintResult>(replay = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
+    val mutableLiveAuthResultFlow = _mutableLiveAuthResultChannel.asSharedFlow()
+
 
     fun authenticate(activity: FragmentActivity,result: (FingerprintResult) -> Unit){
         if (canUseBiometric(activity)){
@@ -76,10 +90,12 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         }
         keyPairGenerator.initialize(keyBuilder.build())
 
+
         return keyPairGenerator.generateKeyPair()
     }
 
     fun register(activity: FragmentActivity) {
+        hasCalled = false
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
@@ -92,30 +108,10 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             }
             showBiometricPrompt(activity = activity,cipher = cipher)
         }else{
-            _mutableLiveAuthResultChannel.sendResult(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
+            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
     }
 
-
-    private fun Channel<FingerprintResult>.sendResult(value: FingerprintResult){
-        var job: Job? = null
-        job = CoroutineScope(Dispatchers.Main).launch {
-            Log.d("SavedPasswordItem", "hello : boo boo")
-            _mutableLiveAuthResultChannel.trySend(value)
-            if (job != null){
-                _mutableLiveAuthResultChannel.cancel()
-                job?.cancel()
-                Log.d("SavedPasswordItem", "hello : boo cancel $_mutableLiveAuthResultChannel")
-            }
-        }.job
-
-        Log.d("SavedPasswordItem", "hello : boo cancel ${job.isActive}")
-//        if (job.isActive){
-//            Log.d("SavedPasswordItem", "hello : boo isCompleted")
-//            job.cancel()
-//            _mutableLiveAuthResultChannel.close()
-//        }
-    }
 
     private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
 
@@ -167,7 +163,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
-            _mutableLiveAuthResultChannel.sendResult(FingerprintResult(errorString = errString.toString()))
+            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = errString.toString()))
             super.onAuthenticationError(errorCode, errString)
         }
 
@@ -176,13 +172,13 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
 
             if (result.cryptoObject != null){
 
-                _mutableLiveAuthResultChannel.sendResult(FingerprintResult(cryptoObject = result.cryptoObject))
+                _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(cryptoObject = result.cryptoObject))
             }
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            _mutableLiveAuthResultChannel.sendResult(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
+            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
     }
 

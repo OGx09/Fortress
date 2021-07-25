@@ -38,7 +38,9 @@ import androidx.fragment.app.FragmentActivity
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
+import com.example.myapplication.utils.collectData
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 
@@ -51,6 +53,22 @@ fun MainPasswordList(activity: MainActivity,
         emptyList()
     )
 
+    val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
+    LaunchedEffect(key1 = fingerPrintFlow){
+        Log.d("SavedPasswordItem", "hello : EBUBE DIKE")
+        fingerPrintFlow.collectData{
+            Log.d("SavedPasswordItem", "hello : $it")
+            it.errorString?.apply {
+                Log.d("SavedPasswordItem", "$this")
+                activity.viewModel.showMessage(this)
+            }
+
+            it.cryptoObject?.cipher?.apply {
+                Log.d("SavedPasswordItems", "$this")
+                navController.navigate(Routes.PASSWORD_DETAILS)
+            }
+        }
+    }
 
 //    result.value?.apply{
 //
@@ -152,21 +170,6 @@ fun SavePasswordContents(scaffoldState: ScaffoldState, activity: MainActivity, l
 @Composable
 fun SavedPasswordItem(scaffoldState: ScaffoldState, mainActivity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
 
-    val fingerPrintFlow = mainActivity.fingerprintUtil._mutableLiveAuthResultChannel
-    LaunchedEffect(key1 = fingerPrintFlow){
-        fingerPrintFlow.consumeEach {
-            Log.d("SavedPasswordItem", "hello : $it")
-        it.errorString?.apply {
-            Log.d("SavedPasswordItem", "$this")
-            mainActivity.viewModel.showMessage(this)
-        }
-
-            it.cryptoObject?.cipher?.apply{
-            Log.d("SavedPasswordItems", "$this")
-            navController.navigate(Routes.PASSWORD_DETAILS)
-        }
-        }
-    }
 
     Box(modifier = Modifier.padding(top = 20.dp, bottom = 15.dp)) {
         Card(elevation = 10.dp,
