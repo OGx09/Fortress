@@ -2,6 +2,7 @@ package com.example.myapplication.features.ui
 
 import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -20,7 +21,7 @@ fun StateCodelabTheme(
 ) {
 
     activity?.apply {
-        window.statusBarColor = MaterialTheme.colors.primaryVariant.toArgb()
+        window.statusBarColor = Color.Transparent.toArgb()
         val colors = if (darkTheme) {
             DarkColorPalette
         } else {

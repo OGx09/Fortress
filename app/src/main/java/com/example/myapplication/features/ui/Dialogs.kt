@@ -1,10 +1,19 @@
 package com.example.myapplication.features.ui
 
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Modifier.Companion.foldIn
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
+import com.example.myapplication.features.ui.screens.Center
 
 @Composable
 fun AlertDialogComponent(openDialog: MutableState<Boolean>) {
@@ -14,34 +23,31 @@ fun AlertDialogComponent(openDialog: MutableState<Boolean>) {
         // information/detail on it. For example, while logging out, you can show a dialog
         // to the user "Are you sure?". If you click outside of the dialog or the back button,
         // then dialog will disappear. To disable this feature, use empty onCloseRequest
-        AlertDialog(
-            // onDismissRequest will be called when back button is pressed or there is some click
-            // outside the AlertDialog and NOT on pressing the dismissButton
-            onDismissRequest = { openDialog.value = false },
-            title = { Text(text = "Alert Dialog") },
-            text = { Text("Hello! I am an Alert Dialog") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                        /* Do some other action */
-                    }
-                ) {
-                    Text("Confirm")
+        val dialogWidth = 70.dp
+        val dialogHeight = 70.dp
+
+        Dialog(onDismissRequest = {
+            //Don't allow manual dismiss
+        }) {
+            // Draw a rectangle shape with rounded corners inside the dialog
+            Column(verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                val popupWidth =  70.dp
+                val popupHeight = 70.dp
+                val cornerSize = 16.dp
+
+                Box(
+                    Modifier
+                        .size(popupWidth, popupHeight)
+                        .align(alignment = Alignment.CenterHorizontally)
+                        .background(MaterialTheme.colors.primary, RoundedCornerShape(cornerSize))
+                ){
+                    CircularProgressIndicator(color = MaterialTheme.colors.background,
+                        modifier = Modifier.fillMaxWidth().fillMaxHeight()
+                            .align(alignment = Alignment.Center).padding(Paddings.normalAll))
                 }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                        /* Do some other action */
-                    }
-                ) {
-                    Text("Dismiss")
-                }
-            },
-            backgroundColor = Color.White,
-            contentColor = Color.DarkGray
-        )
+            }
+        }
+
     }
 }

@@ -67,7 +67,7 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
 
     val usernameState = remember { mutableStateOf(TextFieldValue()) }
 
-    val openDialog = remember { mutableStateOf(true) }
+    val openDialog = remember { mutableStateOf(false) }
 
     val buttonState = remember{ mutableStateOf(false) }
 
@@ -76,7 +76,6 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
 
     Log.d("savePasswordToDbState", "THIS IS LOADING!!! $savePasswordToDbState")
 
-
     AlertDialogComponent(openDialog = openDialog)
 
     LaunchedEffect(key1 = savePasswordToDbState){
@@ -84,6 +83,7 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
             if (isLoading){
                 openDialog.value = true
             }else{
+                openDialog.value = false
                 //There was an error
                 error?.apply {
                     scaffoldState?.snackbarHostState?.showSnackbar(this)
@@ -94,7 +94,6 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
             }
         }
     }
-
 
     val passwordTextState = remember { mutableStateOf(TextFieldValue()) }
 

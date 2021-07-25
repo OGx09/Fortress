@@ -44,7 +44,7 @@ fun MainSplashScreen(navController: NavController, mainActivity: MainActivity) {
 
     val hasLogedIn = mainActivity.viewModel.openWelcomeOrPasswordMain.observeAsState()
 
-    Surface(color = MaterialTheme.colors.primary) {
+    Surface(color = MaterialTheme.colors.background) {
         val transitionState = remember { MutableTransitionState(SplashState.Shown) }
         val transition = updateTransition(transitionState, label = "splashTransition")
         val splashAlpha by transition.animateFloat(
