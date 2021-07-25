@@ -1,15 +1,11 @@
 package com.example.myapplication.utils
 
-import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Base64.encodeToString
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import com.example.myapplication.repository.database.PasswordEntity
@@ -19,14 +15,12 @@ import java.lang.RuntimeException
 import java.security.*
 import java.util.*
 import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import javax.inject.Inject
-import android.util.Base64
 import androidx.biometric.BiometricManager
-import androidx.lifecycle.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
-import kotlin.coroutines.CoroutineContext
 
 
 class MainThreadExecutor: Executor {
@@ -38,6 +32,7 @@ class MainThreadExecutor: Executor {
 
 }
 
+
 class FingerprintUtils @Inject constructor(private val encrptedUtils: EncryptionUtils){
 
     lateinit var executor: Executor
@@ -46,7 +41,9 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private var isEncrypt : Boolean = false
     private var passwordEntity: PasswordEntity? =null
     private var mToBeSignedMessage: String? = null
-    private var mutableLiveAuthResult: MutableLiveData<FingerprintResult> = MutableLiveData()
+
+    val _mutableLiveAuthResultChannel: Channel<FingerprintResult> = Channel<FingerprintResult>(Channel.BUFFERED)
+    val mutableLiveAuthResultFlow = _mutableLiveAuthResultChannel.receiveAsFlow()
 
     fun authenticate(activity: FragmentActivity,result: (FingerprintResult) -> Unit){
         if (canUseBiometric(activity)){
@@ -82,8 +79,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         return keyPairGenerator.generateKeyPair()
     }
 
-    fun register(activity: FragmentActivity):
-            LiveData<FingerprintResult> {
+    fun register(activity: FragmentActivity) {
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
@@ -96,9 +92,29 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             }
             showBiometricPrompt(activity = activity,cipher = cipher)
         }else{
-            mutableLiveAuthResult.value = FingerprintResult(errorString = DEFAULT_ERROR_MSG)
+            _mutableLiveAuthResultChannel.sendResult(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
-        return mutableLiveAuthResult
+    }
+
+
+    private fun Channel<FingerprintResult>.sendResult(value: FingerprintResult){
+        var job: Job? = null
+        job = CoroutineScope(Dispatchers.Main).launch {
+            Log.d("SavedPasswordItem", "hello : boo boo")
+            _mutableLiveAuthResultChannel.trySend(value)
+            if (job != null){
+                _mutableLiveAuthResultChannel.cancel()
+                job?.cancel()
+                Log.d("SavedPasswordItem", "hello : boo cancel $_mutableLiveAuthResultChannel")
+            }
+        }.job
+
+        Log.d("SavedPasswordItem", "hello : boo cancel ${job.isActive}")
+//        if (job.isActive){
+//            Log.d("SavedPasswordItem", "hello : boo isCompleted")
+//            job.cancel()
+//            _mutableLiveAuthResultChannel.close()
+//        }
     }
 
     private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
@@ -151,7 +167,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
-            mutableLiveAuthResult.value =  FingerprintResult(errorString = errString.toString())
+            _mutableLiveAuthResultChannel.sendResult(FingerprintResult(errorString = errString.toString()))
             super.onAuthenticationError(errorCode, errString)
         }
 
@@ -159,25 +175,17 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             super.onAuthenticationSucceeded(result)
 
             if (result.cryptoObject != null){
-                try{
 
-                    mutableLiveAuthResult.value = FingerprintResult(cryptoObject = result.cryptoObject)
-                }catch (e: SignatureException){
-                    mutableLiveAuthResult.value = FingerprintResult(errorString = e.message)
-                }
+                _mutableLiveAuthResultChannel.sendResult(FingerprintResult(cryptoObject = result.cryptoObject))
             }
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            mutableLiveAuthResult.value = FingerprintResult(errorString = DEFAULT_ERROR_MSG)
+            _mutableLiveAuthResultChannel.sendResult(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
     }
 
-
-    fun dispose(observer: LifecycleOwner){
-        mutableLiveAuthResult.removeObservers(observer)
-    }
 
     companion object{
         private const val TAG = "FingerprintUtils"
