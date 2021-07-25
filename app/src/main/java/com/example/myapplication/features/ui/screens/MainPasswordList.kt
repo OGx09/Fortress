@@ -30,6 +30,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.shadow
@@ -38,6 +39,7 @@ import androidx.fragment.app.FragmentActivity
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
+import com.example.myapplication.features.ui.Sizes.titleSize
 import com.example.myapplication.utils.collectData
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collect
@@ -97,7 +99,7 @@ fun MainPasswordList(activity: MainActivity,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Box(modifier = Modifier.padding(top = 5.dp, start = 8.dp)) {
-                    Icon(Icons.Rounded.Menu,
+                    Icon(Icons.Rounded.Settings,
                         contentDescription = "Add password",
                         modifier = Modifier.size(30.dp))
                 }
@@ -126,7 +128,7 @@ fun MainPasswordList(activity: MainActivity,
                     modifier = Modifier.padding(start = 10.dp,
                         end = 10.dp))
                 Text("Your Passwords In One Secure Place",
-                    fontWeight = FontWeight.Bold, fontSize = 28.sp, modifier = Modifier.padding(10.dp))
+                    fontWeight = FontWeight.Bold, fontSize = titleSize, modifier = Modifier.padding(10.dp))
                 Spaces.Small()
                 SavePasswordContents(scaffoldState = scaffoldState, activity, list = savePassword, navController)
             }

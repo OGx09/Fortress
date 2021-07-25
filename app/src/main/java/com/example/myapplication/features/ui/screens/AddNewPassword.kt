@@ -1,12 +1,15 @@
 package com.example.myapplication.features.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -30,6 +33,7 @@ import com.example.myapplication.features.ui.DefaultTextField
 import com.example.myapplication.data.LoadingState
 import com.example.myapplication.data.Result
 import com.example.myapplication.features.ui.AlertDialogComponent
+import com.example.myapplication.features.ui.Sizes
 import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.utils.FingerprintUtils
 import com.example.myapplication.utils.SingleLiveEvent
@@ -48,7 +52,24 @@ fun AddNewPassword(mainActivity: MainActivity,
                    viewModel: MainActivityViewModel){
 
     val scaffoldState = rememberScaffoldState()
-    Scaffold(scaffoldState = scaffoldState) {
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        TopAppBar(
+            title = {
+                Text(text = "Pets Show")
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    Toast.makeText(mainActivity, "Splash!!", Toast.LENGTH_LONG).show()
+                }) {
+                    Icon(imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back Btn")
+                }
+            },
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.primary,
+            elevation = 0.dp
+        )
+    }) {
         MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
             viewModel = viewModel, scaffoldState = scaffoldState)
@@ -113,8 +134,8 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         )
     ) {
         Text("Add New Password!",
-            modifier = Modifier.padding(20.dp),
-            fontSize = 18.sp,
+            modifier = Modifier.padding(28.dp),
+            fontSize = Sizes.titleSize,
             color = MaterialTheme.colors.primary,
             style = TextStyle(fontWeight = FontWeight.Bold)
         )
