@@ -21,26 +21,12 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
+import com.example.myapplication.features.ui.DefaultTopbar
 
 @Composable
 fun PasswordDetails(activity: MainActivity, viewModel: MainActivityViewModel){
    Scaffold(topBar = {
-       TopAppBar(
-           title = {
-               Text(text = "Pets Show")
-           },
-           navigationIcon = {
-               IconButton(onClick = {
-                   Toast.makeText(activity, "Splash!!", Toast.LENGTH_LONG).show()
-               }) {
-                   Icon(imageVector = Icons.Filled.ArrowBack,
-                       contentDescription = "Back Btn")
-               }
-           },
-           backgroundColor = MaterialTheme.colors.background,
-           contentColor = MaterialTheme.colors.primary,
-           elevation = 0.dp
-       )
+       DefaultTopbar(mainActivity = activity)
    }){
        MainContent(viewModel = viewModel)
    }

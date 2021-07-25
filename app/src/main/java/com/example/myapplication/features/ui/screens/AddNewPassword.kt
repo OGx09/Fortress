@@ -29,12 +29,9 @@ import androidx.lifecycle.Observer
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
-import com.example.myapplication.features.ui.DefaultTextField
 import com.example.myapplication.data.LoadingState
 import com.example.myapplication.data.Result
-import com.example.myapplication.features.ui.AlertDialogComponent
-import com.example.myapplication.features.ui.Sizes
-import com.example.myapplication.features.ui.UiState
+import com.example.myapplication.features.ui.*
 import com.example.myapplication.utils.FingerprintUtils
 import com.example.myapplication.utils.SingleLiveEvent
 import com.example.myapplication.utils.collectData
@@ -53,22 +50,7 @@ fun AddNewPassword(mainActivity: MainActivity,
 
     val scaffoldState = rememberScaffoldState()
     Scaffold(scaffoldState = scaffoldState, topBar = {
-        TopAppBar(
-            title = {
-                Text(text = "Pets Show")
-            },
-            navigationIcon = {
-                IconButton(onClick = {
-                    Toast.makeText(mainActivity, "Splash!!", Toast.LENGTH_LONG).show()
-                }) {
-                    Icon(imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back Btn")
-                }
-            },
-            backgroundColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.primary,
-            elevation = 0.dp
-        )
+        DefaultTopbar(mainActivity = mainActivity)
     }) {
         MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
