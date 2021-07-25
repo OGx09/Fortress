@@ -28,18 +28,19 @@ import com.example.myapplication.data.LoadingState
 import com.example.myapplication.utils.FingerprintUtils
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 
 
 //@ExperimentalUnitApi
 @ExperimentalCoroutinesApi
 @ExperimentalComposeApi
 @Composable
-fun AddNewPassword(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity,
+fun AddNewPassword(mainActivity: MainActivity,
                    viewModel: MainActivityViewModel){
 
     val scaffoldState = rememberScaffoldState()
     Scaffold(scaffoldState = scaffoldState) {
-        MainContent(fingerprintUtil = fingerprintUtil,
+        MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
             viewModel = viewModel, scaffoldState = scaffoldState)
     }
@@ -144,10 +145,8 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         )
         Spacer(modifier = Modifier.size(30.dp))
 
-        Button(onClick = {
-            fingerprintUtil.register(mainActivity as FragmentActivity)
-                .observe(mainActivity){
-                    Log.d("DefaultTextField", "T_HIS $it")
+        /*
+        Log.d("DefaultTextField", "T_HIS $it")
                     it.errorString?.apply {
                         viewModel.showMessage(this)
                     }
@@ -161,7 +160,29 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
                             buzzWord = buzzTextState.value.text,
                             username = usernameState.value.text, this)
                     }
-                }}, enabled = buttonState.value,
+         */
+//        val fingerPrintUtilsState =  fingerprintUtil.mutableLiveAuthResult.collectAsState(initial = null)
+//        LaunchedEffect(key1 =  fingerprintUtil.mutableLiveAuthResult){
+//
+//            fingerPrintUtilsState.value?.error?.apply {
+//                scaffoldState?.snackbarHostState?.showSnackbar(this)
+//            }
+//            fingerPrintUtilsState.value?.apply {
+//                Log.d("CypherText", "Cypher $this")
+//                if (initialLoad){
+//                    this.data?.apply {
+//
+//                        viewModel.savePassword(webTextState.value.text,
+//                            webNameTextState.value.text,
+//                            passwordTextState.value.text,
+//                            buzzWord = buzzTextState.value.text,
+//                            username = usernameState.value.text, this)
+//                    }
+//                }
+//            }
+//        }
+
+        Button(onClick = {fingerprintUtil.register(mainActivity as FragmentActivity)}, enabled = buttonState.value,
             modifier = Modifier
                 .padding(12.dp)
                 .requiredHeight(50.dp)

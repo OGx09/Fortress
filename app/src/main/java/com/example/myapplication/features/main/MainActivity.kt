@@ -37,7 +37,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     @Inject
     lateinit var fingerprintUtil : FingerprintUtils
 
-    private lateinit var navController: NavHostController
+    lateinit var navController: NavHostController
 
 
 
@@ -67,6 +67,14 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
 
         var screenChangeAnimState by  remember { mutableStateOf(0F) }
 
+        val snackbarHostState = remember { SnackbarHostState()}
+
+        LaunchedEffect(key1 = viewModel.messageState ){
+            viewModel.messageState.collect {
+                snackbarHostState.showSnackbar(it)
+            }
+        }
+
         NavHost(navController = navController,
             startDestination = Routes.SPLASH_SCREEN) {
             composable(Routes.SPLASH_SCREEN){MainSplashScreen(navController, this@MainActivity)}
@@ -75,7 +83,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
             composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
             composable(Routes.ADD_NEW_PASSWORD) {
                 screenChangeAnimState = 1f
-                AddNewPassword(fingerprintUtil, this@MainActivity, viewModel)
+                AddNewPassword(this@MainActivity, viewModel)
             }
         }
 

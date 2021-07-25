@@ -1,7 +1,6 @@
 package com.example.myapplication.features.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,30 +16,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
-import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.sharp.Add
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.fragment.app.FragmentActivity
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
+import com.example.myapplication.utils.collectData
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
 
 @Composable
@@ -52,8 +53,42 @@ fun MainPasswordList(activity: MainActivity,
         emptyList()
     )
 
+    val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
+    LaunchedEffect(key1 = fingerPrintFlow){
+        Log.d("SavedPasswordItem", "hello : EBUBE DIKE")
+        fingerPrintFlow.collectData{
+            Log.d("SavedPasswordItem", "hello : $it")
+            it.errorString?.apply {
+                Log.d("SavedPasswordItem", "$this")
+                activity.viewModel.showMessage(this)
+            }
+
+            it.cryptoObject?.cipher?.apply {
+                Log.d("SavedPasswordItems", "$this")
+                navController.navigate(Routes.PASSWORD_DETAILS)
+            }
+        }
+    }
+
+//    result.value?.apply{
+//
+//        this.errorString?.apply {
+//            Log.d("SavedPasswordItem", "$this")
+//            activity.viewModel.showMessage(this)
+//        }
+//
+//        this.cryptoObject?.cipher?.apply{
+//            Log.d("SavedPasswordItems", "$this")
+//            navController.navigate(Routes.PASSWORD_DETAILS)
+//        }
+//    }
+
+
+
+    val scaffoldState = rememberScaffoldState()
 
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             Row(modifier = Modifier
                 .fillMaxHeight(fraction = 0.1f)
@@ -93,7 +128,7 @@ fun MainPasswordList(activity: MainActivity,
                 Text("Your Passwords In One Secure Place",
                     fontWeight = FontWeight.Bold, fontSize = 28.sp, modifier = Modifier.padding(10.dp))
                 Spaces.Small()
-                SavePasswordContents(activity, list = savePassword, navController)
+                SavePasswordContents(scaffoldState = scaffoldState, activity, list = savePassword, navController)
             }
         }
     )
@@ -116,7 +151,7 @@ fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
 }
 
 @Composable
-fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
+fun SavePasswordContents(scaffoldState: ScaffoldState, activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
     //passwordEntityList
 
     val lazyState = rememberLazyListState()
@@ -127,19 +162,20 @@ fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, nav
 
         items(list) {passwordEntity ->
             //fadeInItemState.setValue()
-            SavedPasswordItem(activity, passwordEntity = passwordEntity, navController)
+            SavedPasswordItem(scaffoldState, activity, passwordEntity = passwordEntity, navController)
         }
     }
 }
 
 @Composable
-fun SavedPasswordItem(activity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
+fun SavedPasswordItem(scaffoldState: ScaffoldState, mainActivity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
+
 
     Box(modifier = Modifier.padding(top = 20.dp, bottom = 15.dp)) {
         Card(elevation = 10.dp,
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
-                navController.navigate(Routes.PASSWORD_DETAILS)
+                mainActivity.fingerprintUtil.register(mainActivity as FragmentActivity)
             }
         ) {
 
