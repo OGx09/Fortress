@@ -27,9 +27,12 @@ import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.shadow
@@ -38,6 +41,7 @@ import androidx.fragment.app.FragmentActivity
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
+import com.example.myapplication.features.ui.Sizes.titleSize
 import com.example.myapplication.utils.collectData
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collect
@@ -97,7 +101,7 @@ fun MainPasswordList(activity: MainActivity,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Box(modifier = Modifier.padding(top = 5.dp, start = 8.dp)) {
-                    Icon(Icons.Rounded.Menu,
+                    Icon(Icons.Rounded.Settings,
                         contentDescription = "Add password",
                         modifier = Modifier.size(30.dp))
                 }
@@ -126,7 +130,7 @@ fun MainPasswordList(activity: MainActivity,
                     modifier = Modifier.padding(start = 10.dp,
                         end = 10.dp))
                 Text("Your Passwords In One Secure Place",
-                    fontWeight = FontWeight.Bold, fontSize = 28.sp, modifier = Modifier.padding(10.dp))
+                    fontWeight = FontWeight.Bold, fontSize = titleSize, modifier = Modifier.padding(10.dp))
                 Spaces.Small()
                 SavePasswordContents(scaffoldState = scaffoldState, activity, list = savePassword, navController)
             }
@@ -200,11 +204,23 @@ fun SavedPasswordItem(scaffoldState: ScaffoldState, mainActivity: MainActivity, 
 
                     }
                 }
-                Column(modifier = Modifier.padding(start = 10.dp)) {
+                Column(modifier = Modifier
+                    .padding(start = 10.dp)
+                    .fillMaxWidth(0.82f)) {
                     Text(text = passwordEntity.websiteName,
                         fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 5.dp))
                     Text(text = passwordEntity.website, color = Color.Gray)
                 }
+
+                Column(modifier = Modifier.size(38.dp).background(Color.Red,
+                    shape = RoundedCornerShape(38.dp))
+                    .shadow(1.dp, shape =  CircleShape, clip = true).clickable {
+                        //mainActivity.fingerprintUtil.register(activity = mainActivity)
+                    },
+                    verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Rounded.Delete, contentDescription = "Delete password")
+                }
+
             }
         }
     }

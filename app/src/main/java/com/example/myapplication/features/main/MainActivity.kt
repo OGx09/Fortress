@@ -67,14 +67,6 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
 
         var screenChangeAnimState by  remember { mutableStateOf(0F) }
 
-        val snackbarHostState = remember { SnackbarHostState()}
-
-        LaunchedEffect(key1 = viewModel.messageState ){
-            viewModel.messageState.collect {
-                snackbarHostState.showSnackbar(it)
-            }
-        }
-
         NavHost(navController = navController,
             startDestination = Routes.SPLASH_SCREEN) {
             composable(Routes.SPLASH_SCREEN){MainSplashScreen(navController, this@MainActivity)}

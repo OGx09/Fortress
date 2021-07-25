@@ -44,7 +44,7 @@ fun MainSplashScreen(navController: NavController, mainActivity: MainActivity) {
 
     val hasLogedIn = mainActivity.viewModel.openWelcomeOrPasswordMain.observeAsState()
 
-    Surface(color = MaterialTheme.colors.primary) {
+    Surface(color = MaterialTheme.colors.background) {
         val transitionState = remember { MutableTransitionState(SplashState.Shown) }
         val transition = updateTransition(transitionState, label = "splashTransition")
         val splashAlpha by transition.animateFloat(
@@ -100,7 +100,7 @@ fun SplashScreen(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
                 fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 6.dp))
 
             Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(MaterialTheme.colors.surface)){
+                withStyle(style = SpanStyle(MaterialTheme.colors.primary)){
                     append("Created by: ")
                 }
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)){

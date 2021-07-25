@@ -1,15 +1,19 @@
 package com.example.myapplication.features.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -20,12 +24,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
-import com.example.myapplication.features.ui.DefaultTextField
 import com.example.myapplication.data.LoadingState
+import com.example.myapplication.data.Result
+import com.example.myapplication.features.ui.*
 import com.example.myapplication.utils.FingerprintUtils
+import com.example.myapplication.utils.SingleLiveEvent
+import com.example.myapplication.utils.collectData
+import com.example.myapplication.utils.observeAsSingleState
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -39,7 +49,9 @@ fun AddNewPassword(mainActivity: MainActivity,
                    viewModel: MainActivityViewModel){
 
     val scaffoldState = rememberScaffoldState()
-    Scaffold(scaffoldState = scaffoldState) {
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        DefaultTopbar(mainActivity = mainActivity)
+    }) {
         MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
             viewModel = viewModel, scaffoldState = scaffoldState)
@@ -58,13 +70,31 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
 
     val usernameState = remember { mutableStateOf(TextFieldValue()) }
 
-    val buttonState = remember{ mutableStateOf(false) }
-    val savePasswordToDbState = viewModel
-        .savePasswordDataLiveData.observeAsState(initial = LoadingState(data = false))
+    val openDialog = remember { mutableStateOf(false) }
 
-    savePasswordToDbState.value.error?.apply {
-        LaunchedEffect(key1 =  scaffoldState){
-            scaffoldState?.snackbarHostState?.showSnackbar(this@apply)
+    val buttonState = remember{ mutableStateOf(false) }
+
+    val savePasswordToDbState: UiState<out Boolean?>? = viewModel
+        .savePasswordDataLiveData.observeAsSingleState(initial = null).value
+
+    Log.d("savePasswordToDbState", "THIS IS LOADING!!! $savePasswordToDbState")
+
+    AlertDialogComponent(openDialog = openDialog)
+
+    LaunchedEffect(key1 = savePasswordToDbState){
+        savePasswordToDbState?.apply {
+            if (isLoading){
+                openDialog.value = true
+            }else{
+                openDialog.value = false
+                //There was an error
+                error?.apply {
+                    scaffoldState?.snackbarHostState?.showSnackbar(this)
+                }
+                data?.apply {
+                    mainActivity.navController.popBackStack()
+                }
+            }
         }
     }
 
@@ -86,8 +116,8 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         )
     ) {
         Text("Add New Password!",
-            modifier = Modifier.padding(20.dp),
-            fontSize = 18.sp,
+            modifier = Modifier.padding(28.dp),
+            fontSize = Sizes.titleSize,
             color = MaterialTheme.colors.primary,
             style = TextStyle(fontWeight = FontWeight.Bold)
         )
@@ -161,26 +191,23 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
                             username = usernameState.value.text, this)
                     }
          */
-//        val fingerPrintUtilsState =  fingerprintUtil.mutableLiveAuthResult.collectAsState(initial = null)
-//        LaunchedEffect(key1 =  fingerprintUtil.mutableLiveAuthResult){
-//
-//            fingerPrintUtilsState.value?.error?.apply {
-//                scaffoldState?.snackbarHostState?.showSnackbar(this)
-//            }
-//            fingerPrintUtilsState.value?.apply {
-//                Log.d("CypherText", "Cypher $this")
-//                if (initialLoad){
-//                    this.data?.apply {
-//
-//                        viewModel.savePassword(webTextState.value.text,
-//                            webNameTextState.value.text,
-//                            passwordTextState.value.text,
-//                            buzzWord = buzzTextState.value.text,
-//                            username = usernameState.value.text, this)
-//                    }
-//                }
-//            }
-//        }
+        val fingerPrintUtilsState =  mainActivity.fingerprintUtil.mutableLiveAuthResultFlow
+        LaunchedEffect(key1 = fingerPrintUtilsState){
+           fingerPrintUtilsState.collectData {
+               it.errorString?.apply {
+                   scaffoldState?.snackbarHostState?.showSnackbar(this)
+               }
+               it.cryptoObject?.cipher?.apply {
+                   Log.d("CypherText", "Cypher $this")
+
+                   viewModel.savePassword(webTextState.value.text,
+                       webNameTextState.value.text,
+                       passwordTextState.value.text,
+                       buzzWord = buzzTextState.value.text,
+                       username = usernameState.value.text, this)
+               }
+           }
+        }
 
         Button(onClick = {fingerprintUtil.register(mainActivity as FragmentActivity)}, enabled = buttonState.value,
             modifier = Modifier

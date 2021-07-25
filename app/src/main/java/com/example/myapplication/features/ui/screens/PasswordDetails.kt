@@ -1,72 +1,72 @@
 package com.example.myapplication.features.ui.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
+import com.example.myapplication.features.ui.DefaultTopbar
 
-@Composable
-fun PasswordDetails(activity: MainActivity, viewModel: MainActivityViewModel){
-    MainContent(viewModel = viewModel)
-}
 
+@Preview
 @Composable
 @SuppressLint("unused expression")
-private fun MainContent(viewModel: MainActivityViewModel){
-    Column(modifier = Modifier.fillMaxSize()) {
-        TopCornerBar()
-        BodyContent()
+fun PasswordDetails(activity: MainActivity,viewModel: MainActivityViewModel){
+
+    Image(painter = painterResource(id = R.drawable.data_security_img),
+        contentDescription = null, modifier = Modifier
+            .fillMaxHeight(fraction = 0.6f)
+            .fillMaxWidth(), contentScale = ContentScale.FillHeight
+    )
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 120.dp)) {
+        Spacer(modifier = Modifier
+            .fillMaxHeight(fraction = 0.33f))
+        Card(elevation = 6.dp, modifier = Modifier
+            .background(
+                color = Color.Transparent
+            )
+            .fillMaxWidth()
+            .fillMaxHeight(),
+            shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
+        ) {
+
+           Box(modifier = Modifier.size(110.dp)){
+               Image(painter = painterResource(id = R.drawable.splash_logo),
+                   contentDescription = null, modifier = Modifier
+                       .size(120.dp)
+                       .border(
+                           border = BorderStroke(5.dp, color = Color.White),
+                           shape = CircleShape
+                       )
+                       .background(color = MaterialTheme.colors.background, shape = CircleShape))
+           }
+        }
     }
 
 }
 
 @Composable
 private fun BodyContent(){
-    Card(elevation = 2.dp) {
-        Column(modifier = Modifier.fillMaxWidth()
-            .padding(end = 20.dp, start = 20.dp)) {
 
-        }
-    }
-}
-
-@Composable
-private fun TopCornerBar(){
-    Box(modifier = Modifier
-        .background(
-            color =
-            MaterialTheme.colors.secondary
-        ).fillMaxHeight(fraction = 0.2f)
-        .clip(
-            RoundedCornerShape(
-                0,
-                0, 40,
-                40
-            )
-        )){
-        Column(modifier = Modifier.fillMaxSize()) {
-            Row(modifier = Modifier
-                .clickable {
-
-                }
-                .padding(bottom = 40.dp)) {
-                Icon(painter = painterResource(id = android.R.drawable.arrow_down_float), "Go Back")
-                Spacer(modifier = Modifier.padding(5.dp))
-                Text(text = stringResource(R.string.action_back), fontWeight = FontWeight.Bold)
-            }
-
-        }
-    }
 }

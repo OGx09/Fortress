@@ -2,12 +2,14 @@ package com.example.myapplication.features.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 
 object Sizes {
     val normal = 10.dp
     val medium = 20.dp
     val large = 30.dp
+    val titleSize = 28.sp
 }
 
 object Paddings{
@@ -16,7 +18,6 @@ object Paddings{
     val normalTop = PaddingValues(top = Sizes.normal)
     val normalBottom = PaddingValues(bottom = Sizes.normal)
     val normalAll = PaddingValues(Sizes.normal)
-
 
     val medium = PaddingValues(start = Sizes.medium)
     val mediumEnd= PaddingValues(end = Sizes.medium)

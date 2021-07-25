@@ -2,13 +2,15 @@ package com.example.myapplication.features.ui
 
 import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import com.example.myapplication.features.main.MainActivity
 
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
@@ -20,7 +22,7 @@ fun StateCodelabTheme(
 ) {
 
     activity?.apply {
-        window.statusBarColor = MaterialTheme.colors.primaryVariant.toArgb()
+        window.statusBarColor = Color.Transparent.toArgb()
         val colors = if (darkTheme) {
             DarkColorPalette
         } else {
@@ -37,7 +39,29 @@ fun StateCodelabTheme(
 
 }
 
+@Composable
+fun DefaultTopbar(mainActivity: MainActivity, backgroundColor: Color? =null,  title: String? = null,
+                  onClick: (() -> Unit)? = null) = TopAppBar(
+    title = {
+        Text(text = title ?: "Back")
+    },
+    navigationIcon = {
+        IconButton(onClick = {
+            if (onClick == null) {
+                mainActivity.navController.popBackStack()
+            }else{
+                onClick.invoke()
+            }
 
+        }) {
+            Icon(imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Back Btn")
+        }
+    },
+    backgroundColor = backgroundColor ?: MaterialTheme.colors.background,
+    contentColor = MaterialTheme.colors.primary,
+    elevation = 0.dp
+)
 
 private val DarkColorPalette = darkColors(
     primary = white100,
@@ -52,5 +76,5 @@ private val LightColorPalette = lightColors(
         primaryVariant = purple700,
         secondary = grey800,
     surface = white100,
-    background = white100
+    background = white100,
 )
