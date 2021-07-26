@@ -88,25 +88,27 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
         val secretKey = getSecretKey()
         var fortressModel: FortressModel? =null
-        try {
-            cipher.init(Cipher.DECRYPT_MODE, secretKey)
-            val encryptedStrinng = dao.getEncryptedEntity(id)
-            val decryptedString: ByteArray = cipher.doFinal(encryptedStrinng.toByteArray())
-            val serializeString = Gson().toJson(decryptedString)
-            fortressModel = Gson().fromJson(serializeString, FortressModel::class.java)
-            Log.d(
-                "MY_APP_TAG", "Encrypted information: " +
-                        decryptedString
-            )
-        } catch (e: InvalidKeyException) {
-            fortressModel = null
-            Log.e("MY_APP_TAG", "Key is invalid.")
-        } catch (e: UserNotAuthenticatedException) {
-            fortressModel = null
-            Log.d("MY_APP_TAG", "The key's validity timed out.")
-        } finally {
-            return fortressModel
-        }
+        cipher.init(Cipher.DECRYPT_MODE, secretKey)
+        val encryptedStrinng = dao.getEncryptedEntity(id)
+        val decryptedString: ByteArray = cipher.doFinal(encryptedStrinng.toByteArray())
+        val serializeString = Gson().toJson(decryptedString)
+        fortressModel = Gson().fromJson(serializeString, FortressModel::class.java)
+        Log.d(
+            "MY_APP_TAG", "Encrypted information: " +
+                    decryptedString
+        )
+        return fortressModel
+//        try {
+//
+//        } catch (e: InvalidKeyException) {
+//            fortressModel = null
+//            Log.e("MY_APP_TAG", "Key is invalid.")
+//        } catch (e: UserNotAuthenticatedException) {
+//            fortressModel = null
+//            Log.d("MY_APP_TAG", "The key's validity timed out.")
+//        } finally {
+//            return fortressModel
+//        }
     }
 
     val  getDao : FortressDao = dao

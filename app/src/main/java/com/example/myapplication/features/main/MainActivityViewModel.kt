@@ -43,6 +43,8 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
+    private val _passwordDetails = MutableLiveData<UiState<FortressModel>>()
+    val passwordDetails :LiveData<UiState<FortressModel>> = _passwordDetails
 
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
@@ -71,6 +73,7 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
             }
         }
     }
+
 
     override fun saveWelcomeUsername(username: String) {
         viewModelScope.launch {
@@ -103,10 +106,12 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
 
 
     fun readSavedPassword(cipher: Cipher, id: Int){
-        viewModelScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(handleError {
+            _passwordDetails.value = UiState(error = it.message)
+        }) {
             val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
             allPasswords?.apply {
-              //  _savePasswordDataLiveData.postValue( this)
+                _passwordDetails.value = UiState(data = this)
             }
         }
     }

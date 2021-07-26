@@ -35,8 +35,9 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
         return encryptionUtils.getDao.getAllEncryptedPassword()
     }
 
-    override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int): FortressModel?{
-        return encryptionUtils.decryptSecretInformation(cipher, id)
+    override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int)
+    : FortressModel? = withContext(Dispatchers.IO){
+        encryptionUtils.decryptSecretInformation(cipher, id)
     }
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao.delete(passwordEntity = passwordEntity)

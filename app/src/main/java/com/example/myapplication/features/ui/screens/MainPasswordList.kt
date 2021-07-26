@@ -69,23 +69,11 @@ fun MainPasswordList(activity: MainActivity,
 
             it.cryptoObject?.cipher?.apply {
                 Log.d("SavedPasswordItems", "$this")
-                navController.navigate(Routes.PASSWORD_DETAILS)
+                viewModel.readSavedPassword(this, )
+                //navController.navigate(Routes.PASSWORD_DETAILS)
             }
         }
     }
-
-//    result.value?.apply{
-//
-//        this.errorString?.apply {
-//            Log.d("SavedPasswordItem", "$this")
-//            activity.viewModel.showMessage(this)
-//        }
-//
-//        this.cryptoObject?.cipher?.apply{
-//            Log.d("SavedPasswordItems", "$this")
-//            navController.navigate(Routes.PASSWORD_DETAILS)
-//        }
-//    }
 
 
 
