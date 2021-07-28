@@ -31,11 +31,13 @@ import com.example.myapplication.features.ui.DefaultTopbar
 @SuppressLint("unused expression")
 fun PasswordDetails(activity: MainActivity,viewModel: MainActivityViewModel){
 
+
     Image(painter = painterResource(id = R.drawable.data_security_img),
         contentDescription = null, modifier = Modifier
             .fillMaxHeight(fraction = 0.6f)
             .fillMaxWidth(), contentScale = ContentScale.FillHeight
     )
+
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -50,20 +52,22 @@ fun PasswordDetails(activity: MainActivity,viewModel: MainActivityViewModel){
             .fillMaxHeight(),
             shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
         ) {
-
-           Box(modifier = Modifier.size(110.dp)){
-               Image(painter = painterResource(id = R.drawable.splash_logo),
-                   contentDescription = null, modifier = Modifier
-                       .size(120.dp)
-                       .border(
-                           border = BorderStroke(5.dp, color = Color.White),
-                           shape = CircleShape
-                       )
-                       .background(color = MaterialTheme.colors.background, shape = CircleShape))
-           }
         }
+
     }
 
+    Column(modifier = Modifier.padding(start = 25.dp)){
+        Spacer(modifier = Modifier
+            .fillMaxHeight(fraction = 0.36f))
+        Image(painter = painterResource(id = R.drawable.splash_logo),
+            contentDescription = null, modifier = Modifier
+                .size(110.dp)
+                .border(
+                    border = BorderStroke(5.dp, color = Color.White),
+                    shape = CircleShape
+                )
+                .background(color = MaterialTheme.colors.background, shape = CircleShape))
+    }
 }
 
 @Composable

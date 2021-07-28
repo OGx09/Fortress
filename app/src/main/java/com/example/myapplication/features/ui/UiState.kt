@@ -2,10 +2,17 @@ package com.example.myapplication.features.ui
 
 import com.example.myapplication.data.Result
 
-data class UiState<T> (val isLoading: Boolean = false, val error: String? = null, val data: T? =null){
+data class UiState<T> (var isLoading: Boolean = false, val error: String? = null, val data: T? =null){
     val hasError : Boolean get() = error != null
 
     val initialLoad: Boolean get() = data == null && isLoading && !hasError
+
+    init {
+        if (error != null || data != null) {
+            isLoading = false
+        }
+
+    }
 }
 
 /*
