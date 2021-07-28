@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +32,7 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Add
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.fragment.app.FragmentActivity
@@ -46,7 +44,9 @@ import com.example.myapplication.utils.collectData
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import javax.crypto.Cipher
 
+var selectedId: Int? = 0
 
 @Composable
 fun MainPasswordList(activity: MainActivity,
@@ -56,6 +56,30 @@ fun MainPasswordList(activity: MainActivity,
     val savePassword : List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(
         emptyList()
     )
+
+    val openDialog = remember { mutableStateOf(false) }
+    val scaffoldState = rememberScaffoldState()
+
+    AlertDialogComponent(openDialog = openDialog)
+
+    val openPasswordDetails =activity.viewModel.passwordDetails.observeAsState()
+    openPasswordDetails.value?.apply {
+        LaunchedEffect(key1 = this){
+
+            openDialog.value = isLoading
+
+            if(error != null){
+                scaffoldState.snackbarHostState.showSnackbar(error)
+            }
+
+            data?.apply {
+                navController.navigate(Routes.PASSWORD_DETAILS)
+            }
+
+        }
+
+    }
+
 
     val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
     LaunchedEffect(key1 = fingerPrintFlow){
@@ -68,16 +92,12 @@ fun MainPasswordList(activity: MainActivity,
             }
 
             it.cryptoObject?.cipher?.apply {
-                Log.d("SavedPasswordItems", "$this")
-                viewModel.readSavedPassword(this, )
-                //navController.navigate(Routes.PASSWORD_DETAILS)
+                Log.d("SavedPasswordItems", "$selectedId")
+                activity.viewModel.readSavedPassword(this, selectedId)
             }
         }
+
     }
-
-
-
-    val scaffoldState = rememberScaffoldState()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -120,7 +140,7 @@ fun MainPasswordList(activity: MainActivity,
                 Text("Your Passwords In One Secure Place",
                     fontWeight = FontWeight.Bold, fontSize = titleSize, modifier = Modifier.padding(10.dp))
                 Spaces.Small()
-                SavePasswordContents(scaffoldState = scaffoldState, activity, list = savePassword, navController)
+                SavePasswordContents(activity, list = savePassword, navController)
             }
         }
     )
@@ -143,8 +163,7 @@ fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
 }
 
 @Composable
-fun SavePasswordContents(scaffoldState: ScaffoldState, activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
-    //passwordEntityList
+fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
 
     val lazyState = rememberLazyListState()
     LazyColumn(
@@ -154,19 +173,20 @@ fun SavePasswordContents(scaffoldState: ScaffoldState, activity: MainActivity, l
 
         items(list) {passwordEntity ->
             //fadeInItemState.setValue()
-            SavedPasswordItem(scaffoldState, activity, passwordEntity = passwordEntity, navController)
+            SavedPasswordItem( activity, passwordEntity = passwordEntity, navController)
         }
     }
 }
 
 @Composable
-fun SavedPasswordItem(scaffoldState: ScaffoldState, mainActivity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
+fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
 
-
-    Box(modifier = Modifier.padding(top = 20.dp, bottom = 15.dp)) {
+    Box(modifier = Modifier
+        .padding(top = 20.dp, bottom = 15.dp)) {
         Card(elevation = 10.dp,
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
+                selectedId = passwordEntity.id
                 mainActivity.fingerprintUtil.register(mainActivity as FragmentActivity)
             }
         ) {
@@ -184,11 +204,11 @@ fun SavedPasswordItem(scaffoldState: ScaffoldState, mainActivity: MainActivity, 
                     .background(color = iconColor)) {
                     Center {
                         Image(painter  = rememberImagePainter(
-                            data = passwordEntity.iconBytes,
+                            data = passwordEntity.website,
                             builder = {
                                 transformations(CircleCropTransformation())
-                            }
-                        ), "")
+                            },
+                        ), "", modifier = Modifier.size(40.dp))
 
                     }
                 }
@@ -200,9 +220,14 @@ fun SavedPasswordItem(scaffoldState: ScaffoldState, mainActivity: MainActivity, 
                     Text(text = passwordEntity.website, color = Color.Gray)
                 }
 
-                Column(modifier = Modifier.size(38.dp).background(Color.Red,
-                    shape = RoundedCornerShape(38.dp))
-                    .shadow(1.dp, shape =  CircleShape, clip = true).clickable {
+                Column(modifier = Modifier
+                    .size(38.dp)
+                    .background(
+                        Color.Red,
+                        shape = RoundedCornerShape(38.dp)
+                    )
+                    .shadow(1.dp, shape = CircleShape, clip = true)
+                    .clickable {
                         //mainActivity.fingerprintUtil.register(activity = mainActivity)
                     },
                     verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {

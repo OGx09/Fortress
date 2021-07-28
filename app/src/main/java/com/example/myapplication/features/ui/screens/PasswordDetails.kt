@@ -31,13 +31,13 @@ import com.example.myapplication.features.ui.DefaultTopbar
 @SuppressLint("unused expression")
 fun PasswordDetails(activity: MainActivity,viewModel: MainActivityViewModel){
 
-    //viewModel.readSavedPassword()
 
     Image(painter = painterResource(id = R.drawable.data_security_img),
         contentDescription = null, modifier = Modifier
             .fillMaxHeight(fraction = 0.6f)
             .fillMaxWidth(), contentScale = ContentScale.FillHeight
     )
+
 
     Column(modifier = Modifier
         .fillMaxWidth()

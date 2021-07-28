@@ -22,6 +22,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
 
 
 class MainThreadExecutor: Executor {
@@ -99,10 +100,11 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
+                //val iv: ByteArray
                 cipher = encrptedUtils.getCipher()
                 val secretKey = encrptedUtils.getSecretKey()
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-
+                val ivParams: IvParameterSpec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
             }catch (e: java.lang.Exception){
                 throw RuntimeException()
             }
@@ -112,6 +114,21 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         }
     }
 
+    fun authenticate(activity: FragmentActivity, cipher: Cipher?) {
+        hasCalled = false
+        if (canUseBiometric(activity)){
+            try {
+                val secretKey = encrptedUtils.getSecretKey()
+                cipher?.init(Cipher.DECRYPT_MODE, secretKey)
+
+            }catch (e: java.lang.Exception){
+                _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = e.message))
+            }
+            showBiometricPrompt(activity = activity,cipher = cipher)
+        }else{
+            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
+        }
+    }
 
     private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
 
@@ -127,7 +144,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
 
             //Show biometric prompt
         if (cipher != null){
-            Log.i(TAG, "Show biometric prompt");
+            Log.i(TAG, "Show biometric prompt $cipher");
             biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
     }

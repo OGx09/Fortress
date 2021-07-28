@@ -6,7 +6,9 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -49,9 +51,11 @@ fun AddNewPassword(mainActivity: MainActivity,
                    viewModel: MainActivityViewModel){
 
     val scaffoldState = rememberScaffoldState()
+    val scrollabletate = rememberScrollableState{1f}
+
     Scaffold(scaffoldState = scaffoldState, topBar = {
         DefaultTopbar(mainActivity = mainActivity)
-    }) {
+    }, modifier = Modifier.scrollable(scrollabletate, orientation = Orientation.Vertical)) {
         MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
             viewModel = viewModel, scaffoldState = scaffoldState)

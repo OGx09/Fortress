@@ -48,7 +48,6 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
 
         if(Build.VERSION.SDK_INT >= 30){
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-            //SOFT_INPUT_ADJUST_PAN
         }else{
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }

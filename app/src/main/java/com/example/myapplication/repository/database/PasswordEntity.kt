@@ -14,9 +14,9 @@ import com.google.gson.Gson
 
 @Entity
 data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
-                          @ColumnInfo(name ="encryptedData") var encryptedData: String?=null,
                           @ColumnInfo var websiteName: String,
                           @ColumnInfo var website: String,
+                          @ColumnInfo(name ="encryptedData") var encryptedData: String?=null,
                           @ColumnInfo var otherInfo: String,
                           @ColumnInfo var iconBytes: String){
 
@@ -26,4 +26,5 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
     override fun toString(): String {
         return Gson().toJson(this)
     }
+
 }

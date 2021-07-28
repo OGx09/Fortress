@@ -1,6 +1,7 @@
 package com.example.myapplication.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,6 +12,7 @@ import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.data.FortressModel
 import com.example.myapplication.data.WebsiteLogo
 import com.example.myapplication.utils.EncryptionUtils
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +46,7 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
 
     override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity) =
         withContext(dispatcher){
+
         encryptionUtils.encryptSecretInformation(
             cipher = cipher,
             passwordEntity = passwordEntity

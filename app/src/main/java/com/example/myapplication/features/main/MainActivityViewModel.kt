@@ -8,6 +8,7 @@ import com.example.myapplication.data.FortressModel
 import com.example.myapplication.data.LoadingState
 import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.utils.SingleLiveEvent
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -104,11 +105,18 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
 
     }
 
-
-    fun readSavedPassword(cipher: Cipher, id: Int){
+    fun readSavedPassword(cipher: Cipher?, id: Int?){
+        _passwordDetails.value = UiState(isLoading = true)
         viewModelScope.launch(handleError {
             _passwordDetails.value = UiState(error = it.message)
+
+            Log.d(
+                "MY_APP_TAG", "Encrypted information: ${ it.message}"
+            )
         }) {
+            if (cipher == null || id == null){
+                throw NullPointerException("Unable to complete your fingerprint authentication")
+            }
             val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
             allPasswords?.apply {
                 _passwordDetails.value = UiState(data = this)
@@ -135,8 +143,8 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
         viewModelScope.launch {
             _savePasswordDataLiveData.value = (UiState(isLoading = true))
             try {
-                val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
-                val iconUrl: String? = websiteIcon.icons[2]?.url
+                //val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
+                val iconUrl: String? = ""//websiteIcon.icons[2]?.url
 
                 val fortressModel = FortressModel(
                     websiteUrl,
@@ -149,6 +157,9 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
                     iconBytes = iconUrl ?: ""
                 )
                 passwordEntity.fortressModel = fortressModel
+                Log.d(
+                    "MYAPP_TAG", "Encrypted information: " + Gson().toJson(passwordEntity.fortressModel)
+                )
                 repository.savePassword(cipher, passwordEntity)
                 _savePasswordDataLiveData.value = UiState(data = true)
             }catch (e : Exception){
