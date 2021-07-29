@@ -104,7 +104,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
                 cipher = encrptedUtils.getCipher()
                 val secretKey = encrptedUtils.getSecretKey()
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-                val ivParams: IvParameterSpec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
+                //val ivParams: IvParameterSpec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
             }catch (e: java.lang.Exception){
                 throw RuntimeException()
             }
@@ -114,15 +114,19 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         }
     }
 
-    fun authenticate(activity: FragmentActivity, cipher: Cipher?) {
+    fun authenticate(activity: FragmentActivity) {
         hasCalled = false
         if (canUseBiometric(activity)){
+            var cipher: Cipher? = null
             try {
+                //val iv: ByteArray
+                cipher = encrptedUtils.getCipher()
                 val secretKey = encrptedUtils.getSecretKey()
-                cipher?.init(Cipher.DECRYPT_MODE, secretKey)
-
+                cipher.init(Cipher.DECRYPT_MODE, secretKey)
+                //val ivParams: IvParameterSpec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
             }catch (e: java.lang.Exception){
-                _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = e.message))
+                e.printStackTrace()
+                Log.e("authenticate", e.message +"_")
             }
             showBiometricPrompt(activity = activity,cipher = cipher)
         }else{
@@ -188,7 +192,6 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             super.onAuthenticationSucceeded(result)
 
             if (result.cryptoObject != null){
-
                 _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(cryptoObject = result.cryptoObject))
             }
         }

@@ -1,11 +1,15 @@
 package com.example.myapplication
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.myapplication.features.main.MainActivity
+import com.example.myapplication.features.ui.StateCodelabTheme
+import com.example.myapplication.features.ui.screens.MainPasswordList
+import com.example.myapplication.features.ui.screens.WelcomePage
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,15 +28,24 @@ class MainActivityTest {
     @get:Rule
     val composableRule = createAndroidComposeRule<MainActivity>()
 
-    @Test
-    fun check_AddPassword() {
-        composableRule.onNodeWithText("+").assertExists()
-        composableRule.onNodeWithText("+").performClick()
-    }
-
+    /*
+    MainPasswordList(activity = mainActivity, viewModel = mainActivity.viewModel,
+                    navController = mainActivity.navController)
+     */
 
     @Test
-    fun fillout_form(){
+    fun test_mainContent(){
+        val mainActivity = composableRule.activity
+        composableRule.setContent {
+            StateCodelabTheme(darkTheme = false,
+                activity = mainActivity, content = {
+                WelcomePage(activity = mainActivity,
+                    viewModel = mainActivity.viewModel,
+                    navController = mainActivity.navController)
+            })
 
+            composableRule.onNodeWithText("Welcome username").assertIsDisplayed()
+        }
     }
+
 }

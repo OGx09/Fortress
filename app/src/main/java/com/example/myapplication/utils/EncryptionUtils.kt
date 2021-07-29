@@ -20,8 +20,13 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.inject.Inject
+import java.nio.charset.StandardCharsets
+
 
 class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
+
+
+    private val SHARED_PREFERENCE_KEY_IV = "iv"
 
     companion object {
         const val KEY_NAME: String = "androiddebugkey"
@@ -70,12 +75,10 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
 
        val gson = Gson()
 
-        try {
-            val encryptedInfo: ByteArray = cipher.doFinal(
-                gson.toJson(passwordEntity.fortressModel).toByteArray(Charsets.UTF_8)
-            )
-            val base64 = Base64.encodeToString(encryptedInfo, Base64.DEFAULT)
-            passwordEntity.encryptedData = base64
+       try {
+           val bytes = cipher.doFinal((gson.toJson(passwordEntity.fortressModel)).toByteArray())
+           val encrypted = Base64.encodeToString(bytes, Base64.NO_WRAP)
+
             dao.insertEncryptedEntity(passwordEntity)
 
         } catch (e: InvalidKeyException) {
@@ -90,27 +93,31 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
 
     suspend fun decryptSecretInformation(cipher: Cipher, id: Int) :FortressModel?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
-        val secretKey = getSecretKey()
         var fortressModel: FortressModel? =null
-//        cipher.init(Cipher.DECRYPT_MODE, secretKey,  Base64.decode(
-//            cipher.iv,
-//            Base64.DEFAULT
-//        ))
+
         val encryptedStrinng = dao.getEncryptedEntity(id)
 
-        val decryptedString: ByteArray = cipher.doFinal(Base64.decode(encryptedStrinng.toByteArray(Charsets.UTF_8), Base64.DEFAULT))
+        try {
+
+            val decodedBytes: ByteArray = Base64.decode(encryptedStrinng, Base64.NO_WRAP)
+            val decryptedInfo: ByteArray = cipher.doFinal(decodedBytes)
+
+            val string = String(decryptedInfo)
+
+            Log.d("MY_APP_TAG", "ddecrypted information: $string ")
 
 
-        Log.d(
-            "MY_APP_TAG_", "Encrypted information: ___ " + encryptedStrinng
-        )
-        val serializeString = Gson().toJson(decryptedString)
-
-        fortressModel = Gson().fromJson(serializeString, FortressModel::class.java)
+        } catch (e: InvalidKeyException) {
+            Log.e("MY_APP_TAG", "Key is invalid.")
+        } catch (e: UserNotAuthenticatedException) {
+            Log.d("MY_APP_TAG", "The key's validity timed out.")
+        }
 
 
         return fortressModel
     }
+
+
 
     val  getDao : FortressDao = dao
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.myapplication.utils.observeAsSingleState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,7 +63,7 @@ fun MainPasswordList(activity: MainActivity,
 
     AlertDialogComponent(openDialog = openDialog)
 
-    val openPasswordDetails =activity.viewModel.passwordDetails.observeAsState()
+    val openPasswordDetails =activity.viewModel.passwordDetails.observeAsSingleState(UiState(isLoading = false))
     openPasswordDetails.value?.apply {
         LaunchedEffect(key1 = this){
 

@@ -77,7 +77,7 @@ class SingleLiveEvent<T> : MutableLiveData<T?>() {
 
 
 @Composable
-fun <R, T : R> SingleLiveEvent<T>.observeAsSingleState(initial: R): State<R> {
+fun <R, T : R> SingleLiveEvent<T>.observeAsSingleState(initial: R? =null): State<R?> {
     val lifecycleOwner = LocalLifecycleOwner.current
     val state = remember { mutableStateOf(initial) }
     DisposableEffect(this, lifecycleOwner) {
