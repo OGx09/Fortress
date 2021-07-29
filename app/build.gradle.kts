@@ -77,6 +77,8 @@ android {
 
     packagingOptions {
         exclude("META-INF/*.kotlin_module")
+        exclude ("META-INF/AL2.0")
+        exclude ("META-INF/LGPL2.1")
         exclude ("META-INF/DEPENDENCIES")
         exclude ("META-INF/LICENSE")
         exclude ("META-INF/LICENSE.txt")
@@ -103,6 +105,10 @@ dependencies {
 
     Libs.kaptDeps.forEach {
         kapt(it)
+    }
+
+    Libs.debugImpl.forEach{
+        debugImplementation(it)
     }
 
 //    Libs.debugLibs.forEach {libs ->

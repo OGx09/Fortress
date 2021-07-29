@@ -39,7 +39,8 @@ object Libs{
         "androidx.navigation:navigation-compose:2.4.0-alpha04",
         "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
-        "io.coil-kt:coil-compose:${Versions.coil}"
+        "io.coil-kt:coil-compose:${Versions.coil}",
+        "androidx.compose.animation:animation:1.0.0"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 
@@ -47,9 +48,12 @@ object Libs{
 
     val androidTestDeps = arrayOf("androidx.test.ext:junit:1.1.2",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",
-        "androidx.compose.ui:ui-test-manifest:${Versions.composable}")
+        "androidx.compose.ui:ui-test-manifest:${Versions.composable}",
+        "androidx.compose.ui:ui-test-junit4:${Versions.composable}")
 
     val kaptDeps = arrayOf("androidx.room:room-compiler:${Versions.room_version}",
         "com.google.dagger:hilt-android-compiler:${Versions.hilt_version}")
+
+    val debugImpl = arrayOf("androidx.compose.ui:ui-test-manifest:${Versions.composable}")
 
 }
