@@ -40,11 +40,13 @@ object Libs{
         "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
         "io.coil-kt:coil-compose:${Versions.coil}",
-        "androidx.compose.animation:animation:1.0.0"
+        "androidx.compose.animation:animation:1.0.0",
+        "androidx.compose.animation:animation-core:1.0.0"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 
-    val testDeps = arrayOf( "junit:junit:${Versions.junit}", "androidx.room:room-testing:${Versions.room_version}")
+    val testDeps = arrayOf( "junit:junit:${Versions.junit}",
+        "androidx.room:room-testing:${Versions.room_version}")
 
     val androidTestDeps = arrayOf("androidx.test.ext:junit:1.1.2",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",

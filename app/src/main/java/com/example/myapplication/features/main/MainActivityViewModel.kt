@@ -21,9 +21,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Throws
 
-// Created by Gbenga Oladipupo(Devmike01) on 5/16/21. /storage/emulated/0/Android/data/com.appzonegroup.fcmb.dev/files/Pictures/JPEG_20210718_183510_3308039024051686293.jpg
-
-
+// Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{

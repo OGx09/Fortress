@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 
 /**
@@ -28,24 +29,25 @@ class MainActivityTest {
     @get:Rule
     val composableRule = createAndroidComposeRule<MainActivity>()
 
-    /*
-    MainPasswordList(activity = mainActivity, viewModel = mainActivity.viewModel,
-                    navController = mainActivity.navController)
-     */
-
     @Test
     fun test_mainContent(){
         val mainActivity = composableRule.activity
         composableRule.setContent {
             StateCodelabTheme(darkTheme = false,
                 activity = mainActivity, content = {
-                WelcomePage(activity = mainActivity,
-                    viewModel = mainActivity.viewModel,
-                    navController = mainActivity.navController)
-            })
+                    WelcomePage(activity = mainActivity,
+                        viewModel = mainActivity.viewModel,
+                        navController = mainActivity.navController)
+                })
 
-            composableRule.onNodeWithText("Welcome username").assertIsDisplayed()
         }
+    }
+
+    @Test
+    fun test_sample(){
+        assertNull(composableRule)
+        assertNotNull(composableRule)
+         composableRule.onNodeWithText("shdsjdjsj").assertIsDisplayed()
     }
 
 }
