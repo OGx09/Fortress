@@ -34,7 +34,7 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
     }
 
     override fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>> {
-        return encryptionUtils.getDao.getAllEncryptedPassword()
+        return encryptionUtils.getDao().getAllEncryptedPassword()
     }
 
     override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int)

@@ -46,7 +46,11 @@ object Libs{
     )
 
     val testDeps = arrayOf( "junit:junit:${Versions.junit}",
-        "androidx.room:room-testing:${Versions.room_version}")
+        "androidx.room:room-testing:${Versions.room_version}",
+        "org.mockito:mockito-core:1.10.19",
+        "androidx.test:core:1.0.0",
+        "androidx.arch.core:core-testing:2.1.0"
+    )
 
     val androidTestDeps = arrayOf("androidx.test.ext:junit:1.1.2",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",

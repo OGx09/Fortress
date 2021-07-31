@@ -23,7 +23,16 @@ import javax.inject.Inject
 import java.nio.charset.StandardCharsets
 
 
-class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
+interface EncryptionUtils{
+    fun generateSecretKey()
+    fun getSecretKey(): SecretKey
+    fun getCipher(): Cipher
+    suspend fun decryptSecretInformation(cipher: Cipher, id: Int) :FortressModel?
+    suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity)
+    fun getDao(): FortressDao
+}
+
+class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : EncryptionUtils{
 
 
     private val SHARED_PREFERENCE_KEY_IV = "iv"
@@ -34,7 +43,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         const val ALLOWED_AUTHENTICATORS = KeyProperties.KEY_ALGORITHM_AES
     }
 
-    fun generateSecretKey() {
+    override fun generateSecretKey() {
         val keyGenerator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore"
         )
@@ -42,7 +51,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         keyGenerator.generateKey()
     }
 
-    fun getSecretKey(): SecretKey {
+    override fun getSecretKey(): SecretKey {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
 
         // Before the keystore can be accessed, it must be loaded.
@@ -50,7 +59,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         return keyStore.getKey(KEY_NAME, null) as SecretKey
     }
 
-    fun getCipher(): Cipher {
+    override fun getCipher(): Cipher {
         return Cipher.getInstance(
             KeyProperties.KEY_ALGORITHM_AES + "/"
                     + KeyProperties.BLOCK_MODE_CBC + "/"
@@ -70,7 +79,7 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
             .build()
     }
 
-   suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity) {
+    override suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
 
        val gson = Gson()
@@ -88,10 +97,10 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         }
     }
 
+    override fun getDao(): FortressDao = dao
 
 
-
-    suspend fun decryptSecretInformation(cipher: Cipher, id: Int) :FortressModel?{
+    override suspend fun decryptSecretInformation(cipher: Cipher, id: Int) :FortressModel?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
         var fortressModel: FortressModel? =null
 
@@ -117,9 +126,6 @@ class EncryptionUtils @Inject constructor(private val dao: FortressDao) {
         return fortressModel
     }
 
-
-
-    val  getDao : FortressDao = dao
 
 }
 

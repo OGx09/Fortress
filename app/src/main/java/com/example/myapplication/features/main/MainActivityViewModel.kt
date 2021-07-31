@@ -24,7 +24,7 @@ import kotlin.jvm.Throws
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
+open class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
 
     private val _savePasswordEntityLiveData = MediatorLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : MediatorLiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
@@ -57,7 +57,8 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
         _welcomeUsername.value = username
     }
 
-    private fun checkForExistingLogin(){
+    fun checkForExistingLogin(){
+        _openWelcomeOrPasswordMain.value = ( UiState(isLoading = true))
         viewModelScope.launch(handleError {
             _openWelcomeOrPasswordMain.value = ( UiState(error = it.message))
         }) {
@@ -123,7 +124,7 @@ class MainActivityViewModel @Inject constructor(private val repository: Fortress
     }
 
 
-    private fun readSavedPasswordDetails(){
+    fun readSavedPasswordDetails(){
         viewModelScope.launch{
             _savePasswordEntityLiveData.addSource(repository.fetchAllEncryptedPasswords()) {
                 Log.d("FortressRepository", "FortressRepositoryImpl ${it.size}")
