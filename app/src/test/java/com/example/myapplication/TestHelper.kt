@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.util.SparseArray
+import androidx.core.util.forEach
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.LiveData
@@ -50,37 +52,39 @@ fun <T> LiveData<T>.getAwaitValue(time: Long = 2,
 }
 
 class FortressDaoMock : FortressDao{
+    private val fakeDb = SparseArray<PasswordEntity>()
+
     override fun getAllEncryptedPassword(): LiveData<List<PasswordEntity>> {
         val resultLiveData = MutableLiveData<List<PasswordEntity>>()
-        val passwordEntity = PasswordEntity(0, "Google.com", "Google Search",
-            "someEncryptedData", otherInfo = "Hello world!!", "randomstring")
-        val passwordEntityList = mutableListOf<PasswordEntity>().apply{
-            for (i in 0..4 ){
-                add(passwordEntity)
-            }
-        }
-        resultLiveData.value = passwordEntityList
+        val passwordList: MutableList<PasswordEntity> = mutableListOf()
+        fakeDb.forEach { key, value ->  passwordList.add(value) }
+        resultLiveData.value = passwordList
         return resultLiveData
     }
 
     override fun getPasswordDetails(id: Int): LiveData<PasswordEntity> {
-        TODO("Not yet implemented")
+        val passwordLiveData = MutableLiveData<PasswordEntity>()
+        passwordLiveData.value = fakeDb.get(id)
+       return passwordLiveData
     }
 
     override suspend fun getEncryptedEntity(id: Int): String {
-        TODO("Not yet implemented")
+        val encryptedString = fakeDb.get(id)?.encryptedData
+        return encryptedString!!
     }
 
     override suspend fun insert(passwordEntity: PasswordEntity) {
-        TODO("Not yet implemented")
+        fakeDb.put(fakeDb.size() +1, passwordEntity)
     }
 
     override suspend fun insertEncryptedEntity(passwordEntity: PasswordEntity) {
-        TODO("Not yet implemented")
+        fakeDb.put(fakeDb.size() +1, passwordEntity)
     }
 
     override suspend fun delete(passwordEntity: PasswordEntity) {
-        TODO("Not yet implemented")
+        passwordEntity.id?.apply {
+            fakeDb.remove(this)
+        }
     }
 
 }
