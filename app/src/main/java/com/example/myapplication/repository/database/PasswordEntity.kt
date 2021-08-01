@@ -31,7 +31,6 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 
     companion object{
 
-//
 //        fun fakeQueryDb(): SparseArray<PasswordEntity>{
 //
 //            val sparseArray = SparseArray<PasswordEntity>().apply {
@@ -51,7 +50,7 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 //        }
 
         @VisibleForTesting
-        fun mockGetById() = PasswordEntity(0, "Google.com", "Google Search",
+        fun getMock() = PasswordEntity(0, "Google.com", "Google Search",
             "someEncryptedData", otherInfo = "Hello world!!", "randomstring")
     }
 

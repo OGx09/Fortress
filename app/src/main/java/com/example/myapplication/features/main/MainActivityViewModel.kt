@@ -55,12 +55,12 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
 
     fun checkForExistingLogin(){
         _openWelcomeOrPasswordMain.value = ( UiState(isLoading = true))
-        Thread.sleep(1)
         viewModelScope.launch(coroutineContext) {
             repository.fetchUsername().collect {username ->
                 username.apply {
                     if (this != null){
-                        _openWelcomeOrPasswordMain.value = ( UiState(data = this))
+                        print("checkForExistingLogin___ $this")
+                        _openWelcomeOrPasswordMain.value = ( UiState(data = this, isLoading = false))
                     }else{
                         throw IllegalArgumentException("No username")
                     }
