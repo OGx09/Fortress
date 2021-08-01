@@ -41,8 +41,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideEncryptionUtils(db: FortressDatabase) = EncryptionUtilsImpl(db.passwordDao())
-
+    fun provideEncryptionUtils(db: FortressDatabase): EncryptionUtils  = EncryptionUtilsImpl(db.passwordDao())
 
 
     @Provides

@@ -7,8 +7,8 @@ import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.database.PasswordEntity
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import junit.framework.Assert.*
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +27,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class MainActivityViewModelTest {
 
     @Mock
-    lateinit var fortressRepository : FortressRepository
+    lateinit var fortressRepository : RepositoryMock
 
     @Mock
     lateinit var mainViewModel: MainActivityViewModel
@@ -41,15 +41,17 @@ class MainActivityViewModelTest {
 
     @Before
     fun init(){
-
+        mainViewModel = MainActivityViewModel(repository = fortressRepository)
     }
 
     @Test
     fun `test save password entity`(){
+        assertNotNull(mainViewModel.openWelcomeOrPasswordMain)
         mainViewModel.checkForExistingLogin()
-        assertTrue(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue().isLoading)
+        assertFalse(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue().isLoading)
+
         assertEquals(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue().error, null)
-        assertEquals(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue(), "")
+        assertEquals(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue().error, "Gbenga")
     }
 
 

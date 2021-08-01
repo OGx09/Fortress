@@ -48,10 +48,6 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
 
-    init {
-        readSavedPasswordDetails()
-        checkForExistingLogin()
-    }
 
     override fun welcome(username: String){
         _welcomeUsername.value = username
@@ -62,6 +58,7 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
         viewModelScope.launch(handleError {
             _openWelcomeOrPasswordMain.value = ( UiState(error = it.message))
         }) {
+
             repository.fetchUsername().collect {username ->
                 username.apply {
                     if (this != null){
@@ -73,7 +70,6 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
             }
         }
     }
-
 
     override fun saveWelcomeUsername(username: String) {
         viewModelScope.launch {

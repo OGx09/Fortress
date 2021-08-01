@@ -27,7 +27,7 @@ interface EncryptionUtils{
     fun generateSecretKey()
     fun getSecretKey(): SecretKey
     fun getCipher(): Cipher
-    suspend fun decryptSecretInformation(cipher: Cipher, id: Int) :FortressModel?
+    suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?
     suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity)
     fun getDao(): FortressDao
 }
@@ -100,26 +100,26 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     override fun getDao(): FortressDao = dao
 
 
-    override suspend fun decryptSecretInformation(cipher: Cipher, id: Int) :FortressModel?{
+    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
         var fortressModel: FortressModel? =null
 
         val encryptedStrinng = dao.getEncryptedEntity(id)
+        cipher?.run {
 
-        try {
+            try {
+                val decodedBytes: ByteArray = Base64.decode(encryptedStrinng, Base64.NO_WRAP)
+                val decryptedInfo: ByteArray = this.doFinal(decodedBytes)
 
-            val decodedBytes: ByteArray = Base64.decode(encryptedStrinng, Base64.NO_WRAP)
-            val decryptedInfo: ByteArray = cipher.doFinal(decodedBytes)
+                val string = String(decryptedInfo)
 
-            val string = String(decryptedInfo)
+                Log.d("MY_APP_TAG", "ddecrypted information: $string ")
 
-            Log.d("MY_APP_TAG", "ddecrypted information: $string ")
-
-
-        } catch (e: InvalidKeyException) {
-            Log.e("MY_APP_TAG", "Key is invalid.")
-        } catch (e: UserNotAuthenticatedException) {
-            Log.d("MY_APP_TAG", "The key's validity timed out.")
+            } catch (e: InvalidKeyException) {
+                Log.e("MY_APP_TAG", "Key is invalid.")
+            } catch (e: UserNotAuthenticatedException) {
+                Log.d("MY_APP_TAG", "The key's validity timed out.")
+            }
         }
 
 
