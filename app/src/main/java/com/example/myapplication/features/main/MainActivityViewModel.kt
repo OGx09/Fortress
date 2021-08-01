@@ -10,12 +10,11 @@ import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.utils.SingleLiveEvent
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
+import java.util.concurrent.CountDownLatch
 import javax.crypto.Cipher
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -24,7 +23,7 @@ import kotlin.jvm.Throws
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
 @HiltViewModel
-open class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
+open class MainActivityViewModel @Inject constructor(private val coroutineContext: CoroutineContext, private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
 
     private val _savePasswordEntityLiveData = MediatorLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : MediatorLiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
@@ -48,6 +47,7 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
 
+    val countDownLatch = CountDownLatch(1)
 
     override fun welcome(username: String){
         _welcomeUsername.value = username
@@ -55,10 +55,8 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
 
     fun checkForExistingLogin(){
         _openWelcomeOrPasswordMain.value = ( UiState(isLoading = true))
-        viewModelScope.launch(handleError {
-            _openWelcomeOrPasswordMain.value = ( UiState(error = it.message))
-        }) {
-
+        Thread.sleep(1)
+        viewModelScope.launch(coroutineContext) {
             repository.fetchUsername().collect {username ->
                 username.apply {
                     if (this != null){
@@ -81,7 +79,31 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
         _messageState.tryEmit(msg)
     }
 
-    private fun handleError(errorContent: (Throwable) -> Unit) = CoroutineExceptionHandler { _, exception ->
+
+
+    private fun <T> runWithTryCatch( errorLiveData: MutableLiveData<UiState<T>>, content: suspend () -> Unit) {
+
+        try {
+            viewModelScope.launch(coroutineContext) {
+                content.invoke()
+
+                print("_openWelcomeOrPasswordMain eeSSSe\n")
+            }
+        }catch (exception: Exception){
+            print("_openWelcomeOrPasswordMain ERROReee\n")
+            errorLiveData.value = UiState<T>(isLoading = false, error = exception.message)
+        }
+    }
+
+    private fun runWithTryCatch(errorContent: () -> Unit, error: (String?) -> Unit) {
+        try {
+            errorContent.invoke()
+        }catch (exception: Exception){
+            error.invoke(exception.message)
+        }
+    }
+
+    private fun handleError(errorContent: (Throwable) -> Unit) = CoroutineExceptionHandler {_, exception ->
         errorContent(exception)
     }
 

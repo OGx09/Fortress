@@ -10,6 +10,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Qualifier
+import kotlin.coroutines.CoroutineContext
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -18,8 +22,8 @@ object MainActivityModule {
 
     @Provides
     fun bindMainActivityViewModel(@ActivityContext activity: MainActivity,
-                                  repository: FortressRepository): MainActivityViewModel{
-        return ViewModelProvider(activity, ActivityViewModelFactory(repository = repository))
+                                  repository: FortressRepository, coroutineContext: CoroutineContext): MainActivityViewModel{
+        return ViewModelProvider(activity)
             .get(MainActivityViewModel::class.java)
     }
 
@@ -27,3 +31,7 @@ object MainActivityModule {
 //    fun provideFingerprintUtils(encryptionUtils: EncryptionUtils, activity: MainActivity)
 //    = FingerprintUtils(encryptionUtils, activity)
 }
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class MainDispatcher
