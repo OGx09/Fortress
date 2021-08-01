@@ -1,5 +1,7 @@
 package com.example.myapplication.repository.database
 
+import android.util.SparseArray
+import androidx.annotation.VisibleForTesting
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -25,6 +27,32 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 
     override fun toString(): String {
         return Gson().toJson(this)
+    }
+
+    companion object{
+
+//
+//        fun fakeQueryDb(): SparseArray<PasswordEntity>{
+//
+//            val sparseArray = SparseArray<PasswordEntity>().apply {
+//                for (id in 0..4 ){
+//                    put(id, PasswordEntity(i, "Google.com", "Google Search",
+//                        "someEncryptedData", otherInfo = "Hello world!!", "randomstring"))
+//                }
+//            }
+//        }
+//
+//        @VisibleForTesting
+//        fun mockGetAll(){
+//
+//            mutableListOf<PasswordEntity>().apply{
+//
+//            }
+//        }
+
+        @VisibleForTesting
+        fun mockGetById() = PasswordEntity(0, "Google.com", "Google Search",
+            "someEncryptedData", otherInfo = "Hello world!!", "randomstring")
     }
 
 }

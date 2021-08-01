@@ -34,7 +34,7 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
     }
 
     override fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>> {
-        return encryptionUtils.getDao.getAllEncryptedPassword()
+        return encryptionUtils.getDao().getAllEncryptedPassword()
     }
 
     override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int)
@@ -42,7 +42,7 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
         encryptionUtils.decryptSecretInformation(cipher, id)
     }
 
-    override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao.delete(passwordEntity = passwordEntity)
+    override suspend fun removePassword(passwordEntity: PasswordEntity) = encryptionUtils.getDao().delete(passwordEntity = passwordEntity)
 
     override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity) =
         withContext(dispatcher){

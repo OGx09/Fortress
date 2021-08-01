@@ -46,6 +46,11 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.run {
+            readSavedPasswordDetails()
+            checkForExistingLogin()
+        }
+
         if(Build.VERSION.SDK_INT >= 30){
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         }else{

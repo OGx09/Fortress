@@ -18,6 +18,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments(mutableMapOf(
+            "clearPackageData" to "true"
+        ))
+
+        testOptions {
+            execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        }
+
+
     }
 
     buildFeatures {
@@ -39,17 +52,6 @@ android {
 
     }
 
-    packagingOptions {
-        exclude ("META-INF/DEPENDENCIES")
-        exclude ("META-INF/LICENSE")
-        exclude ("META-INF/LICENSE.txt")
-        exclude ("META-INF/license.txt")
-        exclude ("META-INF/NOTICE")
-        exclude ("META-INF/NOTICE.txt")
-        exclude ("META-INF/notice.txt")
-        exclude ("META-INF/ASL2.0")
-        exclude("META-INF/*.kotlin_module")
-    }
 
     buildTypes {
         getByName("release"){

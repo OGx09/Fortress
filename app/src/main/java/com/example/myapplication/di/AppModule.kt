@@ -10,6 +10,7 @@ import com.example.myapplication.repository.WebApi
 import com.example.myapplication.repository.WebsiteLogoService
 import com.example.myapplication.repository.database.FortressDatabase
 import com.example.myapplication.utils.EncryptionUtils
+import com.example.myapplication.utils.EncryptionUtilsImpl
 import com.example.myapplication.utils.dataStore
 import com.google.gson.Gson
 import dagger.Module
@@ -40,8 +41,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideEncryptionUtils(db: FortressDatabase) = EncryptionUtils(db.passwordDao())
-
+    fun provideEncryptionUtils(db: FortressDatabase): EncryptionUtils  = EncryptionUtilsImpl(db.passwordDao())
 
 
     @Provides
