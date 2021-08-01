@@ -15,7 +15,11 @@ object Versions {
     const val androidXCore ="1.3.2"
     const val androidXCompat ="1.2.0"
     const val androidMaterial ="1.3.0"
-    const val compose_activity= "1.3.0-alpha07"
+    const val composeActivity= "1.3.0-alpha07"
+    const val coroutine ="1.3.9"
+    const val mockito ="1.10.19"
+    const val testCore ="1.0.0"
+    const val androidXCoreTest ="2.1.0"
 }
 
 object Libs{
@@ -24,10 +28,10 @@ object Libs{
         "androidx.datastore:datastore-preferences-core:${Versions.datastore}",
         "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinStdlib}",
         "androidx.core:core-ktx:${Versions.androidXCore}",
-        "androidx.appcompat:appcompat:androidXCompat:${Versions.androidXCompat}",
+        "androidx.appcompat:appcompat:${Versions.androidXCompat}",
         "com.google.android.material:material:${Versions.androidMaterial}",
         "androidx.compose.foundation:foundation:${Versions.composable}",
-        "androidx.activity:activity-compose:",
+        "androidx.activity:activity-compose:${Versions.composeActivity}",
         "androidx.compose.ui:ui-tooling:${Versions.composable}",
         "androidx.compose.runtime:runtime:${Versions.composable}",
         "androidx.compose.compiler:compiler:${Versions.composable}",
@@ -44,20 +48,20 @@ object Libs{
         "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
         "io.coil-kt:coil-compose:${Versions.coil}",
-        "androidx.compose.animation:animation:1.0.0",
-        "androidx.compose.animation:animation-core:1.0.0"
+        "androidx.compose.animation:animation:${Versions.composable}",
+        "androidx.compose.animation:animation-core:${Versions.composable}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 
     val testDeps = arrayOf( "junit:junit:${Versions.junit}",
         "androidx.room:room-testing:${Versions.roomVersion}",
-        "org.mockito:mockito-core:1.10.19",
-        "androidx.test:core:1.0.0",
-        "androidx.arch.core:core-testing:2.1.0",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.co}"
+        "org.mockito:mockito-core:${Versions.mockito}",
+        "androidx.test:core:${Versions.testCore}",
+        "androidx.arch.core:core-testing:${Versions.androidXCoreTest}",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutine}"
     )
 
-    val androidTestDeps = arrayOf("androidx.test.ext:junit:1.1.2",
+    val androidTestDeps = arrayOf("androidx.test.ext:junit:${Versions.junit}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",
         "androidx.compose.ui:ui-test-manifest:${Versions.composable}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}")
