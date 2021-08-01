@@ -47,7 +47,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerVersion = Versions.kotlin_stdlib
+        kotlinCompilerVersion = Versions.kotlinStdlib
         kotlinCompilerExtensionVersion = Versions.composable
 
     }
@@ -72,7 +72,7 @@ android {
         resolutionStrategy.eachDependency {
             val requested = this.requested
             if(requested.group == "org.jetbrains.kotlin"  && requested.name == "kotlin-reflect"){
-                this.useVersion(Versions.kotlin_stdlib)
+                this.useVersion(Versions.kotlinStdlib)
             }
         }
     }
