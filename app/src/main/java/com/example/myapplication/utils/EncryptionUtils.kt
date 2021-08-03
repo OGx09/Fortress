@@ -11,6 +11,7 @@ import com.example.myapplication.data.FortressModel
 import com.google.gson.Gson
 import okio.Utf8
 import java.lang.Byte.decode
+import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.security.InvalidKeyException
 import java.security.KeyStore
@@ -21,6 +22,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.inject.Inject
 import java.nio.charset.StandardCharsets
+import java.util.Base64.getDecoder
 
 
 interface EncryptionUtils{
@@ -85,10 +87,15 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
        val gson = Gson()
 
        try {
-           val bytes = cipher.doFinal((gson.toJson(passwordEntity.fortressModel)).toByteArray())
-           val encrypted = Base64.encodeToString(bytes, Base64.NO_WRAP)
+           val jsonText = gson.toJson(passwordEntity.fortressModel)
+           val encryptedInfo: ByteArray = cipher.doFinal(
+               "Some Java World".toByteArray(Charset.defaultCharset())
+           )
 
-            dao.insertEncryptedEntity(passwordEntity)
+           val encryptedByte = java.util.Base64.getEncoder().encode(encryptedInfo)
+           val encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedByte)
+           passwordEntity.encryptedData = encryptedString
+           dao.insertEncryptedEntity(passwordEntity)
 
         } catch (e: InvalidKeyException) {
             Log.e("MY_APP_TAG", "Key is invalid.")
@@ -104,16 +111,21 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
         // Exceptions are unhandled for getCipher() and getSecretKey().
         var fortressModel: FortressModel? =null
 
-        val encryptedStrinng = dao.getEncryptedEntity(id)
+        val encryptedString = dao.getEncryptedEntity(id)
         cipher?.run {
 
             try {
-                val decodedBytes: ByteArray = Base64.decode(encryptedStrinng, Base64.NO_WRAP)
-                val decryptedInfo: ByteArray = this.doFinal(decodedBytes)
+                val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
+                val text = String(decryptedInfo, Charsets.UTF_8)
+                val text1 = Arrays.toString(decryptedInfo)
 
-                val string = String(decryptedInfo)
+                val bytes = "Techie Delight".toByteArray(StandardCharsets.UTF_8)
+                val string = String(bytes, StandardCharsets.UTF_8)
+                Log.d("MY_APP_TAG", "DECODED =>$text1\n $text __ $encryptedString \n $string")
 
-                Log.d("MY_APP_TAG", "ddecrypted information: $string ")
+//                val string = String(decryptedInfo)
+//                Log.d("MY_APP_TAG", "ddecrypted information: $decodedBytes ")
+                fortressModel =  Gson().fromJson(text, FortressModel::class.java)
 
             } catch (e: InvalidKeyException) {
                 Log.e("MY_APP_TAG", "Key is invalid.")

@@ -41,8 +41,8 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
-    private val _passwordDetails = SingleLiveEvent<UiState<FortressModel>>()
-    val passwordDetails :SingleLiveEvent<UiState<FortressModel>> = _passwordDetails
+    private val _passwordDetails = MutableLiveData<UiState<FortressModel>>()
+    val passwordDetails : LiveData<UiState<FortressModel>> = _passwordDetails
 
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
@@ -125,18 +125,15 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     fun readSavedPassword(cipher: Cipher?, id: Int?){
         _passwordDetails.value = UiState(isLoading = true)
         viewModelScope.launch(handleError {
-            _passwordDetails.value = UiState(error = it.message)
+            _passwordDetails.value = UiState(error = it.message, isLoading = false)
 
-            Log.d(
-                "MY_APP_TAG", "Encrypted information: ${ it.message}"
-            )
         }) {
             if (cipher == null || id == null){
                 throw NullPointerException("Unable to complete your fingerprint authentication")
             }
             val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
             allPasswords?.apply {
-                _passwordDetails.value = UiState(data = this)
+                _passwordDetails.value = UiState(data = this, isLoading = false)
             }
         }
     }
