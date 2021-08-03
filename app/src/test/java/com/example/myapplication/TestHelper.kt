@@ -4,7 +4,6 @@ import android.security.keystore.KeyProperties
 import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.LiveData
@@ -14,12 +13,11 @@ import com.example.myapplication.data.FortressModel
 import com.example.myapplication.data.Icon
 import com.example.myapplication.data.WebsiteLogo
 import com.example.myapplication.repository.FortressRepository
-import com.example.myapplication.repository.WebsiteLogoService
+import com.example.myapplication.repository.FortressRepositoryImpl
 import com.example.myapplication.repository.database.FortressDao
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.EncryptionUtils
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.lang.Exception
 import java.util.concurrent.CountDownLatch
@@ -57,38 +55,43 @@ fun <T> LiveData<T>.getAwaitValue(time: Long = 2,
 }
 
 class FortressDaoMock : FortressDao{
-    private val fakeDb = SparseArray<PasswordEntity>()
+
+    private val _fakeDb = HashMap<Int, PasswordEntity>()
+
+    val clear = _fakeDb.clear()
 
     override fun getAllEncryptedPassword(): LiveData<List<PasswordEntity>> {
         val resultLiveData = MutableLiveData<List<PasswordEntity>>()
         val passwordList: MutableList<PasswordEntity> = mutableListOf()
-        fakeDb.forEach { key, value ->  passwordList.add(value) }
+        _fakeDb.forEach { (_, value) ->  passwordList.add(value) }
         resultLiveData.value = passwordList
         return resultLiveData
     }
 
     override fun getPasswordDetails(id: Int): LiveData<PasswordEntity> {
         val passwordLiveData = MutableLiveData<PasswordEntity>()
-        passwordLiveData.value = fakeDb.get(id)
+        passwordLiveData.value = _fakeDb[id]
+        print("Read: ${_fakeDb[id]}\n")
        return passwordLiveData
     }
 
     override suspend fun getEncryptedEntity(id: Int): String {
-        val encryptedString = fakeDb.get(id)?.encryptedData
+        val encryptedString = _fakeDb[id]?.encryptedData
         return encryptedString!!
     }
 
     override suspend fun insert(passwordEntity: PasswordEntity) {
-        fakeDb.put(fakeDb.size() +1, passwordEntity)
+        print("Insert: ${passwordEntity.website}\n")
+        _fakeDb[_fakeDb.size +1] = passwordEntity
     }
 
     override suspend fun insertEncryptedEntity(passwordEntity: PasswordEntity) {
-        fakeDb.put(fakeDb.size() +1, passwordEntity)
+        _fakeDb[_fakeDb.size +1] = passwordEntity
     }
 
     override suspend fun delete(passwordEntity: PasswordEntity) {
         passwordEntity.id?.apply {
-            fakeDb.remove(this)
+            _fakeDb.remove(this)
         }
     }
 
@@ -175,7 +178,7 @@ class EncryptionUtilsMock (private val fortressDao: FortressDao) : EncryptionUti
 }
 
 open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
-                     private val websiteLogoService: WebsiteLogoService,
+                     //private val websiteLogoService: WebsiteLogoService,
                      private val dispatcher: CoroutineDispatcher,
                      private val datastore: DataStore<Preferences>
 ) : FortressRepository {
@@ -212,13 +215,13 @@ open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
     }
 
     override suspend fun saveToDataStore(value: String) {
-
+        datastore.edit {settings ->
+            settings[FortressRepositoryImpl.DATASTORE_USERNAME] = value
+        }
     }
 
-    override suspend fun fetchUsername(): Flow<String?> {
-        return flow {
-            emit("Gbenga")
-        }
+    override suspend fun fetchUsername() =flow {
+        emit("Gbenga")
     }
 
 }

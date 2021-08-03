@@ -34,6 +34,7 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.fragment.app.FragmentActivity
@@ -63,8 +64,11 @@ fun MainPasswordList(activity: MainActivity,
 
     AlertDialogComponent(openDialog = openDialog)
 
-    val openPasswordDetails =activity.viewModel.passwordDetails.observeAsSingleState(UiState(isLoading = false))
-    openPasswordDetails.value?.apply {
+    val openPasswordDetails = activity.viewModel.passwordDetails.observeAsState(UiState(isLoading = false))
+
+    Log.d("SavedPasswordItem_isLoading", "$openPasswordDetails __ $savePassword")
+
+    openPasswordDetails.value.apply {
         LaunchedEffect(key1 = this){
 
             openDialog.value = isLoading
@@ -88,7 +92,6 @@ fun MainPasswordList(activity: MainActivity,
         fingerPrintFlow.collectData{
             Log.d("SavedPasswordItem", "hello : $it")
             it.errorString?.apply {
-                Log.d("SavedPasswordItem", "$this")
                 activity.viewModel.showMessage(this)
             }
 

@@ -24,6 +24,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -74,6 +75,10 @@ object AppModule {
     fun provideDatastore(@ApplicationContext context: Context): DataStore<Preferences> {
         return context.dataStore
     }
+
+
+    @Provides
+    fun provideMainDispatchers() : CoroutineContext = Dispatchers.Main
 
 }
 

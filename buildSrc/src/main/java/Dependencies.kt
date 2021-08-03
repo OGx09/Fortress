@@ -2,6 +2,7 @@
 object Versions {
     const val lifecycle = "2.3.1"
     const val junit ="4.13.2"
+    const val androidJunit ="1.1.2"
     const val kotlinStdlib = "1.5.10"
     const val roomVersion = "2.3.0"
     const val hiltVersion = "2.35"
@@ -61,7 +62,7 @@ object Libs{
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutine}"
     )
 
-    val androidTestDeps = arrayOf("androidx.test.ext:junit:${Versions.junit}",
+    val androidTestDeps = arrayOf("androidx.test.ext:junit:${Versions.androidJunit}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",
         "androidx.compose.ui:ui-test-manifest:${Versions.composable}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}")

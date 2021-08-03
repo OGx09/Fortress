@@ -10,12 +10,11 @@ import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.utils.SingleLiveEvent
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
+import java.util.concurrent.CountDownLatch
 import javax.crypto.Cipher
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -24,7 +23,7 @@ import kotlin.jvm.Throws
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
 @HiltViewModel
-open class MainActivityViewModel @Inject constructor(private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
+open class MainActivityViewModel @Inject constructor(private val coroutineContext: CoroutineContext, private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
 
     private val _savePasswordEntityLiveData = MediatorLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : MediatorLiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
@@ -42,12 +41,13 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
     private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
-    private val _passwordDetails = SingleLiveEvent<UiState<FortressModel>>()
-    val passwordDetails :SingleLiveEvent<UiState<FortressModel>> = _passwordDetails
+    private val _passwordDetails = MutableLiveData<UiState<FortressModel>>()
+    val passwordDetails : LiveData<UiState<FortressModel>> = _passwordDetails
 
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
 
+    val countDownLatch = CountDownLatch(1)
 
     override fun welcome(username: String){
         _welcomeUsername.value = username
@@ -55,14 +55,12 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
 
     fun checkForExistingLogin(){
         _openWelcomeOrPasswordMain.value = ( UiState(isLoading = true))
-        viewModelScope.launch(handleError {
-            _openWelcomeOrPasswordMain.value = ( UiState(error = it.message))
-        }) {
-
+        viewModelScope.launch(coroutineContext) {
             repository.fetchUsername().collect {username ->
                 username.apply {
                     if (this != null){
-                        _openWelcomeOrPasswordMain.value = ( UiState(data = this))
+                        print("checkForExistingLogin___ $this")
+                        _openWelcomeOrPasswordMain.value = ( UiState(data = this, isLoading = false))
                     }else{
                         throw IllegalArgumentException("No username")
                     }
@@ -81,7 +79,31 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
         _messageState.tryEmit(msg)
     }
 
-    private fun handleError(errorContent: (Throwable) -> Unit) = CoroutineExceptionHandler { _, exception ->
+
+
+    private fun <T> runWithTryCatch( errorLiveData: MutableLiveData<UiState<T>>, content: suspend () -> Unit) {
+
+        try {
+            viewModelScope.launch(coroutineContext) {
+                content.invoke()
+
+                print("_openWelcomeOrPasswordMain eeSSSe\n")
+            }
+        }catch (exception: Exception){
+            print("_openWelcomeOrPasswordMain ERROReee\n")
+            errorLiveData.value = UiState<T>(isLoading = false, error = exception.message)
+        }
+    }
+
+    private fun runWithTryCatch(errorContent: () -> Unit, error: (String?) -> Unit) {
+        try {
+            errorContent.invoke()
+        }catch (exception: Exception){
+            error.invoke(exception.message)
+        }
+    }
+
+    private fun handleError(errorContent: (Throwable) -> Unit) = CoroutineExceptionHandler {_, exception ->
         errorContent(exception)
     }
 
@@ -103,18 +125,15 @@ open class MainActivityViewModel @Inject constructor(private val repository: For
     fun readSavedPassword(cipher: Cipher?, id: Int?){
         _passwordDetails.value = UiState(isLoading = true)
         viewModelScope.launch(handleError {
-            _passwordDetails.value = UiState(error = it.message)
+            _passwordDetails.value = UiState(error = it.message, isLoading = false)
 
-            Log.d(
-                "MY_APP_TAG", "Encrypted information: ${ it.message}"
-            )
         }) {
             if (cipher == null || id == null){
                 throw NullPointerException("Unable to complete your fingerprint authentication")
             }
             val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
             allPasswords?.apply {
-                _passwordDetails.value = UiState(data = this)
+                _passwordDetails.value = UiState(data = this, isLoading = false)
             }
         }
     }
