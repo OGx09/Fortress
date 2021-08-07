@@ -23,6 +23,10 @@ import kotlinx.coroutines.flow.*
 import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+
+
+
 
 
 class MainThreadExecutor: Executor {
@@ -32,6 +36,12 @@ class MainThreadExecutor: Executor {
         handler.post(command)
     }
 
+}
+
+object Constants {
+    // encryption/decryption
+    var AES_KEY = "0366D8637F9C6B21"
+    var IV_VECTOR = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
 
 var hasCalled : Boolean = false
@@ -100,13 +110,17 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
-                //val iv: ByteArray
-                cipher = encrptedUtils.getCipher()
-                val secretKey = encrptedUtils.getSecretKey()
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-                //val ivParams: IvParameterSpec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
+
+                cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+
+//                val random = SecureRandom()
+//                val iv = ByteArray(cipher.blockSize)
+//                random.nextBytes(iv)
+//                val ivParams = IvParameterSpec(iv)
+
+                cipher.init(Cipher.ENCRYPT_MODE, encrptedUtils.generateSecretKey())
             }catch (e: java.lang.Exception){
-                throw RuntimeException()
+                e.printStackTrace()
             }
             showBiometricPrompt(activity = activity,cipher = cipher)
         }else{
@@ -119,11 +133,18 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         if (canUseBiometric(activity)){
             var cipher: Cipher? = null
             try {
-                //val iv: ByteArray
-                cipher = encrptedUtils.getCipher()
-                val secretKey = encrptedUtils.getSecretKey()
-                cipher.init(Cipher.DECRYPT_MODE, secretKey)
-                //val ivParams: IvParameterSpec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
+//                val encryted_bytes: ByteArray = Base64.getDecoder.decode(, Base64.DEFAULT)
+
+                cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+                val staticKey = encrptedUtils.getSecretKey().encoded
+               // val keySpec = SecretKeySpec(staticKey, "AES")
+                val ivSpec = IvParameterSpec(Constants.IV_VECTOR)
+
+                val random = SecureRandom()
+                val iv = ByteArray(cipher.blockSize)
+                random.nextBytes(iv)
+                val ivParams = IvParameterSpec(iv)
+                cipher.init(Cipher.DECRYPT_MODE, encrptedUtils.getSecretKey(), ivParams)
             }catch (e: java.lang.Exception){
                 e.printStackTrace()
                 Log.e("authenticate", e.message +"_")

@@ -22,13 +22,17 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.inject.Inject
 import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import java.util.Base64.getDecoder
+import javax.crypto.spec.SecretKeySpec
+import kotlin.collections.HashMap
 
 
 interface EncryptionUtils{
-    fun generateSecretKey()
+    fun generateSecretKey(): SecretKey
     fun getSecretKey(): SecretKey
     fun getCipher(): Cipher
+    fun getKeyGenParameterSpec(): KeyGenParameterSpec
     suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?
     suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity)
     fun getDao(): FortressDao
@@ -36,6 +40,7 @@ interface EncryptionUtils{
 
 class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : EncryptionUtils{
 
+    private val token = "helloWorldOfDJjango"
 
     private val SHARED_PREFERENCE_KEY_IV = "iv"
 
@@ -45,12 +50,12 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
         const val ALLOWED_AUTHENTICATORS = KeyProperties.KEY_ALGORITHM_AES
     }
 
-    override fun generateSecretKey() {
+    override fun generateSecretKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore"
         )
         keyGenerator.init(getKeyGenParameterSpec())
-        keyGenerator.generateKey()
+        return keyGenerator.generateKey()
     }
 
     override fun getSecretKey(): SecretKey {
@@ -70,7 +75,7 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     }
 
 
-    private fun getKeyGenParameterSpec(): KeyGenParameterSpec {
+    override fun getKeyGenParameterSpec(): KeyGenParameterSpec {
         return KeyGenParameterSpec.Builder(
             KEY_NAME,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
@@ -81,20 +86,20 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
             .build()
     }
 
+
     override suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity) {
         // Exceptions are unhandled for getCipher() and getSecretKey().
+        Log.d("decryptSecretInfir", "$cipher")
 
        val gson = Gson()
 
        try {
-           val jsonText = gson.toJson(passwordEntity.fortressModel)
-           val encryptedInfo: ByteArray = cipher.doFinal(
-               "Some Java World".toByteArray(Charset.defaultCharset())
-           )
+           //val jsonText = gson.toJson()
 
-           val encryptedByte = java.util.Base64.getEncoder().encode(encryptedInfo)
-           val encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedByte)
-           passwordEntity.encryptedData = encryptedString
+          // Log.d("decryptSecretInfir", "$jsonText")
+
+           val encryptedText = cipher.doFinal(passwordEntity.fortressModel.toString().toByteArray(), )
+           passwordEntity.encryptedData = Base64.encodeToString(encryptedText, Base64.DEFAULT or Base64.NO_WRAP) //String(encryptedInfo)
            dao.insertEncryptedEntity(passwordEntity)
 
         } catch (e: InvalidKeyException) {
@@ -115,17 +120,10 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
         cipher?.run {
 
             try {
-                val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
-                val text = String(decryptedInfo, Charsets.UTF_8)
-                val text1 = Arrays.toString(decryptedInfo)
-
-                val bytes = "Techie Delight".toByteArray(StandardCharsets.UTF_8)
-                val string = String(bytes, StandardCharsets.UTF_8)
-                Log.d("MY_APP_TAG", "DECODED =>$text1\n $text __ $encryptedString \n $string")
-
-//                val string = String(decryptedInfo)
-//                Log.d("MY_APP_TAG", "ddecrypted information: $decodedBytes ")
-                fortressModel =  Gson().fromJson(text, FortressModel::class.java)
+               // val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
+                val text = String(doFinal(Base64.decode(encryptedString.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP)))
+                Log.d("Hallelujjah!", "$text")
+                fortressModel =  Gson().fromJson(Gson().toJson(text), FortressModel::class.java)
 
             } catch (e: InvalidKeyException) {
                 Log.e("MY_APP_TAG", "Key is invalid.")
@@ -137,6 +135,8 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
 
         return fortressModel
     }
+
+
 
 
 }

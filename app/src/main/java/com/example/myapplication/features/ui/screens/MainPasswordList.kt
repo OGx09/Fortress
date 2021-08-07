@@ -170,6 +170,12 @@ fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
 fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
 
     val lazyState = rememberLazyListState()
+
+    if (list.isEmpty()){
+        Center {
+            Text("You have not saved any password yet!!")
+        }
+    }
     LazyColumn(
         state = lazyState,
         contentPadding = PaddingValues(all = Dp(value = 10f))
@@ -191,7 +197,7 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
                 selectedId = passwordEntity.id
-                mainActivity.fingerprintUtil.register(mainActivity as FragmentActivity)
+                mainActivity.fingerprintUtil.authenticate(mainActivity as FragmentActivity)
             }
         ) {
 

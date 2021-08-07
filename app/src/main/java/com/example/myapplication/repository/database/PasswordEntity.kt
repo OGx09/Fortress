@@ -19,7 +19,6 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
                           @ColumnInfo var websiteName: String,
                           @ColumnInfo var website: String,
                           @ColumnInfo(name ="encryptedData") var encryptedData: String?=null,
-                          @ColumnInfo var otherInfo: String,
                           @ColumnInfo var iconBytes: String){
 
 
@@ -51,7 +50,7 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 
         @VisibleForTesting
         fun getMock() = PasswordEntity(0, "Google.com", "Google Search",
-            "someEncryptedData", otherInfo = "Hello world!!", "randomstring")
+            "someEncryptedData",  "randomstring")
     }
 
 }
