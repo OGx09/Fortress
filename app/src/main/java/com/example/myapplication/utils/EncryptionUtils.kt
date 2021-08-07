@@ -25,10 +25,11 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.Base64.getDecoder
 import javax.crypto.spec.SecretKeySpec
+import kotlin.collections.HashMap
 
 
 interface EncryptionUtils{
-    fun generateSecretKey()
+    fun generateSecretKey(): SecretKey
     fun getSecretKey(): SecretKey
     fun getCipher(): Cipher
     fun getKeyGenParameterSpec(): KeyGenParameterSpec
@@ -49,12 +50,12 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
         const val ALLOWED_AUTHENTICATORS = KeyProperties.KEY_ALGORITHM_AES
     }
 
-    override fun generateSecretKey() {
+    override fun generateSecretKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore"
         )
         keyGenerator.init(getKeyGenParameterSpec())
-        keyGenerator.generateKey()
+        return keyGenerator.generateKey()
     }
 
     override fun getSecretKey(): SecretKey {
@@ -93,12 +94,12 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
        val gson = Gson()
 
        try {
-           val jsonText = gson.toJson(passwordEntity.fortressModel)
+           //val jsonText = gson.toJson()
 
-           Log.d("decryptSecretInfir", "$jsonText")
+          // Log.d("decryptSecretInfir", "$jsonText")
 
-           val encryptedText = cipher.doFinal(jsonText.toByteArray())
-           passwordEntity.encryptedData = Base64.encodeToString(encryptedText, Base64.NO_WRAP or Base64.DEFAULT) //String(encryptedInfo)
+           val encryptedText = cipher.doFinal(passwordEntity.fortressModel.toString().toByteArray(), )
+           passwordEntity.encryptedData = Base64.encodeToString(encryptedText, Base64.DEFAULT or Base64.NO_WRAP) //String(encryptedInfo)
            dao.insertEncryptedEntity(passwordEntity)
 
         } catch (e: InvalidKeyException) {
@@ -120,9 +121,9 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
 
             try {
                // val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
-                val text = String(doFinal(Base64.decode(encryptedString.toByteArray(), Base64.NO_WRAP or Base64.DEFAULT)))
+                val text = String(doFinal(Base64.decode(encryptedString.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP)))
                 Log.d("Hallelujjah!", "$text")
-                fortressModel =  Gson().fromJson(text, FortressModel::class.java)
+                fortressModel =  Gson().fromJson(Gson().toJson(text), FortressModel::class.java)
 
             } catch (e: InvalidKeyException) {
                 Log.e("MY_APP_TAG", "Key is invalid.")

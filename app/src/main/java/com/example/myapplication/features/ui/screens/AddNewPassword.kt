@@ -201,13 +201,13 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
                it.errorString?.apply {
                    scaffoldState?.snackbarHostState?.showSnackbar(this)
                }
-               it.cryptoObject?.cipher?.apply {
+               it.cryptoObject?.cipher?.run {
                    Log.d("CypherText", "Cypher $this")
 
                    viewModel.savePassword(webTextState.value.text,
                        webNameTextState.value.text,
                        passwordTextState.value.text,
-                       buzzWord = buzzTextState.value.text,
+                       otherInfo = buzzTextState.value.text,
                        username = usernameState.value.text, this)
                }
            }
