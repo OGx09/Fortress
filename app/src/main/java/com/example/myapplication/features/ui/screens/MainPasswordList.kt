@@ -191,7 +191,7 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
                 selectedId = passwordEntity.id
-                mainActivity.fingerprintUtil.register(mainActivity as FragmentActivity)
+                mainActivity.fingerprintUtil.authenticate(mainActivity as FragmentActivity)
             }
         ) {
 

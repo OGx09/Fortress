@@ -151,7 +151,7 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
 
 
     fun savePassword(websiteUrl: String, websiteName: String,
-                     password: String, buzzWord: String,
+                     password: String, otherInfo: String,
                      username: String, cipher: Cipher){
 
         viewModelScope.launch {
@@ -160,20 +160,15 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
                 //val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
                 val iconUrl: String? = ""//websiteIcon.icons[2]?.url
 
-                val fortressModel = FortressModel(
-                    websiteUrl,
-                    username, password, iconUrl
-                )
+                val fortressModel = FortressModel(password,username, otherInfo)
                 val passwordEntity = PasswordEntity(
                     null,
                     websiteName = websiteName,
-                    website = websiteUrl, otherInfo = buzzWord,
-                    iconBytes = iconUrl ?: ""
+                    website = websiteUrl,
+                    iconBytes = iconUrl ?: "http://"
                 )
                 passwordEntity.fortressModel = fortressModel
-                Log.d(
-                    "MYAPP_TAG", "Encrypted information: " + Gson().toJson(passwordEntity.fortressModel)
-                )
+
                 repository.savePassword(cipher, passwordEntity)
                 _savePasswordDataLiveData.value = UiState(data = true)
             }catch (e : Exception){
