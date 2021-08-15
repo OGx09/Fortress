@@ -94,7 +94,8 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
        val gson = Gson()
 
        try {
-           val jsonText = "{\"otherInfo\":\" \"${gson.toJson(passwordEntity.fortressModel)}\""
+           //For some reason
+           val jsonText = "{\"otherInfo\":\" \"${gson.toJson(passwordEntity.fortressModel)}"
 
            Log.d("decryptSecretInfir", "$jsonText")
 
@@ -123,11 +124,11 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
 
             try {
                // val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
-                val text = String(doFinal(Base64.decode(encryptedString.toByteArray(Charset.defaultCharset()),
-                    Base64.DEFAULT or Base64.NO_WRAP)),
-                    Charsets.US_ASCII)
-                Log.d("ENDEDEDDEDDEDD!", "$text \n $encryptedString")
-                fortressModel =  Gson().fromJson(Gson().toJson(text), FortressModel::class.java)
+                val text = doFinal(Base64.decode(encryptedString.toByteArray(Charset.defaultCharset()),
+                    Base64.DEFAULT or Base64.NO_WRAP))
+                val decryptedString = String(text)
+                Log.d("ENDEDEDDEDDEDD!", "${decryptedString.substring(decryptedString.indexOf("{"))}")
+                fortressModel =  Gson().fromJson(decryptedString.substring(decryptedString.indexOf("{")), FortressModel::class.java)
 
             } catch (e: InvalidKeyException) {
                 Log.e("MY_APP_TAG", "Key is invalid.")
