@@ -38,7 +38,7 @@ class FortressRepositoryImpl (private val encryptionUtils: EncryptionUtils,
     }
 
     override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int)
-    : FortressModel? = withContext(Dispatchers.IO){
+    : PasswordEntity? = withContext(Dispatchers.IO){
         encryptionUtils.decryptSecretInformation(cipher, id)
     }
 

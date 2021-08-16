@@ -33,7 +33,7 @@ interface EncryptionUtils{
     fun getSecretKey(): SecretKey
     fun getCipher(): Cipher
     fun getKeyGenParameterSpec(): KeyGenParameterSpec
-    suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?
+    suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) : PasswordEntity?
     suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity)
     fun getDao(): FortressDao
 }
@@ -115,20 +115,21 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     override fun getDao(): FortressDao = dao
 
 
-    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?{
+    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :PasswordEntity?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
-        var fortressModel: FortressModel? =null
 
-        val encryptedString = dao.getEncryptedEntity(id)
+        val passwordEntity = dao.getPasswordDetails(id)
+
+        val encryptedString = passwordEntity.encryptedData
         cipher?.run {
 
             try {
                // val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
-                val text = doFinal(Base64.decode(encryptedString.toByteArray(Charset.defaultCharset()),
+                val text = doFinal(Base64.decode(encryptedString?.toByteArray(Charset.defaultCharset()),
                     Base64.DEFAULT or Base64.NO_WRAP))
                 val decryptedString = String(text)
                 Log.d("ENDEDEDDEDDEDD!", "${decryptedString.substring(decryptedString.indexOf("{"))}")
-                fortressModel =  Gson().fromJson(decryptedString.substring(decryptedString.indexOf("{")), FortressModel::class.java)
+                passwordEntity.fortressModel =  Gson().fromJson(decryptedString.substring(decryptedString.indexOf("{")), FortressModel::class.java)
 
             } catch (e: InvalidKeyException) {
                 Log.e("MY_APP_TAG", "Key is invalid.")
@@ -138,7 +139,7 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
         }
 
 
-        return fortressModel
+        return passwordEntity
     }
 
 
