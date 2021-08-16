@@ -33,7 +33,7 @@ interface EncryptionUtils{
     fun getSecretKey(): SecretKey
     fun getCipher(): Cipher
     fun getKeyGenParameterSpec(): KeyGenParameterSpec
-    suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?
+    suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) : PasswordEntity?
     suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity)
     fun getDao(): FortressDao
 }
@@ -94,12 +94,15 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
        val gson = Gson()
 
        try {
-           //val jsonText = gson.toJson()
+           //For some reason
+           val jsonText = "{\"otherInfo\":\" \"${gson.toJson(passwordEntity.fortressModel)}"
 
-          // Log.d("decryptSecretInfir", "$jsonText")
+           Log.d("decryptSecretInfir", "$jsonText")
 
-           val encryptedText = cipher.doFinal(passwordEntity.fortressModel.toString().toByteArray(), )
-           passwordEntity.encryptedData = Base64.encodeToString(encryptedText, Base64.DEFAULT or Base64.NO_WRAP) //String(encryptedInfo)
+           val encryptedText = cipher.doFinal(jsonText.toByteArray(Charset.defaultCharset()))
+           Log.d("MY_APP_TAG", "Encrypted information: " + Arrays.toString(encryptedText))
+
+           passwordEntity.encryptedData = java.util.Base64.getEncoder().encodeToString(encryptedText) //String(encryptedInfo)
            dao.insertEncryptedEntity(passwordEntity)
 
         } catch (e: InvalidKeyException) {
@@ -112,18 +115,21 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     override fun getDao(): FortressDao = dao
 
 
-    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :FortressModel?{
+    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :PasswordEntity?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
-        var fortressModel: FortressModel? =null
 
-        val encryptedString = dao.getEncryptedEntity(id)
+        val passwordEntity = dao.getPasswordDetails(id)
+
+        val encryptedString = passwordEntity.encryptedData
         cipher?.run {
 
             try {
                // val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
-                val text = String(doFinal(Base64.decode(encryptedString.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP)))
-                Log.d("Hallelujjah!", "$text")
-                fortressModel =  Gson().fromJson(Gson().toJson(text), FortressModel::class.java)
+                val text = doFinal(Base64.decode(encryptedString?.toByteArray(Charset.defaultCharset()),
+                    Base64.DEFAULT or Base64.NO_WRAP))
+                val decryptedString = String(text)
+                Log.d("ENDEDEDDEDDEDD!", "${decryptedString.substring(decryptedString.indexOf("{"))}")
+                passwordEntity.fortressModel =  Gson().fromJson(decryptedString.substring(decryptedString.indexOf("{")), FortressModel::class.java)
 
             } catch (e: InvalidKeyException) {
                 Log.e("MY_APP_TAG", "Key is invalid.")
@@ -133,7 +139,7 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
         }
 
 
-        return fortressModel
+        return passwordEntity
     }
 
 

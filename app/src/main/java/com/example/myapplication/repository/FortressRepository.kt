@@ -11,7 +11,7 @@ interface FortressRepository {
 
     fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>>
 
-    suspend fun fetchPasswordDetails(cipher: Cipher, id: Int) : FortressModel?
+    suspend fun fetchPasswordDetails(cipher: Cipher, id: Int) : PasswordEntity?
 
     suspend fun removePassword(passwordEntity: PasswordEntity)
 

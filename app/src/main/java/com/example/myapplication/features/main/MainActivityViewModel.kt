@@ -41,8 +41,8 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
-    private val _passwordDetails = MutableLiveData<UiState<FortressModel>>()
-    val passwordDetails : LiveData<UiState<FortressModel>> = _passwordDetails
+    private val _passwordDetails = MutableLiveData<UiState<PasswordEntity>>()
+    val passwordDetails : LiveData<UiState<PasswordEntity>> = _passwordDetails
 
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain

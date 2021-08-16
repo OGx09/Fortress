@@ -111,14 +111,14 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             var cipher: Cipher? = null
             try {
 
-                cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+                cipher = encrptedUtils.getCipher()
 
 //                val random = SecureRandom()
 //                val iv = ByteArray(cipher.blockSize)
 //                random.nextBytes(iv)
 //                val ivParams = IvParameterSpec(iv)
 
-                cipher.init(Cipher.ENCRYPT_MODE, encrptedUtils.generateSecretKey())
+                cipher.init(Cipher.ENCRYPT_MODE, encrptedUtils.getSecretKey())
             }catch (e: java.lang.Exception){
                 e.printStackTrace()
             }
@@ -135,13 +135,11 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
             try {
 //                val encryted_bytes: ByteArray = Base64.getDecoder.decode(, Base64.DEFAULT)
 
-                cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-                val staticKey = encrptedUtils.getSecretKey().encoded
-               // val keySpec = SecretKeySpec(staticKey, "AES")
-                val ivSpec = IvParameterSpec(Constants.IV_VECTOR)
+                cipher = encrptedUtils.getCipher()
 
                 val random = SecureRandom()
                 val iv = ByteArray(cipher.blockSize)
+                Log.d("authenticate", ""+cipher.blockSize)
                 random.nextBytes(iv)
                 val ivParams = IvParameterSpec(iv)
                 cipher.init(Cipher.DECRYPT_MODE, encrptedUtils.getSecretKey(), ivParams)

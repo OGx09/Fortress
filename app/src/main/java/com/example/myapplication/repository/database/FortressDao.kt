@@ -13,7 +13,7 @@ interface FortressDao {
     fun getAllEncryptedPassword(): LiveData<List<PasswordEntity>>
 
     @Query("SELECT * FROM passwordentity WHERE id = :id")
-    fun getPasswordDetails(id: Int): LiveData<PasswordEntity>
+    fun getPasswordDetails(id: Int): PasswordEntity
 
 
     @Query("SELECT encryptedData FROM passwordentity WHERE id = :id")
