@@ -29,14 +29,16 @@ import kotlin.collections.HashMap
 
 
 interface EncryptionUtils{
-    fun generateSecretKey(): SecretKey
-    fun getSecretKey(): SecretKey
     fun getCipher(): Cipher
-    fun getKeyGenParameterSpec(): KeyGenParameterSpec
-    suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) : PasswordEntity?
-    suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity)
-    fun getDao(): FortressDao
+    fun decryptSecretInformation( cipherText: ByteArray, cipher: Cipher?) : String?
+    fun encryptSecretInformation(passwordEntity: PasswordEntity, cipher: Cipher): CiphertextWrapper?
+    fun getInitializedCipherForEncryption(keyName: String): Cipher
+    suspend fun decryptDbCiperText(id: Int): FortressModel
+    suspend fun persistInDbAsCipherText(passwordEntity: PasswordEntity)
+    suspend fun getDao(): FortressDao
 }
+
+data class CiphertextWrapper(val ciphertext: ByteArray, val initializationVector: ByteArray)
 
 class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : EncryptionUtils{
 
@@ -44,102 +46,88 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
 
     private val SHARED_PREFERENCE_KEY_IV = "iv"
 
+    private val ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_GCM
+    private val ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_NONE
+    private val ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
+    private val KEY_SIZE = 256
+
     companion object {
         const val KEY_NAME: String = "androiddebugkey"
         const val VALIDITY_DURATION_SECONDS = 5
         const val ALLOWED_AUTHENTICATORS = KeyProperties.KEY_ALGORITHM_AES
     }
 
-    override fun generateSecretKey(): SecretKey {
+    //TODO: To be removed later
+    override suspend fun getDao(): FortressDao = dao
+
+    override fun getInitializedCipherForEncryption(keyName: String): Cipher {
+        val cipher = getCipher()
+        val secretKey = generateSecretKey(keyName = keyName);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        return cipher
+    }
+
+    private fun generateSecretKey(keyName: String): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore"
         )
-        keyGenerator.init(getKeyGenParameterSpec())
+        keyGenerator.init(getKeyGenParameterSpec(keyName))
         return keyGenerator.generateKey()
     }
 
-    override fun getSecretKey(): SecretKey {
+    private fun getSecretKey(keyName: String): SecretKey {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
 
         // Before the keystore can be accessed, it must be loaded.
         keyStore.load(null)
-        return keyStore.getKey(KEY_NAME, null) as SecretKey
+        return keyStore.getKey(keyName, null) as SecretKey
     }
 
     override fun getCipher(): Cipher {
-        return Cipher.getInstance(
-            KeyProperties.KEY_ALGORITHM_AES + "/"
-                    + KeyProperties.BLOCK_MODE_CBC + "/"
-                    + KeyProperties.ENCRYPTION_PADDING_PKCS7
-        )
+        return Cipher.getInstance("$ENCRYPTION_ALGORITHM/$ENCRYPTION_BLOCK_MODE/$ENCRYPTION_PADDING")
     }
 
 
-    override fun getKeyGenParameterSpec(): KeyGenParameterSpec {
+    private fun getKeyGenParameterSpec(keyName: String): KeyGenParameterSpec {
         return KeyGenParameterSpec.Builder(
-            KEY_NAME,
+            keyName,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
         )
-            .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setKeySize(KEY_SIZE)
             .setUserAuthenticationRequired(true)
             .build()
     }
 
 
-    override suspend fun encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity) {
+    override fun encryptSecretInformation(passwordEntity: PasswordEntity, cipher: Cipher): CiphertextWrapper? {
         // Exceptions are unhandled for getCipher() and getSecretKey().
-        Log.d("decryptSecretInfir", "$cipher")
-
        val gson = Gson()
+        val encryptedText = cipher.doFinal(gson.toJson(passwordEntity.fortressModel).toByteArray(Charset.forName("UTF-8")))
+        return CiphertextWrapper(encryptedText, cipher.iv)
+    }
 
-       try {
-           //For some reason
-           val jsonText = "{\"otherInfo\":\" \"${gson.toJson(passwordEntity.fortressModel)}"
+    override suspend fun decryptDbCiperText(id: Int): FortressModel {
+        val json = dao.getEncryptedEntity(id)
 
-           Log.d("decryptSecretInfir", "$jsonText")
+        return dao.getPasswordDetails(id).let {
+            Gson().fromJson(json, FortressModel::class.java)
+        }
 
-           val encryptedText = cipher.doFinal(jsonText.toByteArray(Charset.defaultCharset()))
-           Log.d("MY_APP_TAG", "Encrypted information: " + Arrays.toString(encryptedText))
+    }
 
-           passwordEntity.encryptedData = java.util.Base64.getEncoder().encodeToString(encryptedText) //String(encryptedInfo)
-           dao.insertEncryptedEntity(passwordEntity)
-
-        } catch (e: InvalidKeyException) {
-            Log.e("MY_APP_TAG", "Key is invalid.")
-        } catch (e: UserNotAuthenticatedException) {
-            Log.d("MY_APP_TAG", "The key's validity timed out.")
+    override suspend fun persistInDbAsCipherText(passwordEntity: PasswordEntity) {
+        passwordEntity.run {
+            dao.insertEncryptedEntity(this)
         }
     }
 
-    override fun getDao(): FortressDao = dao
-
-
-    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int) :PasswordEntity?{
+    override fun decryptSecretInformation(cipherText: ByteArray, cipher: Cipher?) :String?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
-
-        val passwordEntity = dao.getPasswordDetails(id)
-
-        val encryptedString = passwordEntity.encryptedData
-        cipher?.run {
-
-            try {
-               // val decryptedInfo: ByteArray = this.doFinal(encryptedString.toByteArray(Charset.defaultCharset()))
-                val text = doFinal(Base64.decode(encryptedString?.toByteArray(Charset.defaultCharset()),
-                    Base64.DEFAULT or Base64.NO_WRAP))
-                val decryptedString = String(text)
-                Log.d("ENDEDEDDEDDEDD!", "${decryptedString.substring(decryptedString.indexOf("{"))}")
-                passwordEntity.fortressModel =  Gson().fromJson(decryptedString.substring(decryptedString.indexOf("{")), FortressModel::class.java)
-
-            } catch (e: InvalidKeyException) {
-                Log.e("MY_APP_TAG", "Key is invalid.")
-            } catch (e: UserNotAuthenticatedException) {
-                Log.d("MY_APP_TAG", "The key's validity timed out.")
-            }
+         return cipher?.let {
+             String(it.doFinal(cipherText), Charset.forName("UTF-8"))
         }
-
-
-        return passwordEntity
     }
 
 

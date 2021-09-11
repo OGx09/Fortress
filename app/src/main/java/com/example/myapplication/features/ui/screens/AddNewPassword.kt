@@ -230,6 +230,8 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
 //    snackbarState.value?.apply {
 //        ShowMessage(scaffoldState = scaffoldState, msg = this)
 //    }
+
+
 }
 
 

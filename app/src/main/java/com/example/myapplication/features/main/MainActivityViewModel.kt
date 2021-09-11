@@ -62,7 +62,7 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
                         print("checkForExistingLogin___ $this")
                         _openWelcomeOrPasswordMain.value = ( UiState(data = this, isLoading = false))
                     }else{
-                        throw IllegalArgumentException("No username")
+                        _openWelcomeOrPasswordMain.value = ( UiState(error = "No username", isLoading = false))
                     }
                 }
             }

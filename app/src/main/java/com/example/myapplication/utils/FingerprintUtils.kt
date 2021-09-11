@@ -70,22 +70,6 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     val mutableLiveAuthResultFlow = _mutableLiveAuthResultChannel.asSharedFlow()
 
 
-    fun authenticate(activity: FragmentActivity,result: (FingerprintResult) -> Unit){
-        if (canUseBiometric(activity)){
-            var signature: Signature? = null
-
-            try {
-                mToBeSignedMessage = "$KEY_NAME:1234567"
-                signature = initSignature(KEY_NAME)
-                Log.d("fingerprintUtils", "___> $signature}")
-            }catch (e: java.lang.Exception){
-                throw RuntimeException()
-            }
-           // showBiometricPrompt(signature = signature)
-        }else{
-            result.invoke(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
-        }
-    }
 
     @Throws(Exception::class)
     private fun generateKeyPair(keyName: String, invalidateBiometricEnrollment: Boolean): KeyPair{
@@ -108,46 +92,19 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     fun register(activity: FragmentActivity) {
         hasCalled = false
         if (canUseBiometric(activity)){
-            var cipher: Cipher? = null
-            try {
-
-                cipher = encrptedUtils.getCipher()
-
-//                val random = SecureRandom()
-//                val iv = ByteArray(cipher.blockSize)
-//                random.nextBytes(iv)
-//                val ivParams = IvParameterSpec(iv)
-
-                cipher.init(Cipher.ENCRYPT_MODE, encrptedUtils.getSecretKey())
-            }catch (e: java.lang.Exception){
-                e.printStackTrace()
-            }
-            showBiometricPrompt(activity = activity,cipher = cipher)
+            showBiometricPrompt(activity = activity,
+                cipher = encrptedUtils
+                    .getInitializedCipherForEncryption(EncryptionUtilsImpl.KEY_NAME))
         }else{
             _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
     }
 
-    fun authenticate(activity: FragmentActivity) {
+    fun authenticate(activity: FragmentActivity, cipher: Cipher) {
         hasCalled = false
         if (canUseBiometric(activity)){
-            var cipher: Cipher? = null
-            try {
-//                val encryted_bytes: ByteArray = Base64.getDecoder.decode(, Base64.DEFAULT)
-
-                cipher = encrptedUtils.getCipher()
-
-                val random = SecureRandom()
-                val iv = ByteArray(cipher.blockSize)
-                Log.d("authenticate", ""+cipher.blockSize)
-                random.nextBytes(iv)
-                val ivParams = IvParameterSpec(iv)
-                cipher.init(Cipher.DECRYPT_MODE, encrptedUtils.getSecretKey(), ivParams)
-            }catch (e: java.lang.Exception){
-                e.printStackTrace()
-                Log.e("authenticate", e.message +"_")
-            }
-            showBiometricPrompt(activity = activity,cipher = cipher)
+            showBiometricPrompt(activity = activity,
+                cipher = cipher)
         }else{
             _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
         }
@@ -156,7 +113,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
     private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
 
         val biometricPrompt = BiometricPrompt(activity,
-            getMainThreadExecutor,
+            MainThreadExecutor(),
             authenticationCallback)
 
         promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -172,33 +129,6 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
         }
     }
 
-    @Throws(Exception::class)
-    private fun initSignature(keyame: String): Signature?{
-        val keyPair = getKeyPair(keyame)
-        if (keyPair != null){
-            val signature = Signature.getInstance("SHA256withECDSA")
-            signature.initSign(keyPair.private)
-            return signature
-        }
-        return null
-    }
-
-    private val getMainThreadExecutor get() = MainThreadExecutor()
-
-
-    @Throws(Exception::class)
-    private fun getKeyPair(keyName: String): KeyPair?{
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        if(keyStore.containsAlias(keyName)){
-            //Get Public Key
-            val publicKey = keyStore.getCertificate(keyName).publicKey
-            //Get private key
-            val privateKey = keyStore.getKey(keyName, null) as PrivateKey
-            return KeyPair(publicKey, privateKey)
-        }
-        return null
-    }
 
     private val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
