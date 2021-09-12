@@ -39,6 +39,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
+import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
@@ -54,6 +57,7 @@ import javax.crypto.Cipher
 
 var selectedId: Int? = 0
 
+
 @Composable
 fun MainPasswordList(activity: MainActivity,
                      viewModel : MainActivityViewModel,
@@ -64,48 +68,30 @@ fun MainPasswordList(activity: MainActivity,
     )
 
     val openDialog = remember { mutableStateOf(false) }
+    val snackbarState = remember{ mutableStateOf<String?>(null)}
+
     val scaffoldState = rememberScaffoldState()
 
     AlertDialogComponent(openDialog = openDialog)
+    MessageSnackbar(snackbarState)
 
-    val openPasswordDetails = activity.viewModel.passwordDetails.observeAsState(UiState(isLoading = false))
+    activity.viewModel.passwordDetails.observe(activity, Observer {uiState ->
 
-    Log.d("SavedPasswordItem_isLoading", "$openPasswordDetails __ $savePassword")
-
-    openPasswordDetails.value.apply {
-        LaunchedEffect(key1 = this){
+        uiState?.run {
 
             openDialog.value = isLoading
 
-            if(error != null){
-                scaffoldState.snackbarHostState.showSnackbar(error)
+            error.run{
+                snackbarState.value = this
+                //scaffoldState.snackbarHostState.showSnackbar(this)
             }
 
-            data?.apply {
+            data.run{
                 navController.navigate(Routes.PASSWORD_DETAILS)
             }
-
         }
 
-    }
-
-
-//    val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
-//    LaunchedEffect(key1 = fingerPrintFlow){
-//        Log.d("SavedPasswordItem", "hello : EBUBE DIKE")
-//        fingerPrintFlow.collectData{
-//            Log.d("SavedPasswordItem", "hello : $it")
-//            it.errorString?.apply {
-//                activity.viewModel.showMessage(this)
-//            }
-//
-//            it.cryptoObject?.cipher?.apply {
-//                Log.d("SavedPasswordItems", "$selectedId")
-//                activity.viewModel.readSavedPassword(this, selectedId)
-//            }
-//        }
-//
-//    }
+    })
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -200,13 +186,16 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
         Card(elevation = 10.dp,
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
-                val  iv =  Base64.decode(passwordEntity.initializationVector, Base64.NO_WRAP)
-                mainActivity.fingerprintUtil.authenticate(iv, mainActivity){
-                    passwordEntity.id?.let { selectedId ->
-                        mainActivity.viewModel.readSavedPassword(selectedId, it.cryptoObject?.cipher)
+                kotlin.runCatching {
+                    val  iv =  Base64.decode(passwordEntity.initializationVector, Base64.NO_WRAP)
+                    mainActivity.fingerprintUtil.authenticate(iv, mainActivity){
+                        passwordEntity.id?.let { selectedId ->
+                            mainActivity.viewModel.readSavedPassword(selectedId, it.cryptoObject?.cipher)
+                        }
                     }
+                }.recoverCatching {
+                    Log.d("SavedPasswordItem", "error -> ${it.message}")
                 }
-
             }
         ) {
 

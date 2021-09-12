@@ -5,6 +5,7 @@ import androidx.annotation.MainThread
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
@@ -27,6 +28,14 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 
 
+fun <T> LiveData<T>.single(): SingleLiveEvent<T>{
+    val innerMutableLiveData = SingleLiveEvent<T>()
+    observeForever{
+        innerMutableLiveData.value = it
+    }
+    return innerMutableLiveData
+}
+
 /**
  * A lifecycle-aware observable that sends only new updates after subscription, used for events like
  * navigation and Snackbar messages.
@@ -39,7 +48,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Note that only one observer is going to be notified of changes.
  */
-class SingleLiveEvent<T> : MutableLiveData<T?>() {
+
+class SingleLiveEvent<T> : MutableLiveData<T>() {
     private val mPending = AtomicBoolean(false)
 
     override fun observe(owner: LifecycleOwner, observer: Observer<in T?>) {

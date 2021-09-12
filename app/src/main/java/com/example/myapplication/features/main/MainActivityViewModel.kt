@@ -9,6 +9,7 @@ import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.utils.EncryptionUtils
 import com.example.myapplication.utils.SingleLiveEvent
+import com.example.myapplication.utils.single
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -45,7 +46,7 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
     private val _passwordDetails = MutableLiveData<UiState<PasswordEntity>>()
-    val passwordDetails : LiveData<UiState<PasswordEntity>> = _passwordDetails
+    val passwordDetails : SingleLiveEvent<UiState<PasswordEntity>> = _passwordDetails.single()
 
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
@@ -128,7 +129,6 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     fun readSavedPassword(detailId: Int, cipher: Cipher?){
         _passwordDetails.value = UiState(isLoading = true)
         viewModelScope.launch(handleError {
-            Log.d("readSavedPasswordFailed", "CYPHERTEXT-> $it")
             _passwordDetails.value = UiState(error = it.message, isLoading = false)
 
         }) {

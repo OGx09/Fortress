@@ -1,6 +1,7 @@
 package com.example.myapplication.features.ui.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
@@ -62,7 +64,10 @@ private fun BodyContent(activity: MainActivity, uiState: UiState<PasswordEntity>
 
 @Composable
 private fun MainContent(activity: MainActivity) = Scaffold() {
-    val openPasswordDetails = activity.viewModel.passwordDetails.observeAsState(UiState(isLoading = false))
+    val openPasswordDetails = activity.viewModel.getDetails()
+    openPasswordDetails.observe(activity, Observer {
+        Log.d("MainContent", "martian: $it}")
+    })
 
     Image(painter = painterResource(id = R.drawable.data_security_img),
         contentDescription = null, modifier = Modifier
@@ -88,5 +93,5 @@ private fun MainContent(activity: MainActivity) = Scaffold() {
 
     }
     
-    BodyContent(activity = activity, uiState = openPasswordDetails.value)
+    //BodyContent(activity = activity, uiState = openPasswordDetails.value)
 }
