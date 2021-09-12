@@ -1,34 +1,25 @@
 package com.example.myapplication.features.ui.screens
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.AlertDialogComponent
-import com.example.myapplication.features.ui.DefaultTopbar
 import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.repository.database.PasswordEntity
 
@@ -65,7 +56,7 @@ private fun BodyContent(activity: MainActivity, uiState: UiState<PasswordEntity>
         
         Text(data.websiteName)
         Text(data.website)
-        Text(text = this.fortressModel?.otherInfo ?: "N/A")
+        Text(text = this.secretDataWrapper?.otherInfo ?: "N/A")
     }
 }
 

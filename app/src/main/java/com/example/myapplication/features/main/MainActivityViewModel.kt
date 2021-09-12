@@ -1,12 +1,13 @@
 package com.example.myapplication.features.main
 
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.data.FortressModel
-import com.example.myapplication.data.LoadingState
+import com.example.myapplication.data.SecretDataWrapper
 import com.example.myapplication.features.ui.UiState
+import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.utils.EncryptionUtils
 import com.example.myapplication.utils.SingleLiveEvent
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,16 +15,18 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import java.lang.IllegalArgumentException
+import java.nio.charset.Charset
 import java.util.concurrent.CountDownLatch
 import javax.crypto.Cipher
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.jvm.Throws
 
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
 
 @HiltViewModel
-open class MainActivityViewModel @Inject constructor(private val coroutineContext: CoroutineContext, private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
+open class MainActivityViewModel @Inject constructor(private val coroutineContext: CoroutineContext,
+                                                     private val encryptedUtils: EncryptionUtils,
+                                                     private val repository: FortressRepository): ViewModel(), MainActivityViewStates{
 
     private val _savePasswordEntityLiveData = MediatorLiveData<List<PasswordEntity>>()
     val savePasswordEntityLiveData : MediatorLiveData<List<PasswordEntity>> = _savePasswordEntityLiveData
@@ -122,19 +125,19 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
 
     }
 
-    fun readSavedPassword(cipher: Cipher?, id: Int?){
+    fun readSavedPassword(detailId: Int, cipher: Cipher?){
         _passwordDetails.value = UiState(isLoading = true)
         viewModelScope.launch(handleError {
+            Log.d("readSavedPasswordFailed", "CYPHERTEXT-> $it")
             _passwordDetails.value = UiState(error = it.message, isLoading = false)
 
         }) {
-            if (cipher == null || id == null){
+            if (cipher == null){
                 throw NullPointerException("Unable to complete your fingerprint authentication")
             }
-            val allPasswords = repository.fetchPasswordDetails(cipher = cipher, id =id)
-            allPasswords?.apply {
-                _passwordDetails.value = UiState(data = this, isLoading = false)
-            }
+
+            val decryptedData = repository.fetchPasswordDetails(detailId, cipher)
+            _passwordDetails.value = UiState(data = decryptedData)
         }
     }
 
@@ -157,18 +160,28 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
         viewModelScope.launch {
             _savePasswordDataLiveData.value = (UiState(isLoading = true))
             try {
-                //val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
-                val iconUrl: String? = ""//websiteIcon.icons[2]?.url
 
-                val fortressModel = FortressModel(password,username, otherInfo)
+                //val websiteIcon = repository.fetchwebsiteIcon(websiteUrl)
+                val iconUrl: String = /*websiteIcon.icons[2]?.url ?:*/ "http://"
+
+                val fortressModel = SecretDataWrapper(password,username, otherInfo)
+
+                val gson = Gson()
+
+                val encryptedData = encryptedUtils.encryptSecretInformation(gson.toJson(fortressModel).toByteArray(
+                    Charset.forName("UTF-8")), cipher)
+
                 val passwordEntity = PasswordEntity(
                     null,
                     websiteName = websiteName,
                     website = websiteUrl,
-                    iconBytes = iconUrl ?: "http://"
+                    iconBytes = iconUrl,
+                    initializationVector = Base64.encodeToString(encryptedData?.initializationVector, Base64.NO_WRAP)
                 )
-                passwordEntity.fortressModel = fortressModel
 
+                passwordEntity.encryptedData = gson.toJson(encryptedData?.cipherdata)
+
+                Log.d("_savePasswordDataLiveData", "HELLO WORLD=> ${encryptedData?.initializationVector}")
                 repository.savePassword(cipher, passwordEntity)
                 _savePasswordDataLiveData.value = UiState(data = true)
             }catch (e : Exception){

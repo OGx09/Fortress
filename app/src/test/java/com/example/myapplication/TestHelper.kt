@@ -1,18 +1,15 @@
 package com.example.myapplication
 
 import android.security.keystore.KeyProperties
-import android.util.SparseArray
-import androidx.core.util.forEach
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.example.myapplication.data.FortressModel
+import com.example.myapplication.data.SecretDataWrapper
 import com.example.myapplication.data.Icon
 import com.example.myapplication.data.WebsiteLogo
-import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.FortressRepositoryImpl
 import com.example.myapplication.repository.database.FortressDao
 import com.example.myapplication.repository.database.PasswordEntity
@@ -151,13 +148,13 @@ class EncryptionUtilsMock (private val fortressDao: FortressDao) : EncryptionUti
         )
     }
 
-    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int): FortressModel? {
+    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int): SecretDataWrapper? {
         return if (cipher != null){
             null
         }else{
             try {
                 fortressDao.getEncryptedEntity(id) // TODO: Add decytpyion logic
-                FortressModel("12345678", "OGX09",
+                SecretDataWrapper("12345678", "OGX09",
                     "HELLO NO INFO", "http://hello.com")
             }catch (e: Exception){
                 null
@@ -188,8 +185,8 @@ open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
         return encryptionUtils.getDao().getAllEncryptedPassword()
     }
 
-    override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int): FortressModel {
-        return FortressModel("123456778", "Gbenga", "Nothing", "m")
+    override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int): SecretDataWrapper {
+        return SecretDataWrapper("123456778", "Gbenga", "Nothing", "m")
     }
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) {

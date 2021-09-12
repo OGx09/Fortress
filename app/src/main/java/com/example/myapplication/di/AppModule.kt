@@ -8,6 +8,7 @@ import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.FortressRepositoryImpl
 import com.example.myapplication.repository.WebApi
 import com.example.myapplication.repository.WebsiteLogoService
+import com.example.myapplication.repository.database.FortressDao
 import com.example.myapplication.repository.database.FortressDatabase
 import com.example.myapplication.utils.EncryptionUtils
 import com.example.myapplication.utils.EncryptionUtilsImpl
@@ -42,7 +43,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideEncryptionUtils(db: FortressDatabase): EncryptionUtils  = EncryptionUtilsImpl(db.passwordDao())
+    fun provideDao(fortressDatabase: FortressDatabase): FortressDao {
+        return fortressDatabase.passwordDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideEncryptionUtils(db: FortressDatabase): EncryptionUtils  = EncryptionUtilsImpl()
 
 
     @Provides
@@ -63,11 +70,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFortressRepository(encryptionUtils: EncryptionUtils,
-                                  websiteLogoService: WebsiteLogoService,
+    fun provideFortressRepository(dao: FortressDao, websiteLogoService: WebsiteLogoService,
+                                  encryptionUtilsImpl: EncryptionUtilsImpl,
                                   dataStore: DataStore<Preferences>,
-                                  @DefaultDispatcher dispatcher: CoroutineDispatcher): FortressRepository{
-        return FortressRepositoryImpl(encryptionUtils, websiteLogoService, dispatcher, dataStore)
+                                  @DefaultDispatcher dispatcher: CoroutineDispatcher): FortressRepository {
+        return FortressRepositoryImpl(websiteLogoService, encryptionUtilsImpl, dispatcher, dao, dataStore)
     }
 
     @Provides

@@ -1,12 +1,11 @@
 package com.example.myapplication.repository.database
 
-import android.util.SparseArray
 import androidx.annotation.VisibleForTesting
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.example.myapplication.data.FortressModel
+import com.example.myapplication.data.SecretDataWrapper
 import com.google.gson.Gson
 
 
@@ -14,15 +13,18 @@ import com.google.gson.Gson
  * TODO: User can either use unique password or set a single password ffor all
  */
 
+data class CipherTextWrapper(val cipherdata: ByteArray, val initializationVector: ByteArray)
+
 @Entity
 data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
                           @ColumnInfo var websiteName: String,
                           @ColumnInfo var website: String,
+                          @ColumnInfo var initializationVector: String,
                           @ColumnInfo(name ="encryptedData") var encryptedData: String?=null,
                           @ColumnInfo var iconBytes: String){
 
 
-    @Ignore var fortressModel: FortressModel? = null
+    @Ignore var secretDataWrapper: SecretDataWrapper? = null
 
     override fun toString(): String {
         return Gson().toJson(this)
@@ -50,7 +52,7 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 
         @VisibleForTesting
         fun getMock() = PasswordEntity(0, "Google.com", "Google Search",
-            "someEncryptedData",  "randomstring")
+            "[]","someEncryptedData",  "randomstring")
     }
 
 }

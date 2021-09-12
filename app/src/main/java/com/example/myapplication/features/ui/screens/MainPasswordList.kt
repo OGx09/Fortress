@@ -1,5 +1,6 @@
 package com.example.myapplication.features.ui.screens
 
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -42,10 +43,13 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.ui.*
 import com.example.myapplication.features.ui.Sizes.titleSize
+import com.example.myapplication.repository.database.CipherTextWrapper
 import com.example.myapplication.utils.collectData
+import com.google.gson.Gson
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import java.nio.charset.Charset
 import javax.crypto.Cipher
 
 var selectedId: Int? = 0
@@ -86,22 +90,22 @@ fun MainPasswordList(activity: MainActivity,
     }
 
 
-    val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
-    LaunchedEffect(key1 = fingerPrintFlow){
-        Log.d("SavedPasswordItem", "hello : EBUBE DIKE")
-        fingerPrintFlow.collectData{
-            Log.d("SavedPasswordItem", "hello : $it")
-            it.errorString?.apply {
-                activity.viewModel.showMessage(this)
-            }
-
-            it.cryptoObject?.cipher?.apply {
-                Log.d("SavedPasswordItems", "$selectedId")
-                activity.viewModel.readSavedPassword(this, selectedId)
-            }
-        }
-
-    }
+//    val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
+//    LaunchedEffect(key1 = fingerPrintFlow){
+//        Log.d("SavedPasswordItem", "hello : EBUBE DIKE")
+//        fingerPrintFlow.collectData{
+//            Log.d("SavedPasswordItem", "hello : $it")
+//            it.errorString?.apply {
+//                activity.viewModel.showMessage(this)
+//            }
+//
+//            it.cryptoObject?.cipher?.apply {
+//                Log.d("SavedPasswordItems", "$selectedId")
+//                activity.viewModel.readSavedPassword(this, selectedId)
+//            }
+//        }
+//
+//    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -196,8 +200,13 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
         Card(elevation = 10.dp,
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
-                selectedId = passwordEntity.id
-                mainActivity.fingerprintUtil.authenticate(mainActivity as FragmentActivity)
+                val  iv =  Base64.decode(passwordEntity.initializationVector, Base64.NO_WRAP)
+                mainActivity.fingerprintUtil.authenticate(iv, mainActivity){
+                    passwordEntity.id?.let { selectedId ->
+                        mainActivity.viewModel.readSavedPassword(selectedId, it.cryptoObject?.cipher)
+                    }
+                }
+
             }
         ) {
 

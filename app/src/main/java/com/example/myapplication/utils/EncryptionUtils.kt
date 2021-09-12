@@ -2,45 +2,30 @@ package com.example.myapplication.utils
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.security.keystore.UserNotAuthenticatedException
-import android.util.Base64
 import android.util.Log
-import com.example.myapplication.repository.database.FortressDao
-import com.example.myapplication.repository.database.PasswordEntity
-import com.example.myapplication.data.FortressModel
-import com.google.gson.Gson
-import okio.Utf8
-import java.lang.Byte.decode
-import java.net.URLDecoder
+import com.example.myapplication.repository.database.CipherTextWrapper
+import java.lang.Exception
 import java.nio.charset.Charset
-import java.security.InvalidKeyException
 import java.security.KeyStore
-import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 import javax.inject.Inject
-import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
-import java.util.Base64.getDecoder
-import javax.crypto.spec.SecretKeySpec
-import kotlin.collections.HashMap
+import javax.crypto.spec.GCMParameterSpec
 
 
 interface EncryptionUtils{
     fun getCipher(): Cipher
-    fun decryptSecretInformation( cipherText: ByteArray, cipher: Cipher?) : String?
-    fun encryptSecretInformation(passwordEntity: PasswordEntity, cipher: Cipher): CiphertextWrapper?
+    fun decryptSecretInformation( cipherText: ByteArray, cipher: Cipher) : String?
+    fun encryptSecretInformation(cypherText: ByteArray, cipher: Cipher): CipherTextWrapper?
     fun getInitializedCipherForEncryption(keyName: String): Cipher
-    suspend fun decryptDbCiperText(id: Int): FortressModel
-    suspend fun persistInDbAsCipherText(passwordEntity: PasswordEntity)
-    suspend fun getDao(): FortressDao
+    fun getInitializedCipherForDecryption(keyName: String,
+                                          initializationVector: ByteArray): Cipher
 }
+//
+//data class CipherTextWrapper(val ciphertext: ByteArray, val initializationVector: ByteArray, cipherTextWrapper: CipherTextWrapper)
 
-data class CiphertextWrapper(val ciphertext: ByteArray, val initializationVector: ByteArray)
-
-class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : EncryptionUtils{
+class EncryptionUtilsImpl @Inject constructor() : EncryptionUtils{
 
     private val token = "helloWorldOfDJjango"
 
@@ -54,16 +39,31 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     companion object {
         const val KEY_NAME: String = "androiddebugkey"
         const val VALIDITY_DURATION_SECONDS = 5
+        private val ANDROID_KEYSTORE = "AndroidKeyStore"
         const val ALLOWED_AUTHENTICATORS = KeyProperties.KEY_ALGORITHM_AES
     }
 
-    //TODO: To be removed later
-    override suspend fun getDao(): FortressDao = dao
 
     override fun getInitializedCipherForEncryption(keyName: String): Cipher {
         val cipher = getCipher()
-        val secretKey = generateSecretKey(keyName = keyName);
+        val secretKey = getOrCreateSecretKey(keyName = keyName);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        return cipher
+    }
+
+
+    override fun getInitializedCipherForDecryption(
+        keyName: String,
+        initializationVector: ByteArray
+    ): Cipher {
+        val cipher = getCipher()
+        try {
+            val secretKey = getOrCreateSecretKey(keyName)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, initializationVector))
+        }catch (e: Exception){
+            e.printStackTrace()
+            Log.e("getInitializedCipherForDecryption", "$e")
+        }
         return cipher
     }
 
@@ -88,6 +88,35 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     }
 
 
+    private fun getOrCreateSecretKey(keyName: String): SecretKey {
+        // If Secretkey was previously created for that keyName, then grab and return it.
+        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
+        keyStore.load(null) // Keystore must be loaded before it can be accessed
+        keyStore.getKey(keyName, null)?.let { return it as SecretKey }
+
+        // if you reach here, then a new SecretKey must be generated for that keyName
+        val paramsBuilder = KeyGenParameterSpec.Builder(
+            keyName,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+        paramsBuilder.apply {
+            setBlockModes(ENCRYPTION_BLOCK_MODE)
+            setEncryptionPaddings(ENCRYPTION_PADDING)
+            setKeySize(KEY_SIZE)
+            setUserAuthenticationRequired(true)
+        }
+
+        val keyGenParams = paramsBuilder.build()
+
+        val keyGenerator = KeyGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES,
+            ANDROID_KEYSTORE
+        )
+        keyGenerator.init(keyGenParams)
+        return keyGenerator.generateKey()
+    }
+
+
     private fun getKeyGenParameterSpec(keyName: String): KeyGenParameterSpec {
         return KeyGenParameterSpec.Builder(
             keyName,
@@ -101,36 +130,26 @@ class EncryptionUtilsImpl @Inject constructor(private val dao: FortressDao) : En
     }
 
 
-    override fun encryptSecretInformation(passwordEntity: PasswordEntity, cipher: Cipher): CiphertextWrapper? {
+
+    override fun decryptSecretInformation(cipherText: ByteArray, cipher: Cipher) :String?{
         // Exceptions are unhandled for getCipher() and getSecretKey().
-       val gson = Gson()
-        val encryptedText = cipher.doFinal(gson.toJson(passwordEntity.fortressModel).toByteArray(Charset.forName("UTF-8")))
-        return CiphertextWrapper(encryptedText, cipher.iv)
+         try {
+             Log.d("decryptSecretInformation", "DECRYPT_CIPHER $cipher")
+             return String(cipher.doFinal(cipherText), Charset.forName("UTF-8"))
+         }catch (exception: Exception){
+             throw Exception(exception.cause)
+         }
     }
 
-    override suspend fun decryptDbCiperText(id: Int): FortressModel {
-        val json = dao.getEncryptedEntity(id)
+    override fun encryptSecretInformation(
+        cipherText: ByteArray,
+        cipher: Cipher
+    ): CipherTextWrapper? {
+        Log.d("eNcryptSecretInformation", "ENCRYPT_CIPHER ${cipher.iv}")
 
-        return dao.getPasswordDetails(id).let {
-            Gson().fromJson(json, FortressModel::class.java)
-        }
-
+        val encryptedText = cipher.doFinal(cipherText)
+        return CipherTextWrapper(encryptedText, cipher.iv)
     }
-
-    override suspend fun persistInDbAsCipherText(passwordEntity: PasswordEntity) {
-        passwordEntity.run {
-            dao.insertEncryptedEntity(this)
-        }
-    }
-
-    override fun decryptSecretInformation(cipherText: ByteArray, cipher: Cipher?) :String?{
-        // Exceptions are unhandled for getCipher() and getSecretKey().
-         return cipher?.let {
-             String(it.doFinal(cipherText), Charset.forName("UTF-8"))
-        }
-    }
-
-
 
 
 }
