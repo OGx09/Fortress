@@ -2,6 +2,7 @@ package com.example.myapplication.features.ui.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -34,13 +35,12 @@ import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.data.LoadingState
 import com.example.myapplication.data.Result
 import com.example.myapplication.features.ui.*
-import com.example.myapplication.utils.FingerprintUtils
-import com.example.myapplication.utils.SingleLiveEvent
-import com.example.myapplication.utils.collectData
-import com.example.myapplication.utils.observeAsSingleState
+import com.example.myapplication.utils.*
+import com.example.myapplication.utils.DragonLog.spit
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlin.math.acos
 
 
 //@ExperimentalUnitApi
@@ -195,25 +195,20 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
                             username = usernameState.value.text, this)
                     }
          */
-        val fingerPrintUtilsState =  mainActivity.fingerprintUtil.mutableLiveAuthResultFlow
-        LaunchedEffect(key1 = fingerPrintUtilsState){
-           fingerPrintUtilsState.collectData {
-               it.errorString?.apply {
-                   scaffoldState?.snackbarHostState?.showSnackbar(this)
-               }
-               it.cryptoObject?.cipher?.run {
-                   Log.d("CypherText", "Cypher $this")
 
-                   viewModel.savePassword(webTextState.value.text,
-                       webNameTextState.value.text,
-                       passwordTextState.value.text,
-                       otherInfo = buzzTextState.value.text,
-                       username = usernameState.value.text, this)
-               }
-           }
-        }
 
-        Button(onClick = {fingerprintUtil.register(mainActivity as FragmentActivity)}, enabled = buttonState.value,
+        Button(onClick = {
+            fingerprintUtil.register(activity = mainActivity, processResult = {
+                it.cryptoObject?.cipher?.run{
+
+                    viewModel.savePassword(webTextState.value.text,
+                        webNameTextState.value.text,
+                        passwordTextState.value.text,
+                        otherInfo = buzzTextState.value.text,
+                        username = usernameState.value.text, this)
+                }
+            })
+             }, enabled = buttonState.value,
             modifier = Modifier
                 .padding(12.dp)
                 .requiredHeight(50.dp)
@@ -230,6 +225,8 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
 //    snackbarState.value?.apply {
 //        ShowMessage(scaffoldState = scaffoldState, msg = this)
 //    }
+
+
 }
 
 

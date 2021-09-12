@@ -6,6 +6,7 @@ import android.os.Looper
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import com.example.myapplication.repository.database.PasswordEntity
@@ -17,6 +18,7 @@ import java.util.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
 import androidx.biometric.BiometricManager
+import com.example.myapplication.repository.database.CipherTextWrapper
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -24,10 +26,6 @@ import java.security.spec.ECGenParameterSpec
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-
-
-
-
 
 class MainThreadExecutor: Executor {
     private val handler = Handler(Looper.getMainLooper())
@@ -59,167 +57,80 @@ suspend fun SharedFlow<FingerprintResult>.collectData(method: suspend  (Fingerpr
 class FingerprintUtils @Inject constructor(private val encrptedUtils: EncryptionUtils){
 
     lateinit var executor: Executor
-    lateinit var biometricPrompt: BiometricPrompt
+    //lateinit var biometricPrompt: BiometricPrompt
     lateinit var promptInfo: BiometricPrompt.PromptInfo
     private var isEncrypt : Boolean = false
     private var passwordEntity: PasswordEntity? =null
     private var mToBeSignedMessage: String? = null
 
-    private val _mutableLiveAuthResultChannel: MutableSharedFlow<FingerprintResult> =
-        MutableSharedFlow<FingerprintResult>(replay = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
-    val mutableLiveAuthResultFlow = _mutableLiveAuthResultChannel.asSharedFlow()
-
-
-    fun authenticate(activity: FragmentActivity,result: (FingerprintResult) -> Unit){
-        if (canUseBiometric(activity)){
-            var signature: Signature? = null
-
-            try {
-                mToBeSignedMessage = "$KEY_NAME:1234567"
-                signature = initSignature(KEY_NAME)
-                Log.d("fingerprintUtils", "___> $signature}")
-            }catch (e: java.lang.Exception){
-                throw RuntimeException()
-            }
-           // showBiometricPrompt(signature = signature)
-        }else{
-            result.invoke(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
-        }
-    }
-
-    @Throws(Exception::class)
-    private fun generateKeyPair(keyName: String, invalidateBiometricEnrollment: Boolean): KeyPair{
-        val keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore")
-        val keyBuilder = KeyGenParameterSpec.Builder(keyName, KeyProperties.PURPOSE_SIGN)
-            .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-            .setDigests(KeyProperties.DIGEST_SHA256,
-                KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA512)
-            .setUserAuthenticationRequired(true)
-
-        if(Build.VERSION.SDK_INT >= 24){
-            keyBuilder.setInvalidatedByBiometricEnrollment(invalidateBiometricEnrollment)
-        }
-        keyPairGenerator.initialize(keyBuilder.build())
-
-
-        return keyPairGenerator.generateKeyPair()
-    }
-
-    fun register(activity: FragmentActivity) {
+    fun register(activity: FragmentActivity,
+                 processResult: (FingerprintResult) -> Unit) {
         hasCalled = false
+
+        val promptInfo = buildBiometricPromptInfo(activity)
         if (canUseBiometric(activity)){
-            var cipher: Cipher? = null
-            try {
+            val biometricPrompt = buildBiometricPrompt(activity = activity,
+                processResult = processResult)
 
-                cipher = encrptedUtils.getCipher()
-
-//                val random = SecureRandom()
-//                val iv = ByteArray(cipher.blockSize)
-//                random.nextBytes(iv)
-//                val ivParams = IvParameterSpec(iv)
-
-                cipher.init(Cipher.ENCRYPT_MODE, encrptedUtils.getSecretKey())
-            }catch (e: java.lang.Exception){
-                e.printStackTrace()
-            }
-            showBiometricPrompt(activity = activity,cipher = cipher)
-        }else{
-            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
-        }
-    }
-
-    fun authenticate(activity: FragmentActivity) {
-        hasCalled = false
-        if (canUseBiometric(activity)){
-            var cipher: Cipher? = null
-            try {
-//                val encryted_bytes: ByteArray = Base64.getDecoder.decode(, Base64.DEFAULT)
-
-                cipher = encrptedUtils.getCipher()
-
-                val random = SecureRandom()
-                val iv = ByteArray(cipher.blockSize)
-                Log.d("authenticate", ""+cipher.blockSize)
-                random.nextBytes(iv)
-                val ivParams = IvParameterSpec(iv)
-                cipher.init(Cipher.DECRYPT_MODE, encrptedUtils.getSecretKey(), ivParams)
-            }catch (e: java.lang.Exception){
-                e.printStackTrace()
-                Log.e("authenticate", e.message +"_")
-            }
-            showBiometricPrompt(activity = activity,cipher = cipher)
-        }else{
-            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
-        }
-    }
-
-    private fun showBiometricPrompt(activity: FragmentActivity, cipher: Cipher?){
-
-        val biometricPrompt = BiometricPrompt(activity,
-            getMainThreadExecutor,
-            authenticationCallback)
-
-        promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for my app")
-            .setSubtitle("Log in using your biometric credential")
-            .setNegativeButtonText("Use account password")
-            .build()
-
-            //Show biometric prompt
-        if (cipher != null){
-            Log.i(TAG, "Show biometric prompt $cipher");
+            val cipher = encrptedUtils.getInitializedCipherForEncryption(EncryptionUtilsImpl.KEY_NAME)
+            //encrptedUtils.encryptSecretInformation(, cipher)
             biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
     }
-
-    @Throws(Exception::class)
-    private fun initSignature(keyame: String): Signature?{
-        val keyPair = getKeyPair(keyame)
-        if (keyPair != null){
-            val signature = Signature.getInstance("SHA256withECDSA")
-            signature.initSign(keyPair.private)
-            return signature
-        }
-        return null
+//
+    fun authenticate(initializationVector:  ByteArray, activity: FragmentActivity,
+                             processResult: (FingerprintResult) -> Unit) {
+        hasCalled = false
+        //val decrypt:  CipherTextWrapper = encrptedUtils.decryptDbCiperText(id)
+        val promptInfo = buildBiometricPromptInfo(activity = activity)
+        val biometricPrompt = buildBiometricPrompt(activity = activity, processResult)
+        val cipher = encrptedUtils.getInitializedCipherForDecryption(EncryptionUtilsImpl.KEY_NAME,
+            initializationVector)
+        biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
     }
 
-    private val getMainThreadExecutor get() = MainThreadExecutor()
+    private fun buildBiometricPrompt(activity: FragmentActivity,
+                                     processResult: (FingerprintResult) -> Unit): BiometricPrompt{
 
+        return BiometricPrompt(activity,
+            MainThreadExecutor(),
+            object : BiometricPrompt.AuthenticationCallback(){
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
+                    processResult.invoke(FingerprintResult(errorString = errString.toString()))
+                    super.onAuthenticationError(errorCode, errString)
+                }
 
-    @Throws(Exception::class)
-    private fun getKeyPair(keyName: String): KeyPair?{
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        if(keyStore.containsAlias(keyName)){
-            //Get Public Key
-            val publicKey = keyStore.getCertificate(keyName).publicKey
-            //Get private key
-            val privateKey = keyStore.getKey(keyName, null) as PrivateKey
-            return KeyPair(publicKey, privateKey)
-        }
-        return null
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+
+                    if (result.cryptoObject != null){
+                        processResult(FingerprintResult(cryptoObject = result.cryptoObject))
+                    }
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    processResult(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
+                }
+            })
+
     }
 
-    private val authenticationCallback : BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback(){
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            Log.e(TAG, "Error code: " + errorCode + "error String: " + errString)
-            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = errString.toString()))
-            super.onAuthenticationError(errorCode, errString)
-        }
+    fun buildBiometricPromptInfo(activity: FragmentActivity) : BiometricPrompt.PromptInfo
+    = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Biometric login for my app")
+        .setSubtitle("Log in using your biometric credential")
+        .setNegativeButtonText("Use account password")
+        .build()
 
-        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-            super.onAuthenticationSucceeded(result)
 
-            if (result.cryptoObject != null){
-                _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(cryptoObject = result.cryptoObject))
-            }
-        }
-
-        override fun onAuthenticationFailed() {
-            super.onAuthenticationFailed()
-            _mutableLiveAuthResultChannel.tryEmit(FingerprintResult(errorString = DEFAULT_ERROR_MSG))
-        }
-    }
+        //Show biometric prompt
+//        if (cipher != null){
+//            Log.i(TAG, "Show biometric prompt $cipher");
+//            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+//        }
+//    }
 
 
     companion object{
