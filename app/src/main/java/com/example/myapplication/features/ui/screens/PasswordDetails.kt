@@ -64,10 +64,6 @@ private fun BodyContent(activity: MainActivity, uiState: UiState<PasswordEntity>
 
 @Composable
 private fun MainContent(activity: MainActivity) = Scaffold() {
-//    val openPasswordDetails = activity.viewModel.getDetails()
-//    openPasswordDetails.observe(activity, Observer {
-//        Log.d("MainContent", "martian: $it}")
-//    })
 
     Image(painter = painterResource(id = R.drawable.data_security_img),
         contentDescription = null, modifier = Modifier

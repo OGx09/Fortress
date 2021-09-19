@@ -67,14 +67,21 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
                  processResult: (FingerprintResult) -> Unit) {
         hasCalled = false
 
-        val promptInfo = buildBiometricPromptInfo(activity)
-        if (canUseBiometric(activity)){
-            val biometricPrompt = buildBiometricPrompt(activity = activity,
-                processResult = processResult)
+        kotlin.runCatching {
+            val promptInfo = buildBiometricPromptInfo()
+            if (canUseBiometric(activity)) {
+                val biometricPrompt = buildBiometricPrompt(
+                    activity = activity,
+                    processResult = processResult
+                )
 
-            val cipher = encrptedUtils.getInitializedCipherForEncryption(EncryptionUtilsImpl.KEY_NAME)
-            //encrptedUtils.encryptSecretInformation(, cipher)
-            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+                val cipher =
+                    encrptedUtils.getInitializedCipherForEncryption(EncryptionUtilsImpl.KEY_NAME)
+                //encrptedUtils.encryptSecretInformation(cipher, cipher)
+                biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+            }
+        }.recoverCatching {
+            processResult.invoke(FingerprintResult(it.message))
         }
     }
 //
@@ -82,7 +89,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
                              processResult: (FingerprintResult) -> Unit) {
         hasCalled = false
         //val decrypt:  CipherTextWrapper = encrptedUtils.decryptDbCiperText(id)
-        val promptInfo = buildBiometricPromptInfo(activity = activity)
+        val promptInfo = buildBiometricPromptInfo()
         val biometricPrompt = buildBiometricPrompt(activity = activity, processResult)
         val cipher = encrptedUtils.getInitializedCipherForDecryption(EncryptionUtilsImpl.KEY_NAME,
             initializationVector)
@@ -117,7 +124,7 @@ class FingerprintUtils @Inject constructor(private val encrptedUtils: Encryption
 
     }
 
-    fun buildBiometricPromptInfo(activity: FragmentActivity) : BiometricPrompt.PromptInfo
+    private fun buildBiometricPromptInfo() : BiometricPrompt.PromptInfo
     = BiometricPrompt.PromptInfo.Builder()
         .setTitle("Biometric login for my app")
         .setSubtitle("Log in using your biometric credential")

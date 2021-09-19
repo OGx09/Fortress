@@ -6,10 +6,10 @@ import androidx.lifecycle.*
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.data.SecretDataWrapper
 import com.example.myapplication.features.ui.UiState
+import com.example.myapplication.features.ui.UiStateV2
 import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.utils.EncryptionUtils
 import com.example.myapplication.utils.SingleLiveEvent
-import com.example.myapplication.utils.single
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -45,8 +45,8 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     private val _openPasswordMain = MutableSharedFlow<UiState<String>>(replay =1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     val openPasswordMain: SharedFlow<UiState<String>> = _openPasswordMain.asSharedFlow()
 
-    private val _passwordDetails = MutableLiveData<UiState<PasswordEntity>>()
-    val passwordDetails : SingleLiveEvent<UiState<PasswordEntity>> = _passwordDetails.single()
+    private val _passwordDetails = SingleLiveEvent<UiStateV2<PasswordEntity>?>()
+    val passwordDetails : LiveData<UiStateV2<PasswordEntity>?> = _passwordDetails
 
     private val _openWelcomeOrPasswordMain = MutableLiveData<UiState<String>>()
     val openWelcomeOrPasswordMain: LiveData<UiState<String>> = _openWelcomeOrPasswordMain
@@ -127,9 +127,10 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
     }
 
     fun readSavedPassword(detailId: Int, cipher: Cipher?){
-        _passwordDetails.value = UiState(isLoading = true)
+        _passwordDetails.value = UiStateV2.Loading()
         viewModelScope.launch(handleError {
-            _passwordDetails.value = UiState(error = it.message, isLoading = false)
+            Log.d("FortressRepository", "FortressRepositoryImpl message")
+            _passwordDetails.value = UiStateV2.Failed(it.message ?: "An error has occurred")
 
         }) {
             if (cipher == null){
@@ -137,7 +138,9 @@ open class MainActivityViewModel @Inject constructor(private val coroutineContex
             }
 
             val decryptedData = repository.fetchPasswordDetails(detailId, cipher)
-            _passwordDetails.value = UiState(data = decryptedData)
+            decryptedData?.run {
+                _passwordDetails.value = UiStateV2.Success(this)
+            }
         }
     }
 

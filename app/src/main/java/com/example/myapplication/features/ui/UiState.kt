@@ -17,6 +17,15 @@ data class UiState<T> (var isLoading: Boolean = false, var error: String? = null
 
 
 
+// Represents different states for the LatestNews screen
+sealed class UiStateV2<T> {
+    data class Success<T>(val news: T): UiStateV2<T>()
+    data class Failed<T>(val exception: String): UiStateV2<T>()
+    data class  Loading<T>(val data: T? = null): UiStateV2<T>()
+}
+
+
+
 /*
 Copy a state based on result
  */

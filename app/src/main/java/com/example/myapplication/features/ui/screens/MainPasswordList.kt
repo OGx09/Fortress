@@ -40,61 +40,62 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.NavOptionsBuilder
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.example.myapplication.features.main.showSnackbar
 import com.example.myapplication.features.ui.*
 import com.example.myapplication.features.ui.Sizes.titleSize
 import com.example.myapplication.repository.database.CipherTextWrapper
 import com.example.myapplication.utils.collectData
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.nio.charset.Charset
 import javax.crypto.Cipher
 
-var selectedId: Int? = 0
 
 
 @Composable
 fun MainPasswordList(activity: MainActivity,
-                     viewModel : MainActivityViewModel,
-                     navController: NavHostController) {
+                     navControllerState: NavHostController,
+                     scaffoldState : ScaffoldState,
+                     openDialog : MutableState<Boolean> = remember { mutableStateOf(false) }) {
 
-    val savePassword : List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(
+    val viewModel = activity.viewModel
+    val savePassword : List <PasswordEntity> by activity.viewModel.savePasswordEntityLiveData.observeAsState(
         emptyList()
     )
 
-    val openDialog = remember { mutableStateOf(false) }
-    val snackbarState = remember{ mutableStateOf<String?>(null)}
-
-    val scaffoldState = rememberScaffoldState()
-
     AlertDialogComponent(openDialog = openDialog)
-    MessageSnackbar(snackbarState)
 
-    activity.viewModel.passwordDetails.observe(activity, Observer {uiState ->
-
-        uiState?.run {
-
-            openDialog.value = isLoading
-
-            error.run{
-                snackbarState.value = this
-                //scaffoldState.snackbarHostState.showSnackbar(this)
+    activity.viewModel.passwordDetails.observe(activity){uiState ->
+        when(uiState){
+            is UiStateV2.Success ->{
+                navControllerState.navigate(Routes.PASSWORD_DETAILS)
+                openDialog.value = false
             }
+            is UiStateV2.Failed ->{
 
-            data.run{
-                navController.navigate(Routes.PASSWORD_DETAILS)
+               activity.lifecycleScope.launch {
+                   scaffoldState.showSnackbar(uiState.exception)
+                   Log.d("AlertDialogComponent", "TWICEASTWICE")
+               }
+                openDialog.value = false
+            }
+            is UiStateV2.Loading ->{
+                openDialog.value = true
             }
         }
+    }
 
-    })
+
 
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = {
             Row(modifier = Modifier
                 .fillMaxHeight(fraction = 0.1f)
@@ -119,7 +120,7 @@ fun MainPasswordList(activity: MainActivity,
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navController.navigate(Routes.ADD_NEW_PASSWORD)}) {
+                navControllerState.navigate(Routes.ADD_NEW_PASSWORD)}) {
                 Icon(Icons.Sharp.Add, contentDescription = "")
             }
         },
@@ -134,7 +135,7 @@ fun MainPasswordList(activity: MainActivity,
                 Text("Your Passwords In One Secure Place",
                     fontWeight = FontWeight.Bold, fontSize = titleSize, modifier = Modifier.padding(10.dp))
                 Spaces.Small()
-                SavePasswordContents(activity, list = savePassword, navController)
+                SavePasswordContents(activity, list = savePassword, navControllerState)
             }
         }
     )
@@ -157,7 +158,7 @@ fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
 }
 
 @Composable
-fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
+fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navControllerState: NavHostController){
 
     val lazyState = rememberLazyListState()
 
@@ -173,13 +174,13 @@ fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, nav
 
         items(list) {passwordEntity ->
             //fadeInItemState.setValue()
-            SavedPasswordItem( activity, passwordEntity = passwordEntity, navController)
+            SavedPasswordItem( activity, passwordEntity = passwordEntity, navControllerState)
         }
     }
 }
 
 @Composable
-fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
+fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity, navControllerState: NavHostController){
 
     Box(modifier = Modifier
         .padding(top = 20.dp, bottom = 15.dp)) {

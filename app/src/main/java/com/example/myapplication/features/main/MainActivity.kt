@@ -15,10 +15,6 @@ import javax.inject.Inject
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import androidx.core.view.OnApplyWindowInsetsListener
-import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,8 +22,11 @@ import com.example.myapplication.features.ui.StateCodelabTheme
 import com.example.myapplication.features.ui.screens.*
 import com.example.myapplication.utils.FingerprintUtils
 import com.example.myapplication.utils.Routes
-import kotlinx.coroutines.flow.collect
 import java.util.*
+
+suspend fun ScaffoldState.showSnackbar(message: String){
+    this.snackbarHostState.showSnackbar(message = message)
+}
 
 @AndroidEntryPoint
 class MainActivity @Inject constructor() : AppCompatActivity() {
@@ -36,9 +35,6 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
 
     @Inject
     lateinit var fingerprintUtil : FingerprintUtils
-
-    lateinit var navController: NavHostController
-
 
 
     @ExperimentalCoroutinesApi
@@ -57,7 +53,11 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
         supportActionBar?.hide()
+
         setContent{
+
+            val scaffoldState = rememberScaffoldState()
+
             StateCodelabTheme(content = { MainContent() }, activity = this)
         }
     }
@@ -67,19 +67,26 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     @Preview
     @Composable
     private fun MainContent() {
-        navController = rememberNavController()
 
-        var screenChangeAnimState by  remember { mutableStateOf(0F) }
+        val scaffoldState = rememberScaffoldState()
+        val navControllerState = rememberNavController()
 
-        NavHost(navController = navController,
-            startDestination = Routes.SPLASH_SCREEN) {
-            composable(Routes.SPLASH_SCREEN){MainSplashScreen(navController, this@MainActivity)}
-            composable(Routes.WELCOME) {WelcomePage(this@MainActivity, viewModel, navController)}
-            composable(Routes.PASSWORD_MAIN) {MainPasswordList(this@MainActivity, viewModel, navController) }
-            composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
-            composable(Routes.ADD_NEW_PASSWORD) {
-                screenChangeAnimState = 1f
-                AddNewPassword(this@MainActivity, viewModel)
+        Scaffold(
+            scaffoldState = scaffoldState,
+        ) {
+
+            var screenChangeAnimState by  remember { mutableStateOf(0F) }
+
+            NavHost(navController = navControllerState,
+                startDestination = Routes.SPLASH_SCREEN) {
+                composable(Routes.SPLASH_SCREEN){MainSplashScreen(navControllerState, this@MainActivity)}
+                composable(Routes.WELCOME) {WelcomePage(this@MainActivity, viewModel, navControllerState)}
+                composable(Routes.PASSWORD_MAIN) {MainPasswordList(this@MainActivity, navControllerState, scaffoldState) }
+                composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
+                composable(Routes.ADD_NEW_PASSWORD) {
+                    screenChangeAnimState = 1f
+                    AddNewPassword(this@MainActivity, viewModel, navControllerState, scaffoldState)
+                }
             }
         }
 

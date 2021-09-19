@@ -53,14 +53,16 @@ fun AlertDialogComponent(openDialog: MutableState<Boolean>) {
     }
 }
 
+
 @Composable
 fun MessageSnackbar(openDialog: MutableState<String?>){
-    Log.d("MessageSnackbar", "${  openDialog.value}")
     openDialog.value?.run {
         Snackbar(
             action = {
-                Button(onClick = {}) {
-                    Text("MyAction")
+                Button(onClick = {
+                    openDialog.value = null
+                }) {
+                    Text("Dismiss")
                 }
             },
             modifier = Modifier.padding(8.dp)

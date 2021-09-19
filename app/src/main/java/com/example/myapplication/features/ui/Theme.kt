@@ -10,6 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.features.main.MainActivity
 
 // Created by Gbenga Oladipupo(Devmike01) on 5/16/21.
@@ -40,15 +43,15 @@ fun StateCodelabTheme(
 }
 
 @Composable
-fun DefaultTopbar(mainActivity: MainActivity, backgroundColor: Color? =null,  title: String? = null,
-                  onClick: (() -> Unit)? = null) = TopAppBar(
+fun DefaultTopbar(backgroundColor: Color? =null,  title: String? = null,
+                  onClick: (() -> Unit)? = null, navControllerState: NavController) = TopAppBar(
     title = {
         Text(text = title ?: "Back")
     },
     navigationIcon = {
         IconButton(onClick = {
             if (onClick == null) {
-                mainActivity.navController.popBackStack()
+                navControllerState.popBackStack()
             }else{
                 onClick.invoke()
             }
