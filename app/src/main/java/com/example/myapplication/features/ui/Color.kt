@@ -30,6 +30,10 @@ val iconColor = Color(0xFFeceff1)
 val scaffoldColor    = Color(0xFFe5e1e6)
 val greyShade = Color(0x65424242)
 
+val lightTeal= Color(0xD5009688)
+val lightOrange= Color(0xCBFF5722)
+//val lightTeal= Color(0xD5009688)
+
 fun randomColor(): Color{
     val rand = Random(200)
     val r: Float = rand.nextFloat()
