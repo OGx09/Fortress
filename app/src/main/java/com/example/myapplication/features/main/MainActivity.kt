@@ -7,6 +7,8 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,13 +17,13 @@ import javax.inject.Inject
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.features.ui.StateCodelabTheme
 import com.example.myapplication.features.ui.screens.*
 import com.example.myapplication.utils.FingerprintUtils
 import com.example.myapplication.utils.Routes
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import java.util.*
 
 suspend fun ScaffoldState.showSnackbar(message: String){
@@ -36,7 +38,12 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     @Inject
     lateinit var fingerprintUtil : FingerprintUtils
 
+    companion object{
+        const val PAGE_TRANSITION_TIME : Int = 500
+    }
 
+
+    @ExperimentalAnimationApi
     @ExperimentalCoroutinesApi
     @ExperimentalComposeApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +69,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
         }
     }
 
+    @ExperimentalAnimationApi
     @ExperimentalCoroutinesApi
     @ExperimentalComposeApi
     @Preview
@@ -69,23 +77,48 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
     private fun MainContent() {
 
         val scaffoldState = rememberScaffoldState()
-        val navControllerState = rememberNavController()
+        val navControllerState = rememberAnimatedNavController()
 
         Scaffold(
             scaffoldState = scaffoldState,
         ) {
 
-            var screenChangeAnimState by  remember { mutableStateOf(0F) }
+            val currentPageOpacity = remember{ mutableStateOf(0f)}
+            AnimatedNavHost(navController = navControllerState,
+                startDestination = Routes.SPLASH_SCREEN,   enterTransition = { initial, target ->
+                    if(target.destination.route == Routes.PASSWORD_MAIN && initial.destination.route == Routes.SPLASH_SCREEN){
+                        fadeIn(animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }else{
+                        slideInVertically(initialOffsetY = { 1000 }, animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }
+                }, exitTransition = { initial, target ->
+                    if(target.destination.route == Routes.PASSWORD_MAIN && initial.destination.route == Routes.SPLASH_SCREEN){
+                        fadeOut(animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }else{
+                        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }
 
-            NavHost(navController = navControllerState,
-                startDestination = Routes.SPLASH_SCREEN) {
-                composable(Routes.SPLASH_SCREEN){MainSplashScreen(navControllerState, this@MainActivity)}
+                },
+                popEnterTransition = { initial, target ->
+                    if(target.destination.route == Routes.PASSWORD_MAIN && initial.destination.route == Routes.SPLASH_SCREEN){
+                        fadeIn(animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }else{
+                        slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }
+                },
+                popExitTransition = { initial, target ->
+                    if(target.destination.route == Routes.PASSWORD_MAIN && initial.destination.route == Routes.SPLASH_SCREEN){
+                        fadeOut(animationSpec = tween(700))
+                    }else{
+                        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(PAGE_TRANSITION_TIME))
+                    }
+                }) {
+                composable(Routes.SPLASH_SCREEN ){MainSplashScreen(navControllerState, this@MainActivity)}
                 composable(Routes.WELCOME) {WelcomePage(this@MainActivity, viewModel, navControllerState)}
-                composable(Routes.PASSWORD_MAIN) {MainPasswordList(this@MainActivity, navControllerState, scaffoldState) }
+                composable(Routes.PASSWORD_MAIN,) {MainPasswordList(this@MainActivity, navControllerState, scaffoldState, currentPageOpacity) }
                 composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
                 composable(Routes.ADD_NEW_PASSWORD) {
-                    screenChangeAnimState = 1f
-                    AddNewPassword(this@MainActivity, viewModel, navControllerState, scaffoldState)
+                    AddNewPassword(this@MainActivity, viewModel, navControllerState, scaffoldState, 1f)
                 }
             }
         }

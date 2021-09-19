@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,12 +52,13 @@ import kotlin.math.acos
 fun AddNewPassword(mainActivity: MainActivity,
                    viewModel: MainActivityViewModel,
                    navControllerState: NavController,
-                   scaffoldState : ScaffoldState = rememberScaffoldState(),
+                   scaffoldState : ScaffoldState,
+                   alpha: Float,
                    scrollableState : ScrollableState = rememberScrollableState{1f}){
 
     Scaffold(scaffoldState = scaffoldState, topBar = {
         DefaultTopbar(navControllerState = navControllerState)
-    }, modifier = Modifier.scrollable(scrollableState, orientation = Orientation.Vertical)) {
+    }, modifier = Modifier.scrollable(scrollableState, orientation = Orientation.Vertical).alpha(alpha)) {
         MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
             viewModel = viewModel, scaffoldState = scaffoldState, navControllerState)

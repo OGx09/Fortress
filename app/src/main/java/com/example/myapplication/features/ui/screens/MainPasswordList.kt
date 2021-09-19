@@ -64,6 +64,7 @@ import javax.crypto.Cipher
 fun MainPasswordList(activity: MainActivity,
                      navControllerState: NavHostController,
                      scaffoldState : ScaffoldState,
+                     currentPageOpacity : MutableState<Float>,
                      openDialog : MutableState<Boolean> = remember { mutableStateOf(false) }) {
 
     val viewModel = activity.viewModel
@@ -120,6 +121,7 @@ fun MainPasswordList(activity: MainActivity,
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(onClick = {
+                currentPageOpacity.value = 1f
                 navControllerState.navigate(Routes.ADD_NEW_PASSWORD)}) {
                 Icon(Icons.Sharp.Add, contentDescription = "")
             }
@@ -212,13 +214,18 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                     //.border(2.dp, grey800,CircleShape)
                     .background(color = iconColor)) {
                     Center {
-                        Image(painter  = rememberImagePainter(
-                            data = passwordEntity.website,
-                            builder = {
-                                transformations(CircleCropTransformation())
-                            },
-                        ), "", modifier = Modifier.size(40.dp))
-
+                        if (passwordEntity.website.length >10) {
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = passwordEntity.website,
+                                    builder = {
+                                        transformations(CircleCropTransformation())
+                                    },
+                                ), "", modifier = Modifier.size(40.dp)
+                            )
+                        }else{
+                            Text(passwordEntity.websiteName.substring(0, 1));
+                        }
                     }
                 }
                 Column(modifier = Modifier
@@ -232,15 +239,14 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                 Column(modifier = Modifier
                     .size(38.dp)
                     .background(
-                        Color.Red,
+                        Color.Cyan,
                         shape = RoundedCornerShape(38.dp)
                     )
-                    .shadow(1.dp, shape = CircleShape, clip = true)
                     .clickable {
                         //mainActivity.fingerprintUtil.register(activity = mainActivity)
                     },
                     verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Rounded.Delete, contentDescription = "Delete password")
+                    Icon(Icons.Rounded.Delete, contentDescription = "Delete password", modifier = Modifier.size(20.dp))
                 }
 
             }

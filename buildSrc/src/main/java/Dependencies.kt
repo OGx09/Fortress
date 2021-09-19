@@ -22,6 +22,7 @@ object Versions {
     const val testCore ="1.0.0"
     const val androidXCoreTest ="2.1.0"
     const val powerMockito ="2.0.7"
+    const val accompanist ="0.18.0"
 }
 
 object Libs{
@@ -51,7 +52,8 @@ object Libs{
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
         "io.coil-kt:coil-compose:${Versions.coil}",
         "androidx.compose.animation:animation:${Versions.composable}",
-        "androidx.compose.animation:animation-core:${Versions.composable}"
+        "androidx.compose.animation:animation-core:${Versions.composable}",
+        "com.google.accompanist:accompanist-navigation-animation:${Versions.accompanist}"
         //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     )
 

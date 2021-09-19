@@ -25,10 +25,11 @@ import com.example.myapplication.features.ui.AlertDialogComponent
 import com.example.myapplication.features.ui.UiState
 import com.example.myapplication.repository.database.PasswordEntity
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 @SuppressLint("unused expression")
 fun PasswordDetails(activity: MainActivity,viewModel: MainActivityViewModel){
+
     MainContent(activity)
     
 }
