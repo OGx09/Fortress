@@ -10,11 +10,14 @@ import androidx.lifecycle.Observer
 import com.example.myapplication.data.SecretDataWrapper
 import com.example.myapplication.data.Icon
 import com.example.myapplication.data.WebsiteLogo
+import com.example.myapplication.repository.FortressRepository
 import com.example.myapplication.repository.FortressRepositoryImpl
+import com.example.myapplication.repository.database.CipherTextWrapper
 import com.example.myapplication.repository.database.FortressDao
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.EncryptionUtils
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.lang.Exception
 import java.util.concurrent.CountDownLatch
@@ -65,11 +68,10 @@ class FortressDaoMock : FortressDao{
         return resultLiveData
     }
 
-    override fun getPasswordDetails(id: Int): LiveData<PasswordEntity> {
+    override fun getPasswordDetails(id: Int): PasswordEntity {
         val passwordLiveData = MutableLiveData<PasswordEntity>()
-        passwordLiveData.value = _fakeDb[id]
-        print("Read: ${_fakeDb[id]}\n")
-       return passwordLiveData
+        val passwordEntity = _fakeDb[id]
+       return passwordEntity!!
     }
 
     override suspend fun getEncryptedEntity(id: Int): String {
@@ -120,57 +122,32 @@ class FortressDaoMock : FortressDao{
 //}
 
 class EncryptionUtilsMock (private val fortressDao: FortressDao) : EncryptionUtils{
-
-    //Stolen from Android source code in CipherInputStreamTest -_*
-    private val aesKeyBytes = byteArrayOf(
-        0x50.toByte(),
-        0x98.toByte(),
-        0xF2.toByte(),
-        0xC3.toByte(),
-        0x85.toByte(),
-        0x23.toByte(),
-        0xA3.toByte(),
-        0x33.toByte(), 0x50.toByte(), 0x98.toByte(), 0xF2.toByte(), 0xC3.toByte(),
-        0x85.toByte(), 0x23.toByte(), 0xA3.toByte(), 0x33.toByte()
-    )
-
-    override fun generateSecretKey() {}
-
-    override fun getSecretKey(): SecretKey {
-       return SecretKeySpec(aesKeyBytes, "RC4")
-    }
-
     override fun getCipher(): Cipher {
-        return Cipher.getInstance(
-            KeyProperties.KEY_ALGORITHM_AES + "/"
-                    + KeyProperties.BLOCK_MODE_CBC + "/"
-                    + KeyProperties.ENCRYPTION_PADDING_PKCS7
-        )
+        TODO("Not yet implemented")
     }
 
-    override suspend fun decryptSecretInformation(cipher: Cipher?, id: Int): SecretDataWrapper? {
-        return if (cipher != null){
-            null
-        }else{
-            try {
-                fortressDao.getEncryptedEntity(id) // TODO: Add decytpyion logic
-                SecretDataWrapper("12345678", "OGX09",
-                    "HELLO NO INFO", "http://hello.com")
-            }catch (e: Exception){
-                null
-            }
-
-        }
+    override fun decryptSecretInformation(cipherText: ByteArray, cipher: Cipher): String? {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun
-            encryptSecretInformation(cipher: Cipher, passwordEntity: PasswordEntity) {
-
+    override fun encryptSecretInformation(
+        cypherText: ByteArray,
+        cipher: Cipher
+    ): CipherTextWrapper? {
+        TODO("Not yet implemented")
     }
 
-    override fun getDao(): FortressDao {
-        return fortressDao
+    override fun getInitializedCipherForEncryption(keyName: String): Cipher {
+        TODO("Not yet implemented")
     }
+
+    override fun getInitializedCipherForDecryption(
+        keyName: String,
+        initializationVector: ByteArray
+    ): Cipher {
+        TODO("Not yet implemented")
+    }
+
 
 }
 
@@ -179,46 +156,45 @@ open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
                      private val dispatcher: CoroutineDispatcher,
                      private val datastore: DataStore<Preferences>
 ) : FortressRepository {
-
-
     override fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>> {
-        return encryptionUtils.getDao().getAllEncryptedPassword()
+        TODO("Not yet implemented")
     }
 
-    override suspend fun fetchPasswordDetails(cipher: Cipher, id: Int): SecretDataWrapper {
-        return SecretDataWrapper("123456778", "Gbenga", "Nothing", "m")
+    override suspend fun fetchPasswordDetails(id: Int, cipher: Cipher): PasswordEntity? {
+        TODO("Not yet implemented")
     }
 
     override suspend fun removePassword(passwordEntity: PasswordEntity) {
-        encryptionUtils.getDao().delete(passwordEntity)
+        TODO("Not yet implemented")
     }
 
     override suspend fun savePassword(cipher: Cipher, passwordEntity: PasswordEntity) {
-        encryptionUtils.getDao().insertEncryptedEntity(passwordEntity)
+        TODO("Not yet implemented")
     }
 
     override suspend fun fetchwebsiteIcon(websiteUrl: String): WebsiteLogo {
-        return WebsiteLogo().apply {
-            icons = mutableListOf<Icon>().apply {
-                val icon = Icon()
-                icon.bytes =100
-                icon.url = "http://"
-                for (i in 0..2){
-                    add(icon)
-                }
-            }
-            url = "http://"
-        }
+        TODO("Not yet implemented")
     }
 
     override suspend fun saveToDataStore(value: String) {
-        datastore.edit {settings ->
-            settings[FortressRepositoryImpl.DATASTORE_USERNAME] = value
-        }
+        TODO("Not yet implemented")
     }
 
-    override suspend fun fetchUsername() =flow {
-        emit("Gbenga")
+    override suspend fun getCipherTextFromDb(id: Int): ByteArray {
+        TODO("Not yet implemented")
     }
+
+    override suspend fun fetchUsername(): Flow<String?> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun decryptDbCiperText(id: Int): CipherTextWrapper {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun persistInDbAsCipherText(passwordEntity: PasswordEntity) {
+        TODO("Not yet implemented")
+    }
+
 
 }

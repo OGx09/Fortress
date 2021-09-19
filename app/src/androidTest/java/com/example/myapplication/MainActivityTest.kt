@@ -37,7 +37,7 @@ class MainActivityTest {
                 activity = mainActivity, content = {
                     WelcomePage(activity = mainActivity,
                         viewModel = mainActivity.viewModel,
-                        navController = mainActivity.navController)
+                        navControllerState = mainActivity.navControllerState)
                 })
 
         }

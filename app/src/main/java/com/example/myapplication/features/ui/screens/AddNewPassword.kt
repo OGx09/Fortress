@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.main.MainActivityViewModel
@@ -37,8 +40,7 @@ import com.example.myapplication.data.Result
 import com.example.myapplication.features.ui.*
 import com.example.myapplication.utils.*
 import com.example.myapplication.utils.DragonLog.spit
-import kotlinx.coroutines.DisposableHandle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlin.math.acos
 
@@ -48,40 +50,35 @@ import kotlin.math.acos
 @ExperimentalComposeApi
 @Composable
 fun AddNewPassword(mainActivity: MainActivity,
-                   viewModel: MainActivityViewModel){
-
-    val scaffoldState = rememberScaffoldState()
-    val scrollabletate = rememberScrollableState{1f}
+                   viewModel: MainActivityViewModel,
+                   navControllerState: NavController,
+                   scaffoldState : ScaffoldState,
+                   alpha: Float,
+                   scrollableState : ScrollableState = rememberScrollableState{1f}){
 
     Scaffold(scaffoldState = scaffoldState, topBar = {
-        DefaultTopbar(mainActivity = mainActivity)
-    }, modifier = Modifier.scrollable(scrollabletate, orientation = Orientation.Vertical)) {
+        DefaultTopbar(navControllerState = navControllerState)
+    }, modifier = Modifier.scrollable(scrollableState, orientation = Orientation.Vertical).alpha(alpha)) {
         MainContent(fingerprintUtil = mainActivity.fingerprintUtil,
             mainActivity = mainActivity,
-            viewModel = viewModel, scaffoldState = scaffoldState)
+            viewModel = viewModel, scaffoldState = scaffoldState, navControllerState)
     }
+
 }
 
 @Composable
 private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainActivity, viewModel: MainActivityViewModel,
-                        scaffoldState: ScaffoldState?){
+                        scaffoldState: ScaffoldState?,   navControllerState: NavController,  actionCoroutineScope : CoroutineScope = rememberCoroutineScope()){
 
     val webTextState = remember { mutableStateOf(TextFieldValue()) }
-
     val webNameTextState = remember { mutableStateOf(TextFieldValue()) }
-
     val buzzTextState = remember { mutableStateOf(TextFieldValue()) }
-
     val usernameState = remember { mutableStateOf(TextFieldValue()) }
-
     val openDialog = remember { mutableStateOf(false) }
-
     val buttonState = remember{ mutableStateOf(false) }
 
     val savePasswordToDbState: UiState<out Boolean?>? = viewModel
         .savePasswordDataLiveData.observeAsSingleState(initial = null).value
-
-    Log.d("savePasswordToDbState", "THIS IS LOADING!!! $savePasswordToDbState")
 
     AlertDialogComponent(openDialog = openDialog)
 
@@ -96,7 +93,7 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
                     scaffoldState?.snackbarHostState?.showSnackbar(this)
                 }
                 data?.apply {
-                    mainActivity.navController.popBackStack()
+                    navControllerState.popBackStack()
                 }
             }
         }
@@ -179,34 +176,24 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         )
         Spacer(modifier = Modifier.size(30.dp))
 
-        /*
-        Log.d("DefaultTextField", "T_HIS $it")
-                    it.errorString?.apply {
-                        viewModel.showMessage(this)
-                    }
-
-                    it.cryptoObject?.cipher?.apply {
-                        Log.d("CypherText", "Cypher $this")
-
-                        viewModel.savePassword(webTextState.value.text,
-                            webNameTextState.value.text,
-                            passwordTextState.value.text,
-                            buzzWord = buzzTextState.value.text,
-                            username = usernameState.value.text, this)
-                    }
-         */
-
 
         Button(onClick = {
             fingerprintUtil.register(activity = mainActivity, processResult = {
-                it.cryptoObject?.cipher?.run{
+                actionCoroutineScope.launch {
 
-                    viewModel.savePassword(webTextState.value.text,
-                        webNameTextState.value.text,
-                        passwordTextState.value.text,
-                        otherInfo = buzzTextState.value.text,
-                        username = usernameState.value.text, this)
+                    it.cryptoObject?.cipher?.run{
+                        viewModel.savePassword(webTextState.value.text,
+                            webNameTextState.value.text,
+                            passwordTextState.value.text,
+                            otherInfo = buzzTextState.value.text,
+                            username = usernameState.value.text, this)
+                    }
+
+                    it.errorString?.run{
+                        scaffoldState?.snackbarHostState?.showSnackbar(this@run)
+                    }
                 }
+
             })
              }, enabled = buttonState.value,
             modifier = Modifier
@@ -216,31 +203,6 @@ private fun MainContent(fingerprintUtil: FingerprintUtils, mainActivity: MainAct
         ) {
             Text("Save Password", fontSize = 18.sp)
         }
-    }
-
-
-//    val snackbarState =viewModel.messageState.observeForever {
-//        Log.d("DefaultTextFie__ldd", "T_HIS $it")
-//    }
-//    snackbarState.value?.apply {
-//        ShowMessage(scaffoldState = scaffoldState, msg = this)
-//    }
-
-
-}
-
-
-@Composable
-fun ShowMessage(scaffoldState: SnackbarHostState?, msg: String){
-
-    LaunchedEffect(key1 =  scaffoldState){
-        scaffoldState?.showSnackbar(msg)
-    }
-}
-
-val disposable = object : DisposableHandle {
-    override fun dispose() {
-        TODO("Not yet implemented")
     }
 
 }

@@ -21,6 +21,8 @@ object Versions {
     const val mockito ="1.10.19"
     const val testCore ="1.0.0"
     const val androidXCoreTest ="2.1.0"
+    const val powerMockito ="2.0.7"
+    const val accompanist ="0.18.0"
 }
 
 object Libs{
@@ -50,8 +52,9 @@ object Libs{
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
         "io.coil-kt:coil-compose:${Versions.coil}",
         "androidx.compose.animation:animation:${Versions.composable}",
-        "androidx.compose.animation:animation-core:${Versions.composable}"
-        //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
+        "androidx.compose.animation:animation-core:${Versions.composable}",
+        "com.google.accompanist:accompanist-navigation-animation:${Versions.accompanist}",
+        "com.google.accompanist:accompanist-systemuicontroller:${Versions.accompanist}"
     )
 
     val testDeps = arrayOf( "junit:junit:${Versions.junit}",
@@ -59,13 +62,19 @@ object Libs{
         "org.mockito:mockito-core:${Versions.mockito}",
         "androidx.test:core:${Versions.testCore}",
         "androidx.arch.core:core-testing:${Versions.androidXCoreTest}",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutine}"
+        "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutine}",
+        "org.mockito:mockito-all:1.10.19",
+        "org.powermock:powermock-module-junit4:${Versions.powerMockito}",
+        "org.powermock:powermock-module-junit4-rule:${Versions.powerMockito}"
+        , "org.powermock:powermock-api-mockito2:${Versions.powerMockito}",
+        "org.powermock:powermock-classloading-xstream:1.6.6"
     )
 
     val androidTestDeps = arrayOf("androidx.test.ext:junit:${Versions.androidJunit}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",
         "androidx.compose.ui:ui-test-manifest:${Versions.composable}",
-        "androidx.compose.ui:ui-test-junit4:${Versions.composable}")
+        "androidx.compose.ui:ui-test-junit4:${Versions.composable}"
+    )
 
     val kaptDeps = arrayOf("androidx.room:room-compiler:${Versions.roomVersion}",
         "com.google.dagger:hilt-android-compiler:${Versions.hiltVersion}")

@@ -40,21 +40,21 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 
 @Composable
-fun WelcomePage (activity: MainActivity, viewModel: MainActivityViewModel, navController: NavController){
+fun WelcomePage (activity: MainActivity, viewModel: MainActivityViewModel, navControllerState: NavController){
 
     val scaffoldState = rememberScaffoldState()
     Scaffold( scaffoldState = scaffoldState) {
-        WelcomePageComponents(activity = activity, viewModel, scaffoldState, navController = navController)
+        WelcomePageComponents(activity = activity, viewModel, scaffoldState, navControllerState = navControllerState)
     }
 }
 
 @Composable
-fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewModel, scaffoldState: ScaffoldState, navController: NavController){
+fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewModel, scaffoldState: ScaffoldState, navControllerState: NavController){
 
     val username: String = viewModel.welcomeUsername.observeAsState("").value
     val focusManager = LocalFocusManager.current
 
-    StartPasswordMain(viewModel, navController = navController, scaffoldState = scaffoldState)
+    StartPasswordMain(viewModel, navControllerState = navControllerState, scaffoldState = scaffoldState)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween) {
@@ -105,13 +105,13 @@ fun WelcomePageComponents(activity: MainActivity, viewModel: MainActivityViewMod
 
 
 @Composable
-fun StartPasswordMain(viewModel: MainActivityViewModel, navController: NavController, scaffoldState: ScaffoldState){
+fun StartPasswordMain(viewModel: MainActivityViewModel, navControllerState: NavController, scaffoldState: ScaffoldState){
     //This is now working
     LaunchedEffect(viewModel.openPasswordMain){
         viewModel.openPasswordMain.collect {
             it.data?.apply {
-                navController.popBackStack()
-                navController.navigate(Routes.PASSWORD_MAIN)
+                navControllerState.popBackStack()
+                navControllerState.navigate(Routes.PASSWORD_MAIN)
             }
             it.error?.apply {
                 scaffoldState.snackbarHostState.showSnackbar(this)

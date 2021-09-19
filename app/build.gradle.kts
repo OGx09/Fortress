@@ -7,13 +7,18 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = 31
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
+//        configurations.all{
+//            resolutionStrategy {
+//                this.force("androidx.core:core-ktx:1.6.0")
+//            }
+//        }
         applicationId ="com.example.myapplication"
         minSdk = (23)
-        targetSdk = 30
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
 

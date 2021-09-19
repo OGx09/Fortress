@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.livedata.observeAsState
-import com.example.myapplication.utils.observeAsSingleState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,93 +21,67 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapplication.features.main.MainActivity
-import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.example.myapplication.features.main.showSnackbar
 import com.example.myapplication.features.ui.*
 import com.example.myapplication.features.ui.Sizes.titleSize
-import com.example.myapplication.repository.database.CipherTextWrapper
-import com.example.myapplication.utils.collectData
-import com.google.gson.Gson
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
-import java.nio.charset.Charset
-import javax.crypto.Cipher
+import kotlinx.coroutines.launch
 
-var selectedId: Int? = 0
 
 @Composable
 fun MainPasswordList(activity: MainActivity,
-                     viewModel : MainActivityViewModel,
-                     navController: NavHostController) {
+                     statusBarState : MutableState<Color?>,
+                     navControllerState: NavHostController,
+                     scaffoldState : ScaffoldState,
+                     currentPageOpacity : MutableState<Float>,
+                     openDialog : MutableState<Boolean> = remember { mutableStateOf(false) }) {
 
-    val savePassword : List<PasswordEntity> by viewModel.savePasswordEntityLiveData.observeAsState(
+    statusBarState.value = MaterialTheme.colors.background
+
+    val viewModel = activity.viewModel
+    val savePassword : List <PasswordEntity> by activity.viewModel.savePasswordEntityLiveData.observeAsState(
         emptyList()
     )
 
-    val openDialog = remember { mutableStateOf(false) }
-    val scaffoldState = rememberScaffoldState()
-
     AlertDialogComponent(openDialog = openDialog)
 
-    val openPasswordDetails = activity.viewModel.passwordDetails.observeAsState(UiState(isLoading = false))
-
-    Log.d("SavedPasswordItem_isLoading", "$openPasswordDetails __ $savePassword")
-
-    openPasswordDetails.value.apply {
-        LaunchedEffect(key1 = this){
-
-            openDialog.value = isLoading
-
-            if(error != null){
-                scaffoldState.snackbarHostState.showSnackbar(error)
+    activity.viewModel.openPasswordDetails.observe(activity){ uiState ->
+        when(uiState){
+            is UiStateV2.Success ->{
+                viewModel.readPasswordDetails(uiState.data)
+                navControllerState.navigate(Routes.PASSWORD_DETAILS)
+                openDialog.value = false
             }
+            is UiStateV2.Failed ->{
 
-            data?.apply {
-                navController.navigate(Routes.PASSWORD_DETAILS)
+               activity.lifecycleScope.launch {
+                   scaffoldState.showSnackbar(uiState.exception)
+               }
+                openDialog.value = false
             }
-
+            is UiStateV2.Loading ->{
+                openDialog.value = true
+            }
         }
-
     }
 
 
-//    val fingerPrintFlow = activity.fingerprintUtil.mutableLiveAuthResultFlow
-//    LaunchedEffect(key1 = fingerPrintFlow){
-//        Log.d("SavedPasswordItem", "hello : EBUBE DIKE")
-//        fingerPrintFlow.collectData{
-//            Log.d("SavedPasswordItem", "hello : $it")
-//            it.errorString?.apply {
-//                activity.viewModel.showMessage(this)
-//            }
-//
-//            it.cryptoObject?.cipher?.apply {
-//                Log.d("SavedPasswordItems", "$selectedId")
-//                activity.viewModel.readSavedPassword(this, selectedId)
-//            }
-//        }
-//
-//    }
 
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = {
             Row(modifier = Modifier
                 .fillMaxHeight(fraction = 0.1f)
@@ -133,7 +106,8 @@ fun MainPasswordList(activity: MainActivity,
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navController.navigate(Routes.ADD_NEW_PASSWORD)}) {
+                currentPageOpacity.value = 1f
+                navControllerState.navigate(Routes.ADD_NEW_PASSWORD)}) {
                 Icon(Icons.Sharp.Add, contentDescription = "")
             }
         },
@@ -148,7 +122,7 @@ fun MainPasswordList(activity: MainActivity,
                 Text("Your Passwords In One Secure Place",
                     fontWeight = FontWeight.Bold, fontSize = titleSize, modifier = Modifier.padding(10.dp))
                 Spaces.Small()
-                SavePasswordContents(activity, list = savePassword, navController)
+                SavePasswordContents(activity, list = savePassword, navControllerState)
             }
         }
     )
@@ -171,7 +145,7 @@ fun PoppedButton(clickable: () -> Unit) = Card(modifier = Modifier
 }
 
 @Composable
-fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navController: NavHostController){
+fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, navControllerState: NavHostController){
 
     val lazyState = rememberLazyListState()
 
@@ -187,26 +161,29 @@ fun SavePasswordContents(activity: MainActivity, list: List<PasswordEntity>, nav
 
         items(list) {passwordEntity ->
             //fadeInItemState.setValue()
-            SavedPasswordItem( activity, passwordEntity = passwordEntity, navController)
+            SavedPasswordItem( activity, passwordEntity = passwordEntity, navControllerState)
         }
     }
 }
 
 @Composable
-fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity, navController: NavHostController){
+fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity, navControllerState: NavHostController){
 
     Box(modifier = Modifier
         .padding(top = 20.dp, bottom = 15.dp)) {
         Card(elevation = 10.dp,
             shape = RoundedCornerShape(15),
             modifier = Modifier.clickable {
-                val  iv =  Base64.decode(passwordEntity.initializationVector, Base64.NO_WRAP)
-                mainActivity.fingerprintUtil.authenticate(iv, mainActivity){
-                    passwordEntity.id?.let { selectedId ->
-                        mainActivity.viewModel.readSavedPassword(selectedId, it.cryptoObject?.cipher)
+                kotlin.runCatching {
+                    val  iv =  Base64.decode(passwordEntity.initializationVector, Base64.NO_WRAP)
+                    mainActivity.fingerprintUtil.authenticate(iv, mainActivity){
+                        passwordEntity.id?.let { selectedId ->
+                            mainActivity.viewModel.openPasswordDetails(selectedId, it.cryptoObject?.cipher)
+                        }
                     }
+                }.recoverCatching {
+                    Log.d("SavedPasswordItem", "error -> ${it.message}")
                 }
-
             }
         ) {
 
@@ -222,13 +199,18 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                     //.border(2.dp, grey800,CircleShape)
                     .background(color = iconColor)) {
                     Center {
-                        Image(painter  = rememberImagePainter(
-                            data = passwordEntity.website,
-                            builder = {
-                                transformations(CircleCropTransformation())
-                            },
-                        ), "", modifier = Modifier.size(40.dp))
-
+                        if (passwordEntity.website.length >10) {
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = passwordEntity.website,
+                                    builder = {
+                                        transformations(CircleCropTransformation())
+                                    },
+                                ), "", modifier = Modifier.size(40.dp)
+                            )
+                        }else{
+                            Text(passwordEntity.websiteName.substring(0, 1));
+                        }
                     }
                 }
                 Column(modifier = Modifier
@@ -242,15 +224,14 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                 Column(modifier = Modifier
                     .size(38.dp)
                     .background(
-                        Color.Red,
+                        Color.Cyan,
                         shape = RoundedCornerShape(38.dp)
                     )
-                    .shadow(1.dp, shape = CircleShape, clip = true)
                     .clickable {
                         //mainActivity.fingerprintUtil.register(activity = mainActivity)
                     },
                     verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Rounded.Delete, contentDescription = "Delete password")
+                    Icon(Icons.Rounded.Delete, contentDescription = "Delete password", modifier = Modifier.size(20.dp))
                 }
 
             }

@@ -1,5 +1,6 @@
 package com.example.myapplication.features.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,5 +50,22 @@ fun AlertDialogComponent(openDialog: MutableState<Boolean>) {
             }
         }
 
+    }
+}
+
+
+@Composable
+fun MessageSnackbar(openDialog: MutableState<String?>){
+    openDialog.value?.run {
+        Snackbar(
+            action = {
+                Button(onClick = {
+                    openDialog.value = null
+                }) {
+                    Text("Dismiss")
+                }
+            },
+            modifier = Modifier.padding(8.dp)
+        ) { Text(text = this) }
     }
 }

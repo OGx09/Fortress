@@ -72,6 +72,7 @@ class FortressRepositoryImpl (private val websiteLogoService: WebsiteLogoService
                 val encryptedData = fromJson(passwordEntity.encryptedData, ByteArray::class.java)
                 val decryptedString = encryptionUtils.decryptSecretInformation(encryptedData, cipher)
                 fromJson(decryptedString, SecretDataWrapper::class.java).let {
+                    passwordEntity.encryptedData = null
                     passwordEntity.secretDataWrapper = it
                     passwordEntity
                 }

@@ -40,7 +40,7 @@ import kotlinx.coroutines.delay
 private const val SplashWaitTime: Long = 2000
 
 @Composable
-fun MainSplashScreen(navController: NavController, mainActivity: MainActivity) {
+fun MainSplashScreen(navControllerState: NavController, mainActivity: MainActivity) {
 
     val hasLogedIn = mainActivity.viewModel.openWelcomeOrPasswordMain.observeAsState()
 
@@ -60,12 +60,12 @@ fun MainSplashScreen(navController: NavController, mainActivity: MainActivity) {
                     transitionState.targetState = SplashState.Completed
                     hasLogedIn.value?.apply {
                         data?.apply {
-                            navController.popBackStack()
-                            navController.navigate(Routes.PASSWORD_MAIN)
+                            navControllerState.popBackStack()
+                            navControllerState.navigate(Routes.PASSWORD_MAIN)
                         }
                         error?.apply {
-                            navController.popBackStack()
-                            navController.navigate(Routes.WELCOME)
+                            navControllerState.popBackStack()
+                            navControllerState.navigate(Routes.WELCOME)
                         }
 
                     }

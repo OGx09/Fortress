@@ -3,8 +3,10 @@ package com.example.myapplication.utils
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,7 +25,21 @@ import java.util.concurrent.atomic.AtomicBoolean
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ *
  */
+
+
+//val innerMutableLiveData = SingleLiveEvent<Any>()
+//@Composable
+//fun <T> LiveData<T>.observeAsSingleState(initial: R? = null): State<T>{
+//    val lifecycleOwner = LocalLifecycleOwner.current
+//    val state = remember { mutableStateOf(initial) }
+//    DisposableEffect(key1 = this, lifecycleOwner) {
+//
+//    }
+//}
+
+
 
 
 
@@ -39,7 +55,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Note that only one observer is going to be notified of changes.
  */
-class SingleLiveEvent<T> : MutableLiveData<T?>() {
+
+class SingleLiveEvent<T> : MutableLiveData<T>() {
     private val mPending = AtomicBoolean(false)
 
     override fun observe(owner: LifecycleOwner, observer: Observer<in T?>) {
@@ -74,6 +91,9 @@ class SingleLiveEvent<T> : MutableLiveData<T?>() {
 }
 
 
+
+@Composable
+fun <R, T: R> LiveData<T>.observeAsSingleState(): State<R?> = observeAsSingleState()
 
 
 @Composable
