@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.example.myapplication.features.ui.StateCodelabTheme
@@ -24,6 +25,7 @@ import com.example.myapplication.utils.Routes
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.util.*
 
 suspend fun ScaffoldState.showSnackbar(message: String){
@@ -78,6 +80,18 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
 
         val scaffoldState = rememberScaffoldState()
         val navControllerState = rememberAnimatedNavController()
+        val systemUiController = rememberSystemUiController()
+        val colorState = remember{mutableStateOf<Color?>(null)}
+
+        SideEffect {
+            // Update all of the system bar colors to be transparent, and use
+            // dark icons if we're in light theme
+            systemUiController.setSystemBarsColor(
+                color = colorState.value ?: Color.Transparent,
+            )
+
+            // setStatusBarsColor() and setNavigationBarsColor() also exist
+        }
 
         Scaffold(
             scaffoldState = scaffoldState,
@@ -115,8 +129,8 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
                 }) {
                 composable(Routes.SPLASH_SCREEN ){MainSplashScreen(navControllerState, this@MainActivity)}
                 composable(Routes.WELCOME) {WelcomePage(this@MainActivity, viewModel, navControllerState)}
-                composable(Routes.PASSWORD_MAIN,) {MainPasswordList(this@MainActivity, navControllerState, scaffoldState, currentPageOpacity) }
-                composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, viewModel) }
+                composable(Routes.PASSWORD_MAIN,) {MainPasswordList(this@MainActivity, colorState, navControllerState, scaffoldState, currentPageOpacity) }
+                composable(Routes.PASSWORD_DETAILS) { PasswordDetails(this@MainActivity, navControllerState, viewModel) }
                 composable(Routes.ADD_NEW_PASSWORD) {
                     AddNewPassword(this@MainActivity, viewModel, navControllerState, scaffoldState, 1f)
                 }

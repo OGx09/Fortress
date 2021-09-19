@@ -44,7 +44,8 @@ fun StateCodelabTheme(
 
 @Composable
 fun DefaultTopbar(backgroundColor: Color? =null,  title: String? = null,
-                  onClick: (() -> Unit)? = null, navControllerState: NavController) = TopAppBar(
+                  onClick: (() -> Unit)? = null,
+                  navControllerState: NavController) = TopAppBar(
     title = {
         Text(text = title ?: "Back")
     },

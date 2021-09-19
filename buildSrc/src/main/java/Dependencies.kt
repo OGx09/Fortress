@@ -53,8 +53,8 @@ object Libs{
         "io.coil-kt:coil-compose:${Versions.coil}",
         "androidx.compose.animation:animation:${Versions.composable}",
         "androidx.compose.animation:animation-core:${Versions.composable}",
-        "com.google.accompanist:accompanist-navigation-animation:${Versions.accompanist}"
-        //"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
+        "com.google.accompanist:accompanist-navigation-animation:${Versions.accompanist}",
+        "com.google.accompanist:accompanist-systemuicontroller:${Versions.accompanist}"
     )
 
     val testDeps = arrayOf( "junit:junit:${Versions.junit}",

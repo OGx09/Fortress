@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.livedata.observeAsState
-import com.example.myapplication.utils.observeAsSingleState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,50 +21,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapplication.features.main.MainActivity
-import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.repository.database.PasswordEntity
 import com.example.myapplication.utils.Routes
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
-import androidx.navigation.NavOptionsBuilder
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.example.myapplication.features.main.showSnackbar
 import com.example.myapplication.features.ui.*
 import com.example.myapplication.features.ui.Sizes.titleSize
-import com.example.myapplication.repository.database.CipherTextWrapper
-import com.example.myapplication.utils.collectData
-import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.nio.charset.Charset
-import javax.crypto.Cipher
-
 
 
 @Composable
 fun MainPasswordList(activity: MainActivity,
+                     statusBarState : MutableState<Color?>,
                      navControllerState: NavHostController,
                      scaffoldState : ScaffoldState,
                      currentPageOpacity : MutableState<Float>,
                      openDialog : MutableState<Boolean> = remember { mutableStateOf(false) }) {
+
+    statusBarState.value = MaterialTheme.colors.background
 
     val viewModel = activity.viewModel
     val savePassword : List <PasswordEntity> by activity.viewModel.savePasswordEntityLiveData.observeAsState(
@@ -74,9 +59,10 @@ fun MainPasswordList(activity: MainActivity,
 
     AlertDialogComponent(openDialog = openDialog)
 
-    activity.viewModel.passwordDetails.observe(activity){uiState ->
+    activity.viewModel.openPasswordDetails.observe(activity){ uiState ->
         when(uiState){
             is UiStateV2.Success ->{
+                viewModel.readPasswordDetails(uiState.data)
                 navControllerState.navigate(Routes.PASSWORD_DETAILS)
                 openDialog.value = false
             }
@@ -84,7 +70,6 @@ fun MainPasswordList(activity: MainActivity,
 
                activity.lifecycleScope.launch {
                    scaffoldState.showSnackbar(uiState.exception)
-                   Log.d("AlertDialogComponent", "TWICEASTWICE")
                }
                 openDialog.value = false
             }
@@ -193,7 +178,7 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                     val  iv =  Base64.decode(passwordEntity.initializationVector, Base64.NO_WRAP)
                     mainActivity.fingerprintUtil.authenticate(iv, mainActivity){
                         passwordEntity.id?.let { selectedId ->
-                            mainActivity.viewModel.readSavedPassword(selectedId, it.cryptoObject?.cipher)
+                            mainActivity.viewModel.openPasswordDetails(selectedId, it.cryptoObject?.cipher)
                         }
                     }
                 }.recoverCatching {
