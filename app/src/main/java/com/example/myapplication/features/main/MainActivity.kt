@@ -4,6 +4,8 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.Lifecycle
 import com.example.myapplication.features.ui.StateCodelabTheme
 import com.example.myapplication.features.ui.screens.*
 import com.example.myapplication.utils.FingerprintUtils
@@ -89,9 +92,10 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
             systemUiController.setSystemBarsColor(
                 color = colorState.value ?: Color.Transparent,
             )
-
             // setStatusBarsColor() and setNavigationBarsColor() also exist
         }
+
+
 
         Scaffold(
             scaffoldState = scaffoldState,
@@ -138,6 +142,7 @@ class MainActivity @Inject constructor() : AppCompatActivity() {
         }
 
     }
+
 }
 
 

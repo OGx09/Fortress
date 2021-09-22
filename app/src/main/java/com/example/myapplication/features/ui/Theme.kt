@@ -45,7 +45,10 @@ fun StateCodelabTheme(
 @Composable
 fun DefaultTopbar(backgroundColor: Color? =null,  title: String? = null,
                   onClick: (() -> Unit)? = null,
-                  navControllerState: NavController) = TopAppBar(
+                  navControllerState: NavController){
+    val textIconColor = if (backgroundColor == MaterialTheme.colors.primary)MaterialTheme.colors.secondary else MaterialTheme.colors.primary
+
+    TopAppBar(
     title = {
         Text(text = title ?: "Back")
     },
@@ -59,13 +62,14 @@ fun DefaultTopbar(backgroundColor: Color? =null,  title: String? = null,
 
         }) {
             Icon(imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Back Btn")
+                contentDescription = "Back Btn",)
         }
     },
     backgroundColor = backgroundColor ?: MaterialTheme.colors.background,
     contentColor = MaterialTheme.colors.primary,
     elevation = 0.dp
 )
+}
 
 private val DarkColorPalette = darkColors(
     primary = white100,
