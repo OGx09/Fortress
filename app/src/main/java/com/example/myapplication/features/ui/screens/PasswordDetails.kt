@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -21,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -58,7 +61,29 @@ fun PasswordDetails(activity: MainActivity, navControllerState: NavController, v
 
         // setStatusBarsColor() and setNavigationBarsColor() also exist
     }
-    MainContent(viewModel)
+
+    Scaffold(scaffoldState = rememberScaffoldState(), topBar = {
+
+        TopAppBar(
+            title = {
+                Text(text = "Back")
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    navControllerState.popBackStack()
+                }) {
+                    Icon(imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back Btn",)
+                }
+            },
+            backgroundColor = MaterialTheme.colors.secondary,
+            contentColor = MaterialTheme.colors.primary,
+            elevation = 0.dp
+        )
+    }, modifier = Modifier
+        .scrollable(rememberScrollState(), orientation = Orientation.Vertical)) {
+        MainContent(viewModel)
+    }
 }
 
 
@@ -76,7 +101,7 @@ private fun MainContent(viewModel: MainActivityViewModel) = Scaffold() {
        ) {
            Card(
                modifier = Modifier
-                   .fillMaxHeight(0.4f)
+                   .fillMaxHeight(0.3f)
                    .fillMaxWidth(), elevation = 10.dp, shape = RoundedCornerShape(bottomEnd = 100.dp),
                backgroundColor = MaterialTheme.colors.secondary
            ) {

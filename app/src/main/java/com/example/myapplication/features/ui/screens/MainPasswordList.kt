@@ -197,9 +197,10 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                     .size(50.dp)
                     .clip(CircleShape)
                     //.border(2.dp, grey800,CircleShape)
-                    .background(color = iconColor)) {
+                    .background(color = randomColor())) {
                     Center {
-                        if (passwordEntity.website.length >10) {
+                        Log.d("Center_", "=> ${passwordEntity.website}")
+                        if (passwordEntity.iconBytes.length >10) {
                             Image(
                                 painter = rememberImagePainter(
                                     data = passwordEntity.website,
@@ -209,7 +210,7 @@ fun SavedPasswordItem(mainActivity: MainActivity, passwordEntity: PasswordEntity
                                 ), "", modifier = Modifier.size(40.dp)
                             )
                         }else{
-                            Text(passwordEntity.websiteName.substring(0, 1));
+                            Text(passwordEntity.websiteName.substring(0, 1), color = Color.Magenta);
                         }
                     }
                 }
