@@ -45,7 +45,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
-@Preview(showBackground = true)
+ @Preview(showBackground = true)
 @Composable
 @SuppressLint("unused expression")
 fun PasswordDetails(activity: MainActivity, navControllerState: NavController, viewModel: MainActivityViewModel){
