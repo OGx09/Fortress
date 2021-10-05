@@ -121,41 +121,14 @@ class FortressDaoMock : FortressDao{
 //
 //}
 
-class EncryptionUtilsMock (private val fortressDao: FortressDao) : EncryptionUtils{
-    override fun getCipher(): Cipher {
-        TODO("Not yet implemented")
-    }
-
-    override fun decryptSecretInformation(cipherText: ByteArray, cipher: Cipher): String? {
-        TODO("Not yet implemented")
-    }
-
-    override fun encryptSecretInformation(
-        cypherText: ByteArray,
-        cipher: Cipher
-    ): CipherTextWrapper? {
-        TODO("Not yet implemented")
-    }
-
-    override fun getInitializedCipherForEncryption(keyName: String): Cipher {
-        TODO("Not yet implemented")
-    }
-
-    override fun getInitializedCipherForDecryption(
-        keyName: String,
-        initializationVector: ByteArray
-    ): Cipher {
-        TODO("Not yet implemented")
-    }
-
-
-}
 
 open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
                      //private val websiteLogoService: WebsiteLogoService,
-                     private val dispatcher: CoroutineDispatcher,
-                     private val datastore: DataStore<Preferences>
+                     private val dispatcher: CoroutineDispatcher
 ) : FortressRepository {
+
+    val countDownLatch = CountDownLatch(10)
+
     override fun fetchAllEncryptedPasswords(): LiveData<List<PasswordEntity>> {
         TODO("Not yet implemented")
     }
@@ -184,8 +157,9 @@ open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchUsername(): Flow<String?> {
-        TODO("Not yet implemented")
+    override suspend fun fetchUsername(): Flow<String?> = flow{
+        countDownLatch.countDown()
+        emit("Gbenga")
     }
 
     override suspend fun decryptDbCiperText(id: Int): CipherTextWrapper {

@@ -2,7 +2,7 @@
 object Versions {
     const val lifecycle = "2.3.1"
     const val junit ="4.13.2"
-    const val androidJunit ="1.1.2"
+    const val androidJunit ="1.4.1-alpha01"
     const val kotlinStdlib = "1.5.10"
     const val roomVersion = "2.3.0"
     const val hiltVersion = "2.35"
@@ -19,7 +19,7 @@ object Versions {
     const val composeActivity= "1.3.0-alpha07"
     const val coroutine ="1.3.9"
     const val mockito ="1.10.19"
-    const val testCore ="1.0.0"
+    const val testCore ="1.4.0-beta01"
     const val androidXCoreTest ="2.1.0"
     const val powerMockito ="2.0.7"
     const val accompanist ="0.18.0"
@@ -47,7 +47,7 @@ object Libs{
         "com.google.code.gson:gson:${Versions.gson}",
         "androidx.compose.runtime:runtime-livedata:${Versions.composable}",
         "androidx.navigation:navigation-ui-ktx:${Versions.navigation}",
-        "androidx.navigation:navigation-compose:2.4.0-alpha04",
+        //"androidx.navigation:navigation-compose:2.3.5",
         "com.squareup.retrofit2:retrofit:${Versions.retrofit}",
         "com.squareup.retrofit2:converter-gson:${Versions.retrofit}",
         "io.coil-kt:coil-compose:${Versions.coil}",
@@ -70,7 +70,8 @@ object Libs{
         "org.powermock:powermock-classloading-xstream:1.6.6"
     )
 
-    val androidTestDeps = arrayOf("androidx.test.ext:junit:${Versions.androidJunit}",
+    val androidTestDeps = arrayOf(
+        //"androidx.test.ext:junit:${Versions.androidJunit}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}",
         "androidx.compose.ui:ui-test-manifest:${Versions.composable}",
         "androidx.compose.ui:ui-test-junit4:${Versions.composable}"

@@ -16,7 +16,7 @@ class WelcomeTest {
 
     @Test
     fun testMainContent(){
-
+        Thread.sleep(1000)
         val button = composableRule.onNode(hasTestTag("shdsjdjsj"), useUnmergedTree = true)//.assertIsDisplayed()
         button.assertIsDisplayed()
         button.assertExists()
