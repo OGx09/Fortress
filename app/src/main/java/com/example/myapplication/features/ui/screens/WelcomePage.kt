@@ -40,7 +40,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 
 @Composable
-fun WelcomePage (activity: MainActivity, viewModel: MainActivityViewModel, navControllerState: NavController){
+fun WelcomePage (activity: MainActivity, viewModel: MainActivityViewModel,
+                 navControllerState: NavController){
 
     val scaffoldState = rememberScaffoldState()
     Scaffold( scaffoldState = scaffoldState) {

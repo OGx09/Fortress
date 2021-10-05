@@ -1,15 +1,16 @@
 package com.example.myapplication
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.myapplication.features.main.MainActivity
 import com.example.myapplication.features.ui.StateCodelabTheme
-import com.example.myapplication.features.ui.screens.MainPasswordList
 import com.example.myapplication.features.ui.screens.WelcomePage
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,15 +30,21 @@ class MainActivityTest {
     @get:Rule
     val composableRule = createAndroidComposeRule<MainActivity>()
 
+    @ExperimentalAnimationApi
     @Test
-    fun test_mainContent(){
+    fun testMainContent(){
         val mainActivity = composableRule.activity
         composableRule.setContent {
             StateCodelabTheme(darkTheme = false,
                 activity = mainActivity, content = {
                     WelcomePage(activity = mainActivity,
-                        viewModel = mainActivity.viewModel,
-                        navControllerState = mainActivity.navControllerState)
+                    viewModel = mainActivity.viewModel,
+                    rememberAnimatedNavController())
+
+                    val button = composableRule.onNode(hasTestTag("shdsjdjsj"), useUnmergedTree = true)//.assertIsDisplayed()
+                    button.assertIsDisplayed()
+                    button.performClick()
+                       // navControllerState = mainActivity.navControllerState)
                 })
 
         }
@@ -47,7 +54,6 @@ class MainActivityTest {
     fun test_sample(){
         assertNull(composableRule)
         assertNotNull(composableRule)
-         composableRule.onNodeWithText("shdsjdjsj").assertIsDisplayed()
     }
 
 }
