@@ -1,15 +1,21 @@
 package com.example.myapplication
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.compose.runtime.collectAsState
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.example.myapplication.features.main.MainActivityViewModel
 import com.example.myapplication.features.ui.UiState
+import com.example.myapplication.repository.FortressRepository
+import com.example.myapplication.repository.FortressRepositoryImpl
 import com.example.myapplication.repository.database.PasswordEntity
+import com.example.myapplication.utils.EncryptionUtils
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.hamcrest.CoreMatchers.`is`
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -19,17 +25,13 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 
 // Created by Gbenga Oladipupo(Devmike01) on 7/31/21.
 
 @RunWith(MockitoJUnitRunner::class)
 class MainActivityViewModelTest {
-
-    lateinit var fortressRepository : RepositoryMock
-
-    @Mock
-    lateinit var mainViewModel: MainActivityViewModel
 
     @Captor
     lateinit var argumentCaptor : ArgumentCaptor<List<PasswordEntity>>
@@ -38,35 +40,39 @@ class MainActivityViewModelTest {
     @Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    lateinit var dataStore: DataStore<Preferences>
-
     @ObsoleteCoroutinesApi
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+    private val mainThreadSurrogate = newSingleThreadContext("UI NO thread")
 
     @ExperimentalCoroutinesApi
     private val mTestCoroutineDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
 
+
     @ExperimentalCoroutinesApi
     @ObsoleteCoroutinesApi
-    @Before
-    fun init(){
-        Dispatchers.setMain(mainThreadSurrogate)
-        val mockDatabase = FortressDaoMock()
-        fortressRepository = RepositoryMock(EncryptionUtilsMock(mockDatabase), mTestCoroutineDispatcher, dataStore)
+    val mainViewModel: MainActivityViewModel = MainActivityViewModel(coroutineContext = mainThreadSurrogate,
+    repository = RepositoryMock(mock(EncryptionUtils::class.java),
+        mTestCoroutineDispatcher), encryptedUtils = mock(EncryptionUtils::class.java));
 
-        mainViewModel = MainActivityViewModel(coroutineContext = mainThreadSurrogate,
-            repository = fortressRepository)
+
+    @ObsoleteCoroutinesApi
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `test livedata setup`(){
+        assertNotNull(mainViewModel.passwordDetails)
+        assertNotNull(mainViewModel.messageState)
+        assertNotNull(mainViewModel.openPasswordDetails)
+        assertNotNull(mainViewModel.openPasswordMain)
+        assertNotNull(mainViewModel.openWelcomeOrPasswordMain)
+        assertNotNull(mainViewModel.savePasswordDataLiveData)
+        assertNotNull(mainViewModel.savePasswordEntityLiveData)
     }
 
     @ExperimentalCoroutinesApi
+    @ObsoleteCoroutinesApi
     @Test
-    fun `test save password entity`(){
+    fun `test checkForExistingLogin()`() = runBlocking{
         mainViewModel.checkForExistingLogin()
-        assertNotNull(fortressRepository)
-        assertNotNull(mainViewModel.openWelcomeOrPasswordMain)
-        assertEquals(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue(), UiState<String>(isLoading = true))
-        assertEquals(mainViewModel.openWelcomeOrPasswordMain.getAwaitValue(), UiState<String>(isLoading = false))
+        assertNull(mainViewModel.openWelcomeOrPasswordMain.value)
     }
 
 
