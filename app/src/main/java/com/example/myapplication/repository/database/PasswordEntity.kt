@@ -52,7 +52,7 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 //        }
 
         @VisibleForTesting
-        fun getMock(id: Int? = null) = PasswordEntity(id, "Google.com", "Google Search",
+        fun getMock(id: Int? = null) = PasswordEntity(id, "Google.com", TestConstants.WEBSITE,
             "[]", TestConstants.ENCRYPTED_STRING,  "randomstring")
     }
 

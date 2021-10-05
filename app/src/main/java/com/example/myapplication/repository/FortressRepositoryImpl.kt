@@ -66,14 +66,14 @@ class FortressRepositoryImpl (private val websiteLogoService: WebsiteLogoService
     }
 
     override suspend fun fetchPasswordDetails(id: Int, cipher: Cipher)
-    : PasswordEntity = withContext(Dispatchers.IO){
+    : PasswordEntity? = withContext(Dispatchers.IO){
         dao.getPasswordDetails(id).let {passwordEntity ->
             Gson().run {
-                val encryptedData = fromJson(passwordEntity.encryptedData, ByteArray::class.java)
+                val encryptedData = fromJson(passwordEntity?.encryptedData, ByteArray::class.java)
                 val decryptedString = encryptionUtils.decryptSecretInformation(encryptedData, cipher)
                 fromJson(decryptedString, SecretDataWrapper::class.java).let {
-                    passwordEntity.encryptedData = null
-                    passwordEntity.secretDataWrapper = it
+                    passwordEntity?.encryptedData = null
+                    passwordEntity?.secretDataWrapper = it
                     passwordEntity
                 }
             }
@@ -113,7 +113,7 @@ class FortressRepositoryImpl (private val websiteLogoService: WebsiteLogoService
 
     override suspend fun decryptDbCiperText(id: Int): CipherTextWrapper {
         return dao.getPasswordDetails(id).let {
-            Gson().fromJson(it.encryptedData, CipherTextWrapper::class.java)
+            Gson().fromJson(it?.encryptedData, CipherTextWrapper::class.java)
         }
 
     }

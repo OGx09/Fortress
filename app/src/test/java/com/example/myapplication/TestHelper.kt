@@ -72,10 +72,8 @@ class FortressDaoMock : FortressDao{
         return resultLiveData
     }
 
-    override fun getPasswordDetails(id: Int): PasswordEntity {
-        val passwordLiveData = MutableLiveData<PasswordEntity>()
-        val passwordEntity = _fakeDb[id]
-       return passwordEntity!!
+    override fun getPasswordDetails(id: Int): PasswordEntity? {
+       return _fakeDb[id]
     }
 
     override suspend fun getEncryptedEntity(id: Int): String? {
@@ -83,7 +81,6 @@ class FortressDaoMock : FortressDao{
     }
 
     override suspend fun insert(passwordEntity: PasswordEntity) {
-        print("Insert: ${passwordEntity.website}\n")
         _fakeDb[passwordEntity.id ?: _fakeDb.size +1] = passwordEntity
     }
 

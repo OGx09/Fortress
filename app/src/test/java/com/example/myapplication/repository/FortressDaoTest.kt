@@ -8,6 +8,8 @@ import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
+import net.bytebuddy.matcher.ElementMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -43,15 +45,43 @@ class FortressDaoTest {
         assertEquals(fortressDatabase.getEncryptedEntity(0), TestConstants.ENCRYPTED_STRING)
     }
 
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `test get password details`()= runBlockingTest {
+        assertNotNull(fortressDatabase.getPasswordDetails(0))
+        assertEquals(fortressDatabase.getPasswordDetails(0)?.website, TestConstants.WEBSITE)
+    }
+
     @ExperimentalCoroutinesApi
     @Test
     fun `delete PasswordEntity`() = runBlockingTest {
-        assertNotNull(fortressDatabase.getEncryptedEntity(0))
-//        fortressDatabase.insert(passwordEntity)
-        fortressDatabase.delete(fortressDatabase.getPasswordDetails(0))
+        val passwordDetails = fortressDatabase.getPasswordDetails(0)
+        assertNotNull(passwordDetails)
+        fortressDatabase.delete(passwordDetails!!)
         assertNull(fortressDatabase.getEncryptedEntity(0))
     }
 
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `test insert()`() = runBlockingTest {
+        fortressDatabase.clear()
+        assertNull(fortressDatabase.getPasswordDetails(0))
+        fortressDatabase.insert(PasswordEntity.getMock(id = 1))
+        assertNotNull(fortressDatabase.getPasswordDetails(1))
+    }
+
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `test get all saved password entities`() = runBlockingTest {
+        for (i in 0..7){
+            fortressDatabase.insert(PasswordEntity.getMock(id = i))
+        }
+        val passwords = fortressDatabase.getAllEncryptedPassword().value
+        assertNotNull(passwords)
+        assertEquals(fortressDatabase.count(), 8)
+    }
 
     @After
     fun tearDown(){
