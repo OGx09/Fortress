@@ -18,11 +18,11 @@ android {
 //        }
         applicationId ="com.example.myapplication"
         minSdk = (23)
-        targetSdk = 31
+        targetSdk = 30
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner( "androidx.test.runner.AndroidJUnitRunner")
 
         // The following argument makes the Android Test Orchestrator run its
         // "pm clear" command after each test invocation. This command ensures
@@ -118,8 +118,5 @@ dependencies {
         debugImplementation(it)
     }
 
-//    Libs.debugLibs.forEach {libs ->
-//        debugImplementation(libs)
-//    }
 
 }
