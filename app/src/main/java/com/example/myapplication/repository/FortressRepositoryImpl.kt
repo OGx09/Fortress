@@ -41,7 +41,7 @@ interface FortressRepository {
 
     suspend fun saveToDataStore(value: String)
 
-    suspend fun getCipherTextFromDb(id: Int): ByteArray
+    suspend fun getCipherTextFromDb(id: Int): ByteArray?
 
     suspend fun fetchUsername(): Flow<String?>
     suspend fun decryptDbCiperText(id: Int): CipherTextWrapper
@@ -101,8 +101,9 @@ class FortressRepositoryImpl (private val websiteLogoService: WebsiteLogoService
         }
     }
 
-    override suspend fun getCipherTextFromDb(id: Int): ByteArray {
-        return dao.getEncryptedEntity(id).toByteArray(Charset.forName("UTF-8"))
+    override suspend fun getCipherTextFromDb(id: Int): ByteArray? {
+        val encryptedEntity = dao.getEncryptedEntity(id)
+        return encryptedEntity?.toByteArray(Charset.forName("UTF-8"))
     }
 
     override suspend fun fetchUsername(): Flow<String?> = dataStoreValue(DATASTORE_USERNAME)

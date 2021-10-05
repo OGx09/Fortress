@@ -17,7 +17,7 @@ interface FortressDao {
 
 
     @Query("SELECT encryptedData FROM passwordentity WHERE id = :id")
-    suspend fun getEncryptedEntity(id: Int): String
+    suspend fun getEncryptedEntity(id: Int): String?
 
     @Insert
     suspend fun insert(passwordEntity: PasswordEntity)

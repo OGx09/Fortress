@@ -1,6 +1,7 @@
-package com.example.myapplication
+package com.example.myapplication.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.myapplication.RepositoryMock
 import com.example.myapplication.utils.EncryptionUtils
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
