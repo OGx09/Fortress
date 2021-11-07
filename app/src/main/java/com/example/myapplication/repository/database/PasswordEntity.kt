@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.example.myapplication.data.SecretDataWrapper
+import com.example.myapplication.utils.testhelper.TestConstants
 import com.google.gson.Gson
 
 
@@ -51,8 +52,8 @@ data class PasswordEntity(@PrimaryKey(autoGenerate = true) val id : Int?,
 //        }
 
         @VisibleForTesting
-        fun getMock() = PasswordEntity(0, "Google.com", "Google Search",
-            "[]","someEncryptedData",  "randomstring")
+        fun getMock(id: Int? = null) = PasswordEntity(id, "Google.com", TestConstants.WEBSITE,
+            "[]", TestConstants.ENCRYPTED_STRING,  "randomstring")
     }
 
 }

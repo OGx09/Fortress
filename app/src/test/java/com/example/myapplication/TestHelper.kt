@@ -58,7 +58,11 @@ class FortressDaoMock : FortressDao{
 
     private val _fakeDb = HashMap<Int, PasswordEntity>()
 
-    val clear = _fakeDb.clear()
+    fun clear(){
+        _fakeDb.clear()
+    }
+
+    fun count() : Int= _fakeDb.size
 
     override fun getAllEncryptedPassword(): LiveData<List<PasswordEntity>> {
         val resultLiveData = MutableLiveData<List<PasswordEntity>>()
@@ -68,24 +72,20 @@ class FortressDaoMock : FortressDao{
         return resultLiveData
     }
 
-    override fun getPasswordDetails(id: Int): PasswordEntity {
-        val passwordLiveData = MutableLiveData<PasswordEntity>()
-        val passwordEntity = _fakeDb[id]
-       return passwordEntity!!
+    override fun getPasswordDetails(id: Int): PasswordEntity? {
+       return _fakeDb[id]
     }
 
-    override suspend fun getEncryptedEntity(id: Int): String {
-        val encryptedString = _fakeDb[id]?.encryptedData
-        return encryptedString!!
+    override suspend fun getEncryptedEntity(id: Int): String? {
+        return _fakeDb[id]?.encryptedData
     }
 
     override suspend fun insert(passwordEntity: PasswordEntity) {
-        print("Insert: ${passwordEntity.website}\n")
-        _fakeDb[_fakeDb.size +1] = passwordEntity
+        _fakeDb[passwordEntity.id ?: _fakeDb.size +1] = passwordEntity
     }
 
     override suspend fun insertEncryptedEntity(passwordEntity: PasswordEntity) {
-        _fakeDb[_fakeDb.size +1] = passwordEntity
+        _fakeDb[passwordEntity.id ?: _fakeDb.size +1] = passwordEntity
     }
 
     override suspend fun delete(passwordEntity: PasswordEntity) {
@@ -153,7 +153,7 @@ open class RepositoryMock(private val encryptionUtils: EncryptionUtils,
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCipherTextFromDb(id: Int): ByteArray {
+    override suspend fun getCipherTextFromDb(id: Int): ByteArray? {
         TODO("Not yet implemented")
     }
 
