@@ -19,7 +19,7 @@ Image credits:
 <a href='https://www.freepik.com/vectors/business'>jcomp</a>
 <br/>
 <br/>
-<img src="/Screenshot_20211102_032602.png" align="left" align="left" height="550px" width="300px"/>
-<img src="/Screenshot_20211102_032531.png" align="left" height="550px" width="300px"/>
-<img src="/Screenshot_20211102_032344.png"  align="left" height="550px" width="300px"/>
-<img src="/Screenshot_20211102_032420.png" align="left" height="550px" width="300px"/>
+<img src="/Screenshot_20211102_032602.png" align="left" align="left" height="570px" width="300px"/>
+<img src="/Screenshot_20211102_032531.png" align="left" height="570px" width="300px"/>
+<img src="/Screenshot_20211102_032344.png"  align="left" height="570px" width="300px"/>
+<img src="/Screenshot_20211102_032645.png" align="left" height="570px" width="300px"/>
